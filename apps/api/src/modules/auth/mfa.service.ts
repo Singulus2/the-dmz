@@ -10,6 +10,8 @@ import { mfaCredentials as mfaCredentialsTable } from '../../db/schema/auth/mfa-
 import { users } from '../../shared/database/schema/users.js';
 import { AppError, ErrorCodes } from '../../shared/middleware/error-handler.js';
 
+import { MfaNotEnabledError } from './auth.errors.js';
+
 import type { AppConfig } from '../../config.js';
 import type { AuthenticatedUser } from './auth.types.js';
 
@@ -142,11 +144,7 @@ export const createWebauthnChallenge = async (
       );
 
     if (credentials.length === 0) {
-      throw new AppError({
-        code: ErrorCodes.AUTH_MFA_NOT_ENABLED,
-        message: 'No WebAuthn credentials found',
-        statusCode: 400,
-      });
+      throw new MfaNotEnabledError();
     }
   }
 
@@ -230,6 +228,8 @@ export const createWebauthnChallenge = async (
         : ([] as { id: string; type: 'public-key' }[]),
   };
 };
+
+export const getMfaChallenge = createWebauthnChallenge;
 
 export const registerWebauthnCredential = async (
   config: AppConfig,

@@ -11,6 +11,8 @@ import { backupCodes as backupCodesTable } from '../../db/schema/auth/backup-cod
 import { users } from '../../shared/database/schema/users.js';
 import { AppError, ErrorCodes } from '../../shared/middleware/error-handler.js';
 
+import { MfaNotEnabledError } from './auth.errors.js';
+
 import type { AppConfig } from '../../config.js';
 import type { AuthenticatedUser } from './auth.types.js';
 
@@ -281,11 +283,7 @@ export const verifyTotpCode = async (
     );
 
   if (credentials.length === 0) {
-    throw new AppError({
-      code: ErrorCodes.AUTH_MFA_NOT_ENABLED,
-      message: 'TOTP is not enabled for this user',
-      statusCode: 400,
-    });
+    throw new MfaNotEnabledError();
   }
 
   const credential = credentials[0]!;
@@ -390,11 +388,7 @@ export const verifyBackupCode = async (
     );
 
   if (validCodes.length === 0) {
-    throw new AppError({
-      code: ErrorCodes.AUTH_MFA_NOT_ENABLED,
-      message: 'No valid backup codes available',
-      statusCode: 400,
-    });
+    throw new MfaNotEnabledError();
   }
 
   const verificationResults = await Promise.all(
