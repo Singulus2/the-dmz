@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Worker, Queue, type WorkerOptions, type Job } from 'bullmq';
 import { lt, and, eq, isNull } from 'drizzle-orm';
 
@@ -112,6 +113,7 @@ export class RetentionWorker {
           try {
             const Sentry = await import('@sentry/node');
             const sentry = Sentry.default ?? Sentry;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
             const context = sanitizeContext({
               jobId: job.id,
               jobName: job.name,
@@ -119,6 +121,7 @@ export class RetentionWorker {
               attemptsMade: job.attemptsMade,
               tenantId: job.data.tenantId,
             });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             sentry.captureException(error, { extra: context });
           } catch {
             // Sentry capture failed, continue without error tracking
@@ -216,73 +219,84 @@ export class RetentionWorker {
     _cursor?: string,
     batchSize: number = DEFAULT_BATCH_SIZE,
   ): Promise<{ processed: number; archived: number; deleted: number; anonymized: number }> {
-    let processed = 0;
-    let archived = 0;
-    let deleted = 0;
-    let anonymized = 0;
-
-    const legalHold = await isLegalHoldActive(tenantId, dataCategory);
-    if (legalHold) {
+    const skipReason = await this.getRetentionSkipReason(tenantId, dataCategory);
+    if (skipReason) {
       return { processed: 0, archived: 0, deleted: 0, anonymized: 0 };
     }
 
     const policy = await getEffectiveRetentionPolicy(tenantId, dataCategory);
+    const expiryDate = calculateExpiryDate(policy.effectiveRetentionDays);
+
+    return this.handleRetentionCase(tenantId, dataCategory, expiryDate, policy, batchSize);
+  }
+
+  private async getRetentionSkipReason(
+    tenantId: string,
+    dataCategory: DataCategory,
+  ): Promise<string | null> {
+    const legalHold = await isLegalHoldActive(tenantId, dataCategory);
+    if (legalHold) {
+      return 'legal_hold';
+    }
+
+    const policy = await getEffectiveRetentionPolicy(tenantId, dataCategory);
     if (policy.effectiveRetentionDays === -1) {
-      return { processed: 0, archived: 0, deleted: 0, anonymized: 0 };
+      return 'retention_disabled';
     }
 
     const expiryDate = calculateExpiryDate(policy.effectiveRetentionDays);
     if (!expiryDate) {
-      return { processed: 0, archived: 0, deleted: 0, anonymized: 0 };
+      return 'no_expiry_date';
     }
 
-    switch (dataCategory) {
-      case 'events':
-        ({ processed, archived, deleted } = await this.processGameEvents(
-          tenantId,
-          expiryDate,
-          policy.effectiveAction,
-          batchSize,
-        ));
-        break;
-      case 'sessions':
-        ({ processed, archived, deleted } = await this.processSessions(
-          tenantId,
-          expiryDate,
-          policy.effectiveAction,
-          batchSize,
-        ));
-        break;
-      case 'analytics':
-        ({ processed, archived, deleted } = await this.processAnalyticsEvents(
-          tenantId,
-          expiryDate,
-          policy.effectiveAction,
-          batchSize,
-        ));
-        break;
-      case 'audit_logs':
-        ({ processed, archived, deleted } = await this.processAuditLogs(
-          tenantId,
-          expiryDate,
-          policy.effectiveAction,
-          batchSize,
-        ));
-        break;
-      case 'user_data':
-        ({ processed, anonymized } = await this.processUserData(tenantId, expiryDate, batchSize));
-        break;
-      case 'chat_messages':
-        ({ processed, archived, deleted } = await this.processChatMessages(
-          tenantId,
-          expiryDate,
-          policy.effectiveAction,
-          batchSize,
-        ));
-        break;
+    return null;
+  }
+
+  /* eslint-disable @typescript-eslint/max-params, max-params */
+  private async handleRetentionCase(
+    tenantId: string,
+    dataCategory: DataCategory,
+    expiryDate: Date,
+    policy: { effectiveRetentionDays: number; effectiveAction: string },
+    batchSize: number,
+  ): Promise<{ processed: number; archived: number; deleted: number; anonymized: number }> {
+    /* eslint-enable @typescript-eslint/max-params, max-params */
+    const retentionHandlers: Record<
+      DataCategory,
+      () => Promise<{ processed: number; archived: number; deleted: number; anonymized?: number }>
+    > = {
+      events: () => this.processGameEvents(tenantId, expiryDate, policy.effectiveAction, batchSize),
+      sessions: () => this.processSessions(tenantId, expiryDate, policy.effectiveAction, batchSize),
+      analytics: () =>
+        this.processAnalyticsEvents(tenantId, expiryDate, policy.effectiveAction, batchSize),
+      audit_logs: () =>
+        this.processAuditLogs(tenantId, expiryDate, policy.effectiveAction, batchSize),
+      chat_messages: () =>
+        this.processChatMessages(tenantId, expiryDate, policy.effectiveAction, batchSize),
+      user_data: () => this.processUserDataAsRetention(tenantId, expiryDate, batchSize),
+    };
+
+    const handler = retentionHandlers[dataCategory];
+    if (!handler) {
+      throw new Error(`Unknown data category: ${dataCategory}`);
     }
 
-    return { processed, archived, deleted, anonymized };
+    const result = await handler();
+    return {
+      processed: result.processed,
+      archived: result.archived,
+      deleted: result.deleted,
+      anonymized: result.anonymized ?? 0,
+    };
+  }
+
+  private async processUserDataAsRetention(
+    tenantId: string,
+    expiryDate: Date,
+    batchSize: number,
+  ): Promise<{ processed: number; archived: number; deleted: number; anonymized: number }> {
+    const { processed, anonymized } = await this.processUserData(tenantId, expiryDate, batchSize);
+    return { processed, archived: 0, deleted: 0, anonymized };
   }
 
   private async processGameEvents(
@@ -502,7 +516,7 @@ export class RetentionWorker {
       const anonymizedData = anonymizationService.anonymize({
         email: user.userId,
         name: 'User',
-      } as Record<string, unknown>);
+      });
 
       const anonymizedEmail = anonymizedData.anonymized['email'] as string;
 
@@ -630,7 +644,7 @@ export class RetentionWorker {
     const { anonymized, fieldsAnonymized } = anonymizationService.anonymize({
       email: user.email,
       name: user.userId,
-    } as Record<string, unknown>);
+    });
 
     const anonymizedEmail = anonymized['email'] as string;
 
