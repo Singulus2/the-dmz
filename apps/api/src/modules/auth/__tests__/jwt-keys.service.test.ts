@@ -12,7 +12,14 @@ import {
   verifyJWT,
 } from '../jwt-keys.service.js';
 import { closeDatabase, getDatabaseClient } from '../../../shared/database/connection.js';
-import { JWTIssuerValidationError, JWTAudienceValidationError } from '../auth.errors.js';
+import {
+  JWTIssuerValidationError,
+  JWTAudienceValidationError,
+  MissingKeyIdError,
+  InvalidKeyIdError,
+  KeyRevokedError,
+  KeyExpiredError,
+} from '../auth.errors.js';
 
 import type { AppConfig } from '../../../config.js';
 
@@ -21,6 +28,23 @@ vi.mock('../../../shared/database/connection.js', () => ({
   closeDatabase: vi.fn(),
 }));
 
+type MockKey = {
+  id: string;
+  keyType: string;
+  algorithm: string;
+  publicKeyPem: string;
+  privateKeyEncryptedPem: string;
+  status: string;
+  activatedAt: Date;
+  expiresAt: Date | null;
+} | null;
+const mockDbForKey = (key: MockKey) => ({
+  select: vi.fn(() => ({
+    from: vi.fn(() => ({
+      where: vi.fn(() => ({ limit: vi.fn(() => Promise.resolve(key ? [key] : [])) })),
+    })),
+  })),
+});
 describe('jwt-keys service', () => {
   describe('generateRSAKeyPair', () => {
     it('generates RSA key pair with kid', async () => {
@@ -452,6 +476,72 @@ describe('jwt-keys service', () => {
       const config = createMockConfig();
 
       await expect(verifyJWT(config, token)).rejects.toThrow(JWTAudienceValidationError);
+    });
+
+    it('verifyJWT should throw MissingKeyIdError when token has no kid in protected header', async () => {
+      const kp = await generateRSAKeyPair();
+      const token = await new SignJWT({ sub: 'test-user' })
+        .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .setIssuer(mockIssuer)
+        .setAudience(mockAudience)
+        .sign(await importPKCS8(kp.privateKeyPem, 'RS256'));
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDbForKey(createdKey!) as unknown as ReturnType<typeof getDatabaseClient>,
+      );
+      await expect(verifyJWT(createMockConfig(), token)).rejects.toThrow(MissingKeyIdError);
+    });
+
+    it('verifyJWT should throw InvalidKeyIdError when key ID not found in database', async () => {
+      const kp = await generateRSAKeyPair();
+      const token = await new SignJWT({ sub: 'test-user' })
+        .setProtectedHeader({ alg: 'RS256', typ: 'JWT', kid: 'unknown' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .setIssuer(mockIssuer)
+        .setAudience(mockAudience)
+        .sign(await importPKCS8(kp.privateKeyPem, 'RS256'));
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDbForKey(null) as unknown as ReturnType<typeof getDatabaseClient>,
+      );
+      await expect(verifyJWT(createMockConfig(), token)).rejects.toThrow(InvalidKeyIdError);
+    });
+
+    it('verifyJWT should throw KeyRevokedError when key has been revoked', async () => {
+      const kp = await generateRSAKeyPair();
+      const token = await new SignJWT({ sub: 'test-user' })
+        .setProtectedHeader({ alg: 'RS256', typ: 'JWT', kid: mockKid })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .setIssuer(mockIssuer)
+        .setAudience(mockAudience)
+        .sign(await importPKCS8(kp.privateKeyPem, 'RS256'));
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDbForKey({ ...createdKey!, status: 'revoked' }) as unknown as ReturnType<
+          typeof getDatabaseClient
+        >,
+      );
+      await expect(verifyJWT(createMockConfig(), token)).rejects.toThrow(KeyRevokedError);
+    });
+
+    it('verifyJWT should throw KeyExpiredError when key has expired', async () => {
+      const kp = await generateRSAKeyPair();
+      const token = await new SignJWT({ sub: 'test-user' })
+        .setProtectedHeader({ alg: 'RS256', typ: 'JWT', kid: mockKid })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .setIssuer(mockIssuer)
+        .setAudience(mockAudience)
+        .sign(await importPKCS8(kp.privateKeyPem, 'RS256'));
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDbForKey({
+          ...createdKey!,
+          status: 'expired',
+          expiresAt: new Date(Date.now() - 86400000),
+        }) as unknown as ReturnType<typeof getDatabaseClient>,
+      );
+      await expect(verifyJWT(createMockConfig(), token)).rejects.toThrow(KeyExpiredError);
     });
   });
 });
