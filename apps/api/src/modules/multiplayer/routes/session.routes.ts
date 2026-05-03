@@ -13,6 +13,7 @@ import type { FastifyInstance } from 'fastify';
 import type { AuthenticatedUser } from '../../auth/index.js';
 
 export const registerSessionRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.post<{ Params: { sessionId: string } }>(
@@ -48,16 +49,19 @@ export const registerSessionRoutes = async (fastify: FastifyInstance): Promise<v
       });
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to start co-op session',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
@@ -109,16 +113,19 @@ export const registerSessionRoutes = async (fastify: FastifyInstance): Promise<v
       const result = await service.advanceDay(user.tenantId, sessionId, user.userId);
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to advance day',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,

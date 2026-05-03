@@ -13,6 +13,7 @@ import type { FastifyInstance } from 'fastify';
 import type { AuthenticatedUser } from '../../auth/index.js';
 
 export const registerLifecycleRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.post(
@@ -44,16 +45,19 @@ export const registerLifecycleRoutes = async (fastify: FastifyInstance): Promise
       });
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to create co-op session',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
@@ -103,16 +107,19 @@ export const registerLifecycleRoutes = async (fastify: FastifyInstance): Promise
       const result = await service.getSession(user.tenantId, sessionId);
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.NOT_FOUND,
           message: result.error ?? 'Co-op session not found',
           statusCode: 404,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
@@ -162,16 +169,19 @@ export const registerLifecycleRoutes = async (fastify: FastifyInstance): Promise
       const result = await service.endSession(user.tenantId, sessionId, user.userId);
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to end session',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
@@ -221,16 +231,19 @@ export const registerLifecycleRoutes = async (fastify: FastifyInstance): Promise
       const result = await service.abandonSession(user.tenantId, sessionId, user.userId);
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to abandon session',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,

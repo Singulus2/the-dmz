@@ -74,7 +74,7 @@ export const coopSessionResponseSchema = z.object({
 
 export const coopSessionResultSchema = z.object({
   success: z.boolean(),
-  session: coopSessionResponseSchema,
+  data: coopSessionResponseSchema.extend({ schemaVersion: z.literal(1) }),
   error: z.string().optional(),
 });
 

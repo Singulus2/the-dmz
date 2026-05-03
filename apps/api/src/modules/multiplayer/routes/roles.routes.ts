@@ -17,6 +17,7 @@ import type { FastifyInstance } from 'fastify';
 import type { AuthenticatedUser } from '../../auth/index.js';
 
 export const registerRolesRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.post<{ Params: { sessionId: string } }>(
@@ -52,16 +53,19 @@ export const registerRolesRoutes = async (fastify: FastifyInstance): Promise<voi
       });
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to assign roles',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
@@ -116,16 +120,19 @@ export const registerRolesRoutes = async (fastify: FastifyInstance): Promise<voi
       });
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to submit role preference',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
@@ -177,16 +184,19 @@ export const registerRolesRoutes = async (fastify: FastifyInstance): Promise<voi
       const result = await service.rotateAuthority(user.tenantId, sessionId, user.userId);
 
       if (!result.success) {
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         throw new AppError({
           code: ErrorCodes.INVALID_INPUT,
           message: result.error ?? 'Failed to rotate authority',
           statusCode: 400,
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
 
       return {
         success: true,
-        session: {
+        data: {
+          schemaVersion: 1 as const,
           sessionId: result.session!.sessionId,
           tenantId: result.session!.tenantId,
           partyId: result.session!.partyId,
