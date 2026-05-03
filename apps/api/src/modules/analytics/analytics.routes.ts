@@ -7,7 +7,7 @@ import { PhishingMetricsService } from './phishing-metrics.service.js';
 import { DecisionQualityService } from './decision-quality.service.js';
 import { metricsCache } from './metrics-cache.js';
 
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import type { AuthenticatedUser } from '../auth/index.js';
 
 const metricsResponseSchema = z.object({
@@ -96,12 +96,78 @@ const trendsResponseSchema = z.object({
   stableRate: z.number(),
 });
 
+type ErrorEnvelope = {
+  success: false;
+  error: { code: string; message: string; details: Record<string, unknown> };
+};
+
+const buildErrorEnvelope = (code: string, message: string): ErrorEnvelope => ({
+  success: false,
+  error: { code, message, details: {} },
+});
+
+const resolveTenantId = (user: AuthenticatedUser, targetTenantId?: string): string => {
+  if (user.role === 'super_admin' && targetTenantId) {
+    return targetTenantId;
+  }
+  return user.tenantId;
+};
+
+const authorizeTargetTenant = (
+  user: AuthenticatedUser,
+  targetTenantId?: string,
+): ErrorEnvelope | null => {
+  if (user.role !== 'super_admin' && targetTenantId) {
+    return buildErrorEnvelope('AUTH_FORBIDDEN', 'Target tenant override not permitted');
+  }
+  return null;
+};
+
 declare module 'fastify' {
   interface FastifyInstance {
     phishingMetrics: PhishingMetricsService;
     decisionQuality: DecisionQualityService;
   }
 }
+
+const buildDateRange = (dateRange?: { startDate?: string; endDate?: string }) => {
+  const startDate = dateRange?.startDate ? new Date(dateRange.startDate) : undefined;
+  const endDate = dateRange?.endDate ? new Date(dateRange.endDate) : undefined;
+  return { startDate, endDate };
+};
+
+type ScoreInput = {
+  tenantId: string;
+  userId: string;
+  startDate?: Date;
+  endDate?: Date;
+};
+
+const computeSinglePlayerScore = async (fastify: FastifyInstance, input: ScoreInput) => {
+  const { tenantId, userId, startDate, endDate } = input;
+  const cacheKey = `scoring:${tenantId}:${userId}:${startDate?.toISOString() ?? 'default'}:${endDate?.toISOString() ?? 'now'}`;
+
+  const cached = metricsCache.get<z.infer<typeof scoringResponseSchema>>(cacheKey);
+  if (cached) {
+    return { cached };
+  }
+
+  const scoreInput: ScoreInput = { tenantId, userId };
+  if (startDate) scoreInput.startDate = startDate;
+  if (endDate) scoreInput.endDate = endDate;
+
+  const augmentedFastify = fastify as FastifyInstance & {
+    decisionQuality: DecisionQualityService;
+  };
+  const score = await augmentedFastify.decisionQuality.computePlayerScore(scoreInput);
+
+  if (!score) {
+    return { notFound: true };
+  }
+
+  metricsCache.set(cacheKey, score, 60000);
+  return { score };
+};
 
 const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.decorate('phishingMetrics', new PhishingMetricsService(fastify.db));
@@ -121,7 +187,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (_request, reply) => {
       const health = fastify.analytics.getHealth();
-      return reply.send(health);
+      return reply.send({ success: true, data: { health } });
     },
   );
 
@@ -140,8 +206,13 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
     async (_request, reply) => {
       const metrics = fastify.analytics.getMetrics();
       return reply.send({
-        ...metrics,
-        lastProcessedAt: metrics.lastProcessedAt?.toISOString() ?? null,
+        success: true,
+        data: {
+          metrics: {
+            ...metrics,
+            lastProcessedAt: metrics.lastProcessedAt?.toISOString() ?? null,
+          },
+        },
       });
     },
   );
@@ -165,22 +236,14 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const user = request.user as AuthenticatedUser;
       const { targetTenantId } = request.query as { targetTenantId?: string };
-      const tenantId =
-        user.role === 'super_admin' && targetTenantId ? targetTenantId : user.tenantId;
+      const tenantId = resolveTenantId(user, targetTenantId);
 
-      if (user.role !== 'super_admin' && targetTenantId) {
-        return reply.status(403).send({
-          success: false,
-          error: {
-            code: 'AUTH_FORBIDDEN',
-            message: 'Target tenant override not permitted',
-            details: {},
-          },
-        });
+      const authError = authorizeTargetTenant(user, targetTenantId);
+      if (authError) {
+        return reply.status(403).send(authError);
       }
 
       const { userId, dateRange } = request.body as z.infer<typeof phishingMetricsRequestSchema>;
-
       const startDate = dateRange?.startDate ? new Date(dateRange.startDate) : undefined;
       const endDate = dateRange?.endDate ? new Date(dateRange.endDate) : undefined;
 
@@ -188,7 +251,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
 
       const cached = metricsCache.get<z.infer<typeof phishingMetricsResponseSchema>>(cacheKey);
       if (cached) {
-        return reply.send(cached);
+        return reply.send({ success: true, data: { phishingMetrics: cached } });
       }
 
       const metrics = await fastify.phishingMetrics.computeAggregatedMetrics(
@@ -199,7 +262,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
 
       metricsCache.set(cacheKey, metrics, 60000);
 
-      return reply.send(metrics);
+      return reply.send({ success: true, data: { phishingMetrics: metrics } });
     },
   );
 
@@ -223,53 +286,35 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const user = request.user as AuthenticatedUser;
       const { targetTenantId } = request.query as { targetTenantId?: string };
-      const tenantId =
-        user.role === 'super_admin' && targetTenantId ? targetTenantId : user.tenantId;
+      const tenantId = resolveTenantId(user, targetTenantId);
 
-      if (user.role !== 'super_admin' && targetTenantId) {
-        return reply.status(403).send({
-          success: false,
-          error: {
-            code: 'AUTH_FORBIDDEN',
-            message: 'Target tenant override not permitted',
-            details: {},
-          },
-        });
+      const authError = authorizeTargetTenant(user, targetTenantId);
+      if (authError) {
+        return reply.status(403).send(authError);
       }
 
       const { userId, dateRange } = request.body as z.infer<typeof scoringRequestSchema>;
-
-      const startDate = dateRange?.startDate ? new Date(dateRange.startDate) : undefined;
-      const endDate = dateRange?.endDate ? new Date(dateRange.endDate) : undefined;
+      const { startDate, endDate } = buildDateRange(dateRange);
 
       if (userId) {
-        const cacheKey = `scoring:${tenantId}:${userId}:${startDate?.toISOString() ?? 'default'}:${endDate?.toISOString() ?? 'now'}`;
-
-        const cached = metricsCache.get<z.infer<typeof scoringResponseSchema>>(cacheKey);
-        if (cached) {
-          return reply.send(cached);
-        }
-
-        const scoreInput: { tenantId: string; userId: string; startDate?: Date; endDate?: Date } = {
+        const result = await computeSinglePlayerScore(fastify, {
           tenantId,
           userId,
-        };
-        if (startDate) scoreInput.startDate = startDate;
-        if (endDate) scoreInput.endDate = endDate;
+          startDate,
+          endDate,
+        });
 
-        const score = await fastify.decisionQuality.computePlayerScore(scoreInput);
-
-        if (!score) {
-          return reply.status(404).send({ error: 'Player not found' });
+        if ('notFound' in result) {
+          return reply.status(404).send(buildErrorEnvelope('NOT_FOUND', 'Player not found'));
         }
-
-        metricsCache.set(cacheKey, score, 60000);
-
-        return reply.send(score);
+        if ('cached' in result) {
+          return reply.send({ success: true, data: { score: result.cached } });
+        }
+        return reply.send({ success: true, data: { score: result.score } });
       }
 
       const scores = await fastify.decisionQuality.computeAllPlayerScores(tenantId);
-      return reply.send(scores);
+      return reply.send({ success: true, data: { scores } });
     },
   );
 
@@ -292,34 +337,26 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const user = request.user as AuthenticatedUser;
       const { targetTenantId } = request.query as { targetTenantId?: string };
-      const tenantId =
-        user.role === 'super_admin' && targetTenantId ? targetTenantId : user.tenantId;
+      const tenantId = resolveTenantId(user, targetTenantId);
 
-      if (user.role !== 'super_admin' && targetTenantId) {
-        return reply.status(403).send({
-          success: false,
-          error: {
-            code: 'AUTH_FORBIDDEN',
-            message: 'Target tenant override not permitted',
-            details: {},
-          },
-        });
+      const authError = authorizeTargetTenant(user, targetTenantId);
+      if (authError) {
+        return reply.status(403).send(authError);
       }
 
       const { weeks, months } = request.body as z.infer<typeof trendsRequestSchema>;
-
       const cacheKey = `trends:${tenantId}:${weeks ?? 4}:${months ?? 3}`;
 
       const cached = metricsCache.get<z.infer<typeof trendsResponseSchema>>(cacheKey);
       if (cached) {
-        return reply.send(cached);
+        return reply.send({ success: true, data: { trends: cached } });
       }
 
       const trends = await fastify.decisionQuality.computeTrends(tenantId, weeks ?? 4, months ?? 3);
 
       metricsCache.set(cacheKey, trends, 300000);
 
-      return reply.send(trends);
+      return reply.send({ success: true, data: { trends } });
     },
   );
 };
