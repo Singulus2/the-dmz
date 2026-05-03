@@ -6,6 +6,7 @@ import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { tenantStatusGuard } from '../../shared/middleware/tenant-status-guard.js';
 import { validateCsrf } from '../auth/index.js';
 
+import { senderContactSchema, subjectSchema } from './phishing-simulation/schemas.js';
 import * as phishingService from './phishing-simulation.service.js';
 
 import type { AuthenticatedUser } from '../auth/index.js';
@@ -16,10 +17,8 @@ const simulationInputSchema = z.object({
   templateId: z.string().uuid().optional(),
   difficultyTier: z.number().min(1).max(5).optional(),
   urgencyLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  senderName: z.string().max(255).optional(),
-  senderEmail: z.string().email().optional(),
-  replyTo: z.string().email().optional(),
-  subject: z.string().min(1).max(500),
+  ...senderContactSchema.shape,
+  subject: subjectSchema,
   body: z.string().min(1),
   includeAttachment: z.boolean().optional(),
   attachmentName: z.string().max(255).optional(),
