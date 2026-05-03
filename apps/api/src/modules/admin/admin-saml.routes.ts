@@ -80,13 +80,6 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const providers = await ssoService.getActiveSSOProviders(tenantContext.tenantId);
 
@@ -145,13 +138,6 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Body: CreateSAMLProviderBody }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const { name, metadataUrl, idpCertificate, spPrivateKey, spCertificate } = request.body;
@@ -219,13 +205,6 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const { id } = request.params;
@@ -304,13 +283,6 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     ) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const { id } = request.params;
 
@@ -382,13 +354,6 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const { id } = request.params;
 
@@ -439,13 +404,6 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const { id } = request.params;

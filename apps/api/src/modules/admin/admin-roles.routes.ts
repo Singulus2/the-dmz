@@ -64,7 +64,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -131,13 +131,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: RevokeRoleParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         await roleAssignmentService.revokeRole(
           tenantContext.tenantId,
@@ -189,7 +182,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -249,13 +242,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const effectivePermissions = await roleAssignmentService.getUserEffectivePermissions(
           tenantContext.tenantId,
@@ -285,13 +271,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     },
     async (req: FastifyRequest, reply: FastifyReply) => {
       const tenantContext = req.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const roles = await roleAssignmentService.getTenantRoles(
@@ -330,13 +309,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Params: RoleIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const permissions = await roleAssignmentService.getRolePermissions(
@@ -402,13 +374,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Body: CreateCustomRoleBody }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const isEntitled = await roleAssignmentService.checkPlanEntitlement(
@@ -478,13 +443,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     ) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const isEntitled = await roleAssignmentService.checkPlanEntitlement(
           tenantContext.tenantId,
@@ -541,13 +499,6 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Params: RoleIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const isEntitled = await roleAssignmentService.checkPlanEntitlement(

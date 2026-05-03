@@ -111,13 +111,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const tokens = await scimService.listScimTokens(
           request.server.config,
@@ -170,13 +163,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Body: CreateScimTokenBody }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const { name, scopes, expiresInDays } = request.body;
@@ -242,13 +228,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: TokenIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const { id } = request.params;
 
@@ -298,13 +277,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       reply: FastifyReply,
     ) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const { id } = request.params;
@@ -371,13 +343,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: TokenIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const { id } = request.params;
 
@@ -422,13 +387,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: TokenIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const { id } = request.params;
 
@@ -464,13 +422,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const result = await scimService.getScimSyncStatus(
@@ -537,13 +488,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const groups = await scimService.listScimGroupsWithRoles(
           request.server.config,
@@ -604,13 +548,6 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       reply: FastifyReply,
     ) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const { id } = request.params;

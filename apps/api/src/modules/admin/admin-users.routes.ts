@@ -69,13 +69,6 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Querystring: ListUsersQuery }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const params: userService.UserListParams = {};
         if (request.query.page) params.page = request.query.page;
@@ -127,13 +120,6 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
-
       try {
         const user = await userService.getUserById(
           tenantContext.tenantId,
@@ -183,7 +169,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -246,7 +232,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -308,7 +294,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -379,7 +365,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -432,7 +418,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       const tenantContext = request.tenantContext;
       const user = request.user;
 
-      if (!tenantContext || !user) {
+      if (!user) {
         return reply.code(401).send({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -478,13 +464,6 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
     },
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
-
-      if (!tenantContext) {
-        return reply.code(401).send({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      }
 
       try {
         const activity = await userService.getUserActivity(
