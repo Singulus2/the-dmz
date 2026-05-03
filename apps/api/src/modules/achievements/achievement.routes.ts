@@ -10,14 +10,20 @@ async function registerAchievementRoutes(
     try {
       const tenantId = (request as FastifyRequest & { tenantId: string }).tenantId;
       if (!tenantId) {
-        return reply.status(401).send({ error: 'Unauthorized' });
+        return reply.status(401).send({
+          success: false,
+          error: { code: 'AUTH_UNAUTHORIZED', message: 'Unauthorized', details: {} },
+        });
       }
 
       const achievements = await service.getAllAchievementDefinitions(tenantId);
-      return reply.send({ achievements });
+      return reply.send({ success: true, data: { achievements } });
     } catch (error) {
       console.error('Error fetching achievements:', error);
-      return reply.status(500).send({ error: 'Internal server error' });
+      return reply.status(500).send({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error', details: {} },
+      });
     }
   });
 
@@ -29,19 +35,28 @@ async function registerAchievementRoutes(
         const tenantId = (request as FastifyRequest & { tenantId: string }).tenantId;
 
         if (!userId || !tenantId) {
-          return reply.status(401).send({ error: 'Unauthorized' });
+          return reply.status(401).send({
+            success: false,
+            error: { code: 'AUTH_UNAUTHORIZED', message: 'Unauthorized', details: {} },
+          });
         }
 
         const playerId = await service.getPlayerByUserId(userId, tenantId);
         if (!playerId) {
-          return reply.status(404).send({ error: 'Player profile not found' });
+          return reply.status(404).send({
+            success: false,
+            error: { code: 'RESOURCE_NOT_FOUND', message: 'Player profile not found', details: {} },
+          });
         }
 
         const achievements = await service.getPlayerAchievements(playerId, tenantId);
-        return reply.send({ achievements });
+        return reply.send({ success: true, data: { achievements } });
       } catch (error) {
         console.error('Error fetching player achievements:', error);
-        return reply.status(500).send({ error: 'Internal server error' });
+        return reply.status(500).send({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: 'Internal server error', details: {} },
+        });
       }
     },
   );
@@ -54,14 +69,20 @@ async function registerAchievementRoutes(
         const { playerId } = request.params;
 
         if (!tenantId) {
-          return reply.status(401).send({ error: 'Unauthorized' });
+          return reply.status(401).send({
+            success: false,
+            error: { code: 'AUTH_UNAUTHORIZED', message: 'Unauthorized', details: {} },
+          });
         }
 
         const achievements = await service.getPublicPlayerAchievements(playerId, tenantId);
-        return reply.send({ achievements });
+        return reply.send({ success: true, data: { achievements } });
       } catch (error) {
         console.error('Error fetching player achievements:', error);
-        return reply.status(500).send({ error: 'Internal server error' });
+        return reply.status(500).send({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: 'Internal server error', details: {} },
+        });
       }
     },
   );
@@ -75,19 +96,28 @@ async function registerAchievementRoutes(
         const { id } = request.params;
 
         if (!userId || !tenantId) {
-          return reply.status(401).send({ error: 'Unauthorized' });
+          return reply.status(401).send({
+            success: false,
+            error: { code: 'AUTH_UNAUTHORIZED', message: 'Unauthorized', details: {} },
+          });
         }
 
         const playerId = await service.getPlayerByUserId(userId, tenantId);
         if (!playerId) {
-          return reply.status(404).send({ error: 'Player profile not found' });
+          return reply.status(404).send({
+            success: false,
+            error: { code: 'RESOURCE_NOT_FOUND', message: 'Player profile not found', details: {} },
+          });
         }
 
         const newShareStatus = await service.toggleShareAchievement(playerId, id, tenantId);
-        return reply.send({ shared: newShareStatus });
+        return reply.send({ success: true, data: { shared: newShareStatus } });
       } catch (error) {
         console.error('Error toggling achievement share:', error);
-        return reply.status(500).send({ error: 'Internal server error' });
+        return reply.status(500).send({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: 'Internal server error', details: {} },
+        });
       }
     },
   );
@@ -98,14 +128,20 @@ async function registerAchievementRoutes(
       try {
         const tenantId = (request as FastifyRequest & { tenantId: string }).tenantId;
         if (!tenantId) {
-          return reply.status(401).send({ error: 'Unauthorized' });
+          return reply.status(401).send({
+            success: false,
+            error: { code: 'AUTH_UNAUTHORIZED', message: 'Unauthorized', details: {} },
+          });
         }
 
         const achievements = await service.getEnterpriseReportableAchievements(tenantId);
-        return reply.send({ achievements });
+        return reply.send({ success: true, data: { achievements } });
       } catch (error) {
         console.error('Error fetching enterprise achievements:', error);
-        return reply.status(500).send({ error: 'Internal server error' });
+        return reply.status(500).send({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: 'Internal server error', details: {} },
+        });
       }
     },
   );
