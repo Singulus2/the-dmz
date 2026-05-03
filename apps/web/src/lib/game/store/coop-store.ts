@@ -409,81 +409,101 @@ function createCoopStore() {
       });
     },
 
+    handleRoleAssigned(payload: Record<string, unknown>): void {
+      const p = payload as {
+        roles: Array<{ playerId: string; role: CoopRole; isAuthority: boolean }>;
+      };
+      update((state) => {
+        if (!state.session) return state;
+        const newSession = { ...state.session, roles: p.roles };
+        const currentRole = p.roles.find((r) => r.playerId === state.currentPlayerId);
+        return {
+          ...state,
+          session: newSession,
+          currentPlayerRole: currentRole?.role ?? state.currentPlayerRole,
+          isAuthority: currentRole?.isAuthority ?? state.isAuthority,
+        };
+      });
+    },
+
+    handleAuthorityTransferred(payload: Record<string, unknown>): void {
+      const p = payload as {
+        newAuthorityPlayerId: string;
+        previousAuthorityPlayerId: string;
+      };
+      update((state) => {
+        if (!state.session) return state;
+        const newRoles = state.session.roles.map((r) => ({
+          ...r,
+          isAuthority: r.playerId === p.newAuthorityPlayerId,
+        }));
+        const newSession = { ...state.session, roles: newRoles };
+        return {
+          ...state,
+          session: newSession,
+          isAuthority: state.currentPlayerId === p.newAuthorityPlayerId,
+        };
+      });
+    },
+
+    handleProposalSubmitted(payload: Record<string, unknown>): void {
+      const proposal = payload as unknown as CoopDecisionProposal;
+      this.addOrUpdateProposal(proposal);
+    },
+
+    handleProposalConfirmed(payload: Record<string, unknown>): void {
+      const proposal = payload as unknown as CoopDecisionProposal;
+      this.addOrUpdateProposal(proposal);
+    },
+
+    handleProposalOverridden(payload: Record<string, unknown>): void {
+      const proposal = payload as unknown as CoopDecisionProposal;
+      this.addOrUpdateProposal(proposal);
+    },
+
+    handleDayAdvanced(payload: Record<string, unknown>): void {
+      const p = payload as {
+        dayNumber: number;
+        newAuthorityPlayerId: string;
+        previousAuthorityPlayerId: string;
+      };
+      update((state) => {
+        if (!state.session) return state;
+        const newRoles = state.session.roles.map((r) => ({
+          ...r,
+          isAuthority: r.playerId === p.newAuthorityPlayerId,
+        }));
+        const newSession = {
+          ...state.session,
+          dayNumber: p.dayNumber,
+          roles: newRoles,
+        };
+        return {
+          ...state,
+          session: newSession,
+          isAuthority: state.currentPlayerId === p.newAuthorityPlayerId,
+        };
+      });
+    },
+
+    handleSessionEnded(): void {
+      set(initialState);
+    },
+
+    sessionEventHandlers: {
+      'coop.session.role_assigned': (p) => this.handleRoleAssigned(p),
+      'coop.session.authority_transferred': (p) => this.handleAuthorityTransferred(p),
+      'coop.session.proposal_submitted': (p) => this.handleProposalSubmitted(p),
+      'coop.session.proposal_confirmed': (p) => this.handleProposalConfirmed(p),
+      'coop.session.proposal_overridden': (p) => this.handleProposalOverridden(p),
+      'coop.session.day_advanced': (p) => this.handleDayAdvanced(p),
+      'coop.session.ended': () => this.handleSessionEnded(),
+    },
+
     handleSessionEvent(event: { type: string; payload: Record<string, unknown> }): void {
-      switch (event.type) {
-        case 'coop.session.role_assigned': {
-          const payload = event.payload as {
-            roles: Array<{ playerId: string; role: CoopRole; isAuthority: boolean }>;
-          };
-          update((state) => {
-            if (!state.session) return state;
-            const newSession = { ...state.session, roles: payload.roles };
-            const currentRole = payload.roles.find((r) => r.playerId === state.currentPlayerId);
-            return {
-              ...state,
-              session: newSession,
-              currentPlayerRole: currentRole?.role ?? state.currentPlayerRole,
-              isAuthority: currentRole?.isAuthority ?? state.isAuthority,
-            };
-          });
-          break;
-        }
-        case 'coop.session.authority_transferred': {
-          const payload = event.payload as {
-            newAuthorityPlayerId: string;
-            previousAuthorityPlayerId: string;
-          };
-          update((state) => {
-            if (!state.session) return state;
-            const newRoles = state.session.roles.map((r) => ({
-              ...r,
-              isAuthority: r.playerId === payload.newAuthorityPlayerId,
-            }));
-            const newSession = { ...state.session, roles: newRoles };
-            return {
-              ...state,
-              session: newSession,
-              isAuthority: state.currentPlayerId === payload.newAuthorityPlayerId,
-            };
-          });
-          break;
-        }
-        case 'coop.session.proposal_submitted':
-        case 'coop.session.proposal_confirmed':
-        case 'coop.session.proposal_overridden': {
-          const proposal = event.payload as unknown as CoopDecisionProposal;
-          this.addOrUpdateProposal(proposal);
-          break;
-        }
-        case 'coop.session.day_advanced': {
-          const payload = event.payload as {
-            dayNumber: number;
-            newAuthorityPlayerId: string;
-            previousAuthorityPlayerId: string;
-          };
-          update((state) => {
-            if (!state.session) return state;
-            const newRoles = state.session.roles.map((r) => ({
-              ...r,
-              isAuthority: r.playerId === payload.newAuthorityPlayerId,
-            }));
-            const newSession = {
-              ...state.session,
-              dayNumber: payload.dayNumber,
-              roles: newRoles,
-            };
-            return {
-              ...state,
-              session: newSession,
-              isAuthority: state.currentPlayerId === payload.newAuthorityPlayerId,
-            };
-          });
-          break;
-        }
-        case 'coop.session.ended': {
-          set(initialState);
-          break;
-        }
+      const handler = this.sessionEventHandlers[event.type];
+      if (handler) {
+        handler(event.payload);
       }
     },
 
