@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SvelteSet } from 'svelte/reactivity';
+
   import Button from '$lib/ui/components/Button.svelte';
 
   import { formatShortDate } from './document-viewer';
@@ -55,17 +57,14 @@
     onSign,
   }: Props = $props();
 
-  let expandedClauses = $state<Set<string>>(new Set());
+  let expandedClauses = new SvelteSet<string>();
 
   function toggleClause(clauseId: string) {
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const newSet = new Set(expandedClauses);
-    if (newSet.has(clauseId)) {
-      newSet.delete(clauseId);
+    if (expandedClauses.has(clauseId)) {
+      expandedClauses.delete(clauseId);
     } else {
-      newSet.add(clauseId);
+      expandedClauses.add(clauseId);
     }
-    expandedClauses = newSet;
   }
 
   function handleClauseClick(clauseId: string) {

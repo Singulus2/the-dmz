@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SvelteSet } from 'svelte/reactivity';
+
   import Button from '$lib/ui/components/Button.svelte';
 
   import type {
@@ -19,7 +21,7 @@
 
   let searchQuery = $state('');
   let selectedFilter = $state<EvidenceEventType | 'all'>('all');
-  let expandedEvidenceIds = $state<Set<string>>(new Set());
+  let expandedEvidenceIds = new SvelteSet<string>();
   let actionFeedback = $state<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const filteredEvidence = $derived(() => {
@@ -43,14 +45,11 @@
   });
 
   function toggleEvidenceExpand(id: string) {
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const newSet = new Set(expandedEvidenceIds);
-    if (newSet.has(id)) {
-      newSet.delete(id);
+    if (expandedEvidenceIds.has(id)) {
+      expandedEvidenceIds.delete(id);
     } else {
-      newSet.add(id);
+      expandedEvidenceIds.add(id);
     }
-    expandedEvidenceIds = newSet;
   }
 
   function isEvidenceExpanded(id: string): boolean {

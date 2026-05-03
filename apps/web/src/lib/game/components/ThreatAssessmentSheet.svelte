@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SvelteSet } from 'svelte/reactivity';
+
   import Button from '$lib/ui/components/Button.svelte';
 
   import { getRiskColor, getRiskLabel, formatShortDate, type RiskLevel } from './document-viewer';
@@ -57,17 +59,14 @@
     onIndicatorToggle,
   }: Props = $props();
 
-  let expandedCategories = $state<Set<string>>(new Set(['faction', 'indicators']));
+  let expandedCategories = new SvelteSet(['faction', 'indicators']);
 
   function toggleCategory(category: string) {
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const newSet = new Set(expandedCategories);
-    if (newSet.has(category)) {
-      newSet.delete(category);
+    if (expandedCategories.has(category)) {
+      expandedCategories.delete(category);
     } else {
-      newSet.add(category);
+      expandedCategories.add(category);
     }
-    expandedCategories = newSet;
   }
 
   function getCategoryIcon(category: string): string {
