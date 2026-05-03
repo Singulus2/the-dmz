@@ -436,6 +436,12 @@ export default [
     },
   },
   {
+    files: ['apps/web/src/lib/game/components/RansomNote.svelte'],
+    rules: {
+      'svelte/no-at-html-tags': 'off',
+    },
+  },
+  {
     files: [
       'apps/web/src/routes/(auth)/+layout.server.ts',
       'apps/web/src/routes/(game)/+layout.server.ts',

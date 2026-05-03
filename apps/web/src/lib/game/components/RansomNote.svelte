@@ -83,8 +83,6 @@
 
   <div class="ransom-note__content">
     <div class="ransom-note__message">
-      <!-- Sanitized by DOMPurify with USE_PROFILES.html before rendering -->
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html sanitizedMessage}
     </div>
 
