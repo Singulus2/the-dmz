@@ -144,29 +144,23 @@ function createSessionStore() {
         if (result.error.category === 'authentication') {
           if (result.error.code === 'AUTH_SESSION_REVOKED') {
             set({ status: SessionStatus.REVOKED, user: null, lockedPreferenceKeys: [], mfa: null });
-          } else if (
+            return;
+          }
+          if (
             result.error.code === 'AUTH_SESSION_EXPIRED' ||
             result.error.code === 'AUTH_TOKEN_EXPIRED'
           ) {
             set({ status: SessionStatus.EXPIRED, user: null, lockedPreferenceKeys: [], mfa: null });
-          } else {
-            set({
-              status: SessionStatus.ANONYMOUS,
-              user: null,
-              lockedPreferenceKeys: [],
-              mfa: null,
-            });
+            return;
           }
-        } else if (result.error.category === 'authorization') {
-          set({
-            status: SessionStatus.POLICY_DENIED,
-            user: null,
-            lockedPreferenceKeys: [],
-            mfa: null,
-          });
-        } else {
           set({ status: SessionStatus.ANONYMOUS, user: null, lockedPreferenceKeys: [], mfa: null });
+          return;
         }
+        if (result.error.category === 'authorization') {
+          set({ status: SessionStatus.POLICY_DENIED, user: null, lockedPreferenceKeys: [], mfa: null });
+          return;
+        }
+        set({ status: SessionStatus.ANONYMOUS, user: null, lockedPreferenceKeys: [], mfa: null });
         return;
       }
 
