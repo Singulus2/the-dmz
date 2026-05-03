@@ -1,5 +1,6 @@
 import {
   DAY_PHASES,
+  EMAIL_STATUS,
   GAME_ACTIONS,
   type GameState,
   type EmailState,
@@ -30,6 +31,8 @@ import { isActionAllowedInPhase, createGameEvent } from './handler-utils.js';
 
 import type { DomainEvent } from './handler-utils.js';
 
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-redundant-type-constituents */
+
 export function handleAckDayStart(
   state: GameState,
   _action: AckDayStartPayload,
@@ -39,7 +42,9 @@ export function handleAckDayStart(
     throw new Error('ACK_DAY_START not allowed in current phase');
   }
   state.currentPhase = DAY_PHASES.PHASE_EMAIL_INTAKE;
-  events.push(createGameEvent(GAME_ENGINE_EVENTS.DAY_STARTED, { day: state.currentDay }, state.updatedAt));
+  events.push(
+    createGameEvent(GAME_ENGINE_EVENTS.DAY_STARTED, { day: state.currentDay }, state.updatedAt),
+  );
 }
 
 export function handleLoadInbox(
@@ -57,7 +62,7 @@ export function handleLoadInbox(
     emailInstances[email.emailId] = email;
     inboxEntries.push({
       emailId: email.emailId,
-      status: 'pending',
+      status: EMAIL_STATUS.PENDING,
       indicators: [],
       verificationRequested: false,
       timeSpentMs: 0,
@@ -68,14 +73,16 @@ export function handleLoadInbox(
   state.inbox = inboxEntries;
   state.currentPhase = DAY_PHASES.PHASE_TRIAGE;
 
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.INBOX_LOADED,
-    {
-      day: state.currentDay,
-      emailCount: action.emails.length,
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.INBOX_LOADED,
+      {
+        day: state.currentDay,
+        emailCount: action.emails.length,
+      },
+      state.updatedAt,
+    ),
+  );
 }
 
 export function handleOpenEmail(
@@ -90,11 +97,13 @@ export function handleOpenEmail(
   if (!email) {
     throw new Error('Email not found');
   }
-  if (email.status === 'pending') {
-    email.status = 'opened';
+  if (email.status === EMAIL_STATUS.PENDING) {
+    email.status = EMAIL_STATUS.OPENED;
     email.openedAt = state.updatedAt;
   }
-  events.push(createGameEvent(GAME_ENGINE_EVENTS.EMAIL_OPENED, { emailId: action.emailId }, state.updatedAt));
+  events.push(
+    createGameEvent(GAME_ENGINE_EVENTS.EMAIL_OPENED, { emailId: action.emailId }, state.updatedAt),
+  );
 }
 
 export function handleMarkIndicator(
@@ -111,11 +120,13 @@ export function handleMarkIndicator(
       targetEmail.indicators.push(action.indicatorType);
     }
   }
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.EMAIL_INDICATOR_MARKED,
-    { emailId: action.emailId, indicatorType: action.indicatorType },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.EMAIL_INDICATOR_MARKED,
+      { emailId: action.emailId, indicatorType: action.indicatorType },
+      state.updatedAt,
+    ),
+  );
 }
 
 export function handleRequestVerification(
@@ -129,7 +140,7 @@ export function handleRequestVerification(
   const emailToVerify = state.inbox.find((e) => e.emailId === action.emailId);
   if (emailToVerify) {
     emailToVerify.verificationRequested = true;
-    emailToVerify.status = 'request_verification';
+    emailToVerify.status = EMAIL_STATUS.REQUEST_VERIFICATION;
   }
 
   const emailInstance = state.emailInstances[action.emailId];
@@ -155,21 +166,25 @@ export function handleRequestVerification(
   state.verificationPackets[action.emailId] = packet;
 
   state.analyticsState.verificationsRequested++;
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.EMAIL_VERIFICATION_REQUESTED,
-    { emailId: action.emailId },
-    state.updatedAt,
-  ));
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.VERIFICATION_PACKET_GENERATED,
-    {
-      emailId: action.emailId,
-      packetId: packet.packetId,
-      artifactCount: packet.artifacts.length,
-      hasIntelligenceBrief: packet.hasIntelligenceBrief,
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.EMAIL_VERIFICATION_REQUESTED,
+      { emailId: action.emailId },
+      state.updatedAt,
+    ),
+  );
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.VERIFICATION_PACKET_GENERATED,
+      {
+        emailId: action.emailId,
+        packetId: packet.packetId,
+        artifactCount: packet.artifacts.length,
+        hasIntelligenceBrief: packet.hasIntelligenceBrief,
+      },
+      state.updatedAt,
+    ),
+  );
 }
 
 interface TrustChangeContext {
@@ -187,18 +202,20 @@ function pushTrustChangeEvent(
   if (ctx.evaluation.trustImpact === 0) {
     return;
   }
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.TRUST_CHANGED,
-    {
-      sessionId: state.sessionId,
-      amount: ctx.evaluation.trustImpact,
-      balanceBefore: ctx.previousTrustScore,
-      balanceAfter: state.trustScore,
-      reason: ctx.evaluation.isCorrect ? 'decision_correct' : 'decision_incorrect',
-      context: { emailId: ctx.emailId, decision: ctx.decision },
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.TRUST_CHANGED,
+      {
+        sessionId: state.sessionId,
+        amount: ctx.evaluation.trustImpact,
+        balanceBefore: ctx.previousTrustScore,
+        balanceAfter: state.trustScore,
+        reason: ctx.evaluation.isCorrect ? 'decision_correct' : 'decision_incorrect',
+        context: { emailId: ctx.emailId, decision: ctx.decision },
+      },
+      state.updatedAt,
+    ),
+  );
 }
 
 interface FundsChangeContext {
@@ -216,18 +233,20 @@ function pushFundsChangeEvent(
   if (ctx.evaluation.fundsImpact === 0) {
     return;
   }
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.CREDITS_CHANGED,
-    {
-      sessionId: state.sessionId,
-      amount: ctx.evaluation.fundsImpact,
-      balanceBefore: ctx.previousFunds,
-      balanceAfter: state.funds,
-      reason: ctx.evaluation.isCorrect ? 'client_approval' : 'client_denial',
-      context: { emailId: ctx.emailId, decision: ctx.decision },
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.CREDITS_CHANGED,
+      {
+        sessionId: state.sessionId,
+        amount: ctx.evaluation.fundsImpact,
+        balanceBefore: ctx.previousFunds,
+        balanceAfter: state.funds,
+        reason: ctx.evaluation.isCorrect ? 'client_approval' : 'client_denial',
+        context: { emailId: ctx.emailId, decision: ctx.decision },
+      },
+      state.updatedAt,
+    ),
+  );
 }
 
 function applyLevelUp(
@@ -247,17 +266,19 @@ function applyLevelUp(
     return;
   }
   state.playerLevel = newLevel;
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.LEVEL_UP,
-    {
-      sessionId: state.sessionId,
-      previousLevel,
-      newLevel,
-      xpRequired: calculateXPForLevel(newLevel),
-      xpAwarded: state.playerXP - previousXP,
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.LEVEL_UP,
+      {
+        sessionId: state.sessionId,
+        previousLevel,
+        newLevel,
+        xpRequired: calculateXPForLevel(newLevel),
+        xpAwarded: state.playerXP - previousXP,
+      },
+      state.updatedAt,
+    ),
+  );
 }
 
 function incrementDecisionAnalytics(
@@ -284,16 +305,18 @@ export interface EmailSubmittedContext {
 }
 
 function pushEmailDecisionSubmittedEvent(ctx: EmailSubmittedContext): void {
-  ctx.events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.EMAIL_DECISION_SUBMITTED,
-    {
-      emailId: ctx.emailId,
-      decision: ctx.decision,
-      timeSpentMs: ctx.timeSpentMs,
-      ...(ctx.evaluationError && { evaluationError: true }),
-    },
-    ctx.state.updatedAt,
-  ));
+  ctx.events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.EMAIL_DECISION_SUBMITTED,
+      {
+        emailId: ctx.emailId,
+        decision: ctx.decision,
+        timeSpentMs: ctx.timeSpentMs,
+        ...(ctx.evaluationError && { evaluationError: true }),
+      },
+      ctx.state.updatedAt,
+    ),
+  );
 }
 
 function applyFactionImpact(
@@ -319,22 +342,24 @@ export interface DecisionEvaluatedContext {
 }
 
 function pushDecisionEvaluatedEvent(ctx: DecisionEvaluatedContext): void {
-  ctx.events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.EMAIL_DECISION_EVALUATED,
-    {
-      emailId: ctx.emailId,
-      decision: ctx.decision,
-      isCorrect: ctx.evaluation.isCorrect,
-      trustImpact: ctx.evaluation.trustImpact,
-      fundsImpact: ctx.evaluation.fundsImpact,
-      factionImpact: ctx.evaluation.factionImpact,
-      threatImpact: ctx.evaluation.threatImpact,
-      explanation: ctx.evaluation.explanation,
-      indicatorsFound: ctx.evaluation.indicatorsFound,
-      indicatorsMissed: ctx.evaluation.indicatorsMissed,
-    },
-    ctx.state.updatedAt,
-  ));
+  ctx.events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.EMAIL_DECISION_EVALUATED,
+      {
+        emailId: ctx.emailId,
+        decision: ctx.decision,
+        isCorrect: ctx.evaluation.isCorrect,
+        trustImpact: ctx.evaluation.trustImpact,
+        fundsImpact: ctx.evaluation.fundsImpact,
+        factionImpact: ctx.evaluation.factionImpact,
+        threatImpact: ctx.evaluation.threatImpact,
+        explanation: ctx.evaluation.explanation,
+        indicatorsFound: ctx.evaluation.indicatorsFound,
+        indicatorsMissed: ctx.evaluation.indicatorsMissed,
+      },
+      ctx.state.updatedAt,
+    ),
+  );
 }
 
 export interface ResolveDecisionContext {
@@ -522,11 +547,11 @@ export function mapDecisionToStatus(
   decision: SubmitDecisionPayload['decision'],
 ): EmailState['status'] {
   const statusMap: Record<string, EmailState['status']> = {
-    approve: 'approved',
-    deny: 'denied',
-    flag: 'flagged',
-    request_verification: 'request_verification',
-    defer: 'deferred',
+    approve: EMAIL_STATUS.APPROVED,
+    deny: EMAIL_STATUS.DENIED,
+    flag: EMAIL_STATUS.FLAGGED,
+    request_verification: EMAIL_STATUS.REQUEST_VERIFICATION,
+    defer: EMAIL_STATUS.DEFERRED,
   };
-  return statusMap[decision] ?? 'pending';
+  return statusMap[decision] ?? EMAIL_STATUS.PENDING;
 }
