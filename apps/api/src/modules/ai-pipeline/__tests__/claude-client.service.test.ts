@@ -113,4 +113,23 @@ describe('claude-client.service', () => {
     expect(estimateAnthropicCostUsd('claude-sonnet-4-6', 1_000_000, 1_000_000)).toBe(18);
     expect(estimateAnthropicCostUsd('claude-haiku-4-5-20251001', 500_000, 500_000)).toBe(3);
   });
+
+  it('returns undefined cost for unknown model with no pricing entry', () => {
+    expect(estimateAnthropicCostUsd('unknown-model-xyz', 1000, 500)).toBeUndefined();
+  });
+
+  it('passes unknown model names through unchanged without alias lookup', () => {
+    const config = createTestConfig({ AI_GENERATION_MODEL: 'custom-model-v1' });
+    expect(resolveAnthropicModel(config, 'generation')).toBe('custom-model-v1');
+    expect(resolveAnthropicModel(config, 'classification')).toBe('custom-model-v1');
+  });
+
+  it('uses classification model for classification task even when generation model is configured', () => {
+    const config = createTestConfig({
+      AI_GENERATION_MODEL: 'sonnet',
+      AI_CLASSIFICATION_MODEL: 'haiku',
+    });
+    expect(resolveAnthropicModel(config, 'classification')).toBe('claude-haiku-4-5-20251001');
+    expect(resolveAnthropicModel(config, 'generation')).toBe('claude-sonnet-4-6');
+  });
 });
