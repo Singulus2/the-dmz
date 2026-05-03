@@ -17,6 +17,7 @@ import type {
   SimulationResultsSummary,
   SimulationOutcome,
 } from './types.js';
+import { SIMULATION_OUTCOME } from './types.js';
 
 function mapResultRow(
   row: typeof phishingSimulationResults.$inferSelect,
@@ -249,7 +250,7 @@ export const recordLinkClick = async (
       linkClicked: true,
       clickedAt: now,
       timeToClickSeconds,
-      simulationOutcome: 'clicked',
+      simulationOutcome: SIMULATION_OUTCOME.CLICKED,
       updatedAt: now,
     })
     .where(
@@ -308,7 +309,10 @@ export const recordReport = async (
       reported: true,
       reportedAt: now,
       timeToReportSeconds,
-      simulationOutcome: currentOutcome === 'clicked' ? 'clicked' : 'reported',
+      simulationOutcome:
+        currentOutcome === SIMULATION_OUTCOME.CLICKED
+          ? SIMULATION_OUTCOME.CLICKED
+          : SIMULATION_OUTCOME.REPORTED,
       updatedAt: now,
     })
     .where(

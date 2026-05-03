@@ -8,6 +8,13 @@ export type SimulationStatus =
 export type UrgencyLevel = 'low' | 'medium' | 'high' | 'critical';
 export type SimulationOutcome = 'clicked' | 'reported' | 'ignored' | 'pending';
 
+export const SIMULATION_OUTCOME = {
+  CLICKED: 'clicked',
+  REPORTED: 'reported',
+  IGNORED: 'ignored',
+  PENDING: 'pending',
+} as const;
+
 export interface PhishingSimulation {
   simulationId: string;
   tenantId: string;
