@@ -1,5 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 
+import { PROPOSAL_STATUS, type ProposalStatus } from '@the-dmz/shared/schemas/coop-session.schema';
+
 import { getDatabaseClient } from '../../shared/database/connection.js';
 import {
   coopSession,
@@ -21,14 +23,6 @@ import {
 
 import type { AppConfig } from '../../config.js';
 import type { EventBus } from '../../shared/events/event-types.js';
-
-export type ProposalStatus =
-  | 'proposed'
-  | 'confirmed'
-  | 'overridden'
-  | 'withdrawn'
-  | 'expired'
-  | 'consensus';
 
 export interface SubmitArbitrationProposalInput {
   playerId: string;
@@ -57,12 +51,17 @@ export interface PendingProposalsResult {
 }
 
 const VALID_STATUS_TRANSITIONS: Record<ProposalStatus, ProposalStatus[]> = {
-  proposed: ['confirmed', 'overridden', 'expired', 'consensus'],
-  confirmed: [],
-  overridden: [],
-  withdrawn: [],
-  expired: [],
-  consensus: [],
+  [PROPOSAL_STATUS.PROPOSED]: [
+    PROPOSAL_STATUS.CONFIRMED,
+    PROPOSAL_STATUS.OVERRIDDEN,
+    PROPOSAL_STATUS.EXPIRED,
+    PROPOSAL_STATUS.CONSENSUS,
+  ],
+  [PROPOSAL_STATUS.CONFIRMED]: [],
+  [PROPOSAL_STATUS.OVERRIDDEN]: [],
+  [PROPOSAL_STATUS.WITHDRAWN]: [],
+  [PROPOSAL_STATUS.EXPIRED]: [],
+  [PROPOSAL_STATUS.CONSENSUS]: [],
 };
 
 function isValidStatusTransition(current: ProposalStatus, next: ProposalStatus): boolean {
@@ -110,7 +109,7 @@ export async function submitArbitrationProposal(
       role: input.role,
       emailId: input.emailId,
       action: input.action,
-      status: 'proposed',
+      status: PROPOSAL_STATUS.PROPOSED,
       conflictFlag: false,
     })
     .returning();
@@ -163,14 +162,14 @@ export async function authorityConfirmProposal(
     return { success: false, error: 'Authority cannot finalize own proposal' };
   }
 
-  if (!isValidStatusTransition(proposal.status as ProposalStatus, 'confirmed')) {
+  if (!isValidStatusTransition(proposal.status as ProposalStatus, PROPOSAL_STATUS.CONFIRMED)) {
     return { success: false, error: `Cannot confirm proposal in status: ${proposal.status}` };
   }
 
   await db
     .update(coopDecisionProposal)
     .set({
-      status: 'confirmed',
+      status: PROPOSAL_STATUS.CONFIRMED,
       authorityAction: 'confirm',
       resolvedAt: new Date(),
     })
@@ -231,14 +230,14 @@ export async function authorityOverrideProposal(
     return { success: false, error: 'Authority cannot override own proposal' };
   }
 
-  if (!isValidStatusTransition(proposal.status as ProposalStatus, 'overridden')) {
+  if (!isValidStatusTransition(proposal.status as ProposalStatus, PROPOSAL_STATUS.OVERRIDDEN)) {
     return { success: false, error: `Cannot override proposal in status: ${proposal.status}` };
   }
 
   await db
     .update(coopDecisionProposal)
     .set({
-      status: 'overridden',
+      status: PROPOSAL_STATUS.OVERRIDDEN,
       authorityAction: 'override',
       conflictFlag: true,
       conflictReason: input.conflictReason ?? null,
@@ -289,14 +288,14 @@ export async function expireProposal(
     return { success: false, error: 'Proposal not found' };
   }
 
-  if (!isValidStatusTransition(proposal.status as ProposalStatus, 'expired')) {
+  if (!isValidStatusTransition(proposal.status as ProposalStatus, PROPOSAL_STATUS.EXPIRED)) {
     return { success: false, error: `Cannot expire proposal in status: ${proposal.status}` };
   }
 
   await db
     .update(coopDecisionProposal)
     .set({
-      status: 'expired',
+      status: PROPOSAL_STATUS.EXPIRED,
       expiredAt: new Date(),
       resolvedAt: new Date(),
     })
@@ -335,7 +334,7 @@ export async function markProposalConsensus(
     return { success: false, error: 'Proposal not found' };
   }
 
-  if (!isValidStatusTransition(proposal.status as ProposalStatus, 'consensus')) {
+  if (!isValidStatusTransition(proposal.status as ProposalStatus, PROPOSAL_STATUS.CONSENSUS)) {
     return {
       success: false,
       error: `Cannot mark consensus for proposal in status: ${proposal.status}`,
@@ -345,7 +344,7 @@ export async function markProposalConsensus(
   await db
     .update(coopDecisionProposal)
     .set({
-      status: 'consensus',
+      status: PROPOSAL_STATUS.CONSENSUS,
       resolvedAt: new Date(),
     })
     .where(eq(coopDecisionProposal.proposalId, proposalId));
@@ -381,7 +380,7 @@ export async function getPendingProposals(
   const proposals = await db.query.coopDecisionProposal.findMany({
     where: and(
       eq(coopDecisionProposal.sessionId, sessionId),
-      eq(coopDecisionProposal.status, 'proposed'),
+      eq(coopDecisionProposal.status, PROPOSAL_STATUS.PROPOSED),
     ),
     orderBy: (proposals, { asc }) => [asc(proposals.proposedAt)],
   });

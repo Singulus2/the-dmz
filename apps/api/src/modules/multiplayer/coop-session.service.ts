@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { DAY_PHASES, type DayPhase } from '@the-dmz/shared/game';
+import { PROPOSAL_STATUS } from '@the-dmz/shared/schemas/coop-session.schema';
 
 import { evaluateFlag } from '../feature-flags/index.js';
 import {
@@ -722,14 +723,14 @@ export class CoopSessionService {
       return { success: false, error: 'Authority cannot finalize own proposal' };
     }
 
-    if (proposal.status !== 'proposed') {
+    if (proposal.status !== PROPOSAL_STATUS.PROPOSED) {
       return { success: false, error: 'Proposal is not in proposed status' };
     }
 
     await this.repository.updateProposal({
       proposalId: options.input.proposalId,
       updates: {
-        status: 'confirmed',
+        status: PROPOSAL_STATUS.CONFIRMED,
         authorityAction: 'confirm',
         resolvedAt: new Date(),
       },
@@ -787,14 +788,14 @@ export class CoopSessionService {
       return { success: false, error: 'Authority cannot override own proposal' };
     }
 
-    if (proposal.status !== 'proposed') {
+    if (proposal.status !== PROPOSAL_STATUS.PROPOSED) {
       return { success: false, error: 'Proposal is not in proposed status' };
     }
 
     await this.repository.updateProposal({
       proposalId: options.input.proposalId,
       updates: {
-        status: 'overridden',
+        status: PROPOSAL_STATUS.OVERRIDDEN,
         authorityAction: 'override',
         conflictFlag: true,
         conflictReason: options.input.conflictReason ?? null,

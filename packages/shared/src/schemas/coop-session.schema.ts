@@ -22,6 +22,15 @@ export const PROPOSAL_STATUSES = [
 ] as const;
 export type ProposalStatus = (typeof PROPOSAL_STATUSES)[number];
 
+export const PROPOSAL_STATUS = {
+  PROPOSED: 'proposed',
+  CONFIRMED: 'confirmed',
+  OVERRIDDEN: 'overridden',
+  WITHDRAWN: 'withdrawn',
+  EXPIRED: 'expired',
+  CONSENSUS: 'consensus',
+} as const satisfies Record<string, ProposalStatus>;
+
 export const AUTHORITY_ACTIONS = ['confirm', 'override'] as const;
 export type AuthorityAction = (typeof AUTHORITY_ACTIONS)[number];
 
