@@ -81,5 +81,5 @@ async function handleChannelCreated(
   _event: DomainEvent<ChatChannelCreatedPayload>,
   _gateway?: WebSocketGatewayInterface,
 ): Promise<void> {
-  // Future: notify clients about new channel availability
+  // TODO(#2493): notify clients about new channel availability
 }
