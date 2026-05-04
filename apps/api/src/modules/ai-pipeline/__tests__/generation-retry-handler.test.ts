@@ -104,9 +104,7 @@ describe('generation-retry-handler', () => {
     });
 
     it('returns provider_error for unknown errors', () => {
-      expect(buildGenerationFailureCategory(new Error('some other error'))).toBe(
-        'provider_error',
-      );
+      expect(buildGenerationFailureCategory(new Error('some other error'))).toBe('provider_error');
       expect(buildGenerationFailureCategory('string error')).toBe('provider_error');
       expect(buildGenerationFailureCategory(null)).toBe('provider_error');
       expect(buildGenerationFailureCategory(undefined)).toBe('provider_error');

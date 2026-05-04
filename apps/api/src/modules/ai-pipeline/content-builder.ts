@@ -1,3 +1,5 @@
+import { isRecord } from '../../shared/utils/index.js';
+
 import {
   type FallbackEmailRequest,
   type FallbackEmailTemplate,
@@ -5,8 +7,6 @@ import {
 } from './fallback-template-selector.js';
 
 import type { GeneratablePromptTemplateCategory } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 const factionDomainMap: Record<string, string> = {
   'Sovereign Compact': 'compact',

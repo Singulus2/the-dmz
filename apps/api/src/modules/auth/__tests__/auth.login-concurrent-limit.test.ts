@@ -86,7 +86,9 @@ describe('login() concurrent session limit', () => {
       });
 
       const { getDatabaseClient } = await import('../../shared/database/connection.js');
-      vi.mocked(getDatabaseClient).mockReturnValue(mockDb as unknown as ReturnType<typeof getDatabaseClient>);
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDb as unknown as ReturnType<typeof getDatabaseClient>,
+      );
 
       await expect(
         login(mockConfig, { email: 'test@example.com', password: 'ValidPassword123!' }),
@@ -141,7 +143,9 @@ describe('login() concurrent session limit', () => {
       });
 
       const { getDatabaseClient } = await import('../../shared/database/connection.js');
-      vi.mocked(getDatabaseClient).mockReturnValue(mockDb as unknown as ReturnType<typeof getDatabaseClient>);
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDb as unknown as ReturnType<typeof getDatabaseClient>,
+      );
 
       await expect(
         login(mockConfig, { email: 'test@example.com', password: 'ValidPassword123!' }),
@@ -226,7 +230,9 @@ describe('login() concurrent session limit', () => {
       });
 
       const { getDatabaseClient } = await import('../../shared/database/connection.js');
-      vi.mocked(getDatabaseClient).mockReturnValue(mockDb as unknown as ReturnType<typeof getDatabaseClient>);
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDb as unknown as ReturnType<typeof getDatabaseClient>,
+      );
 
       const result = await login(mockConfig, {
         email: 'test@example.com',
@@ -238,7 +244,8 @@ describe('login() concurrent session limit', () => {
     });
 
     it('does not throw when under concurrent limit', async () => {
-      const { findUserByEmail, countActiveUserSessions, createSession } = await import('../auth.repo.js');
+      const { findUserByEmail, countActiveUserSessions, createSession } =
+        await import('../auth.repo.js');
       const { verifyPassword, hashToken, generateTokens } = await import('../auth.crypto.js');
       const { resolveTenantId } = await import('../auth.utils.js');
 
@@ -302,7 +309,9 @@ describe('login() concurrent session limit', () => {
       });
 
       const { getDatabaseClient } = await import('../../shared/database/connection.js');
-      vi.mocked(getDatabaseClient).mockReturnValue(mockDb as unknown as ReturnType<typeof getDatabaseClient>);
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDb as unknown as ReturnType<typeof getDatabaseClient>,
+      );
 
       const result = await login(mockConfig, {
         email: 'test@example.com',
@@ -358,7 +367,9 @@ describe('login() concurrent session limit', () => {
       });
 
       const { getDatabaseClient } = await import('../../shared/database/connection.js');
-      vi.mocked(getDatabaseClient).mockReturnValue(mockDb as unknown as ReturnType<typeof getDatabaseClient>);
+      vi.mocked(getDatabaseClient).mockReturnValue(
+        mockDb as unknown as ReturnType<typeof getDatabaseClient>,
+      );
 
       await expect(
         login(mockConfig, { email: 'test@example.com', password: 'ValidPassword123!' }),

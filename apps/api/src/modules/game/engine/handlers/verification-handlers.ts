@@ -22,15 +22,17 @@ export function handleFlagDiscrepancy(
     throw new Error('Artifact not found in packet');
   }
 
-  events.push(createGameEvent(
-    'game.verification.discrepancy_flagged',
-    {
-      emailId: action.emailId,
-      packetId: packet.packetId,
-      artifactId: action.artifactId,
-      documentType: artifact.documentType,
-      reason: action.reason,
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      'game.verification.discrepancy_flagged',
+      {
+        emailId: action.emailId,
+        packetId: packet.packetId,
+        artifactId: action.artifactId,
+        documentType: artifact.documentType,
+        reason: action.reason,
+      },
+      state.updatedAt,
+    ),
+  );
 }

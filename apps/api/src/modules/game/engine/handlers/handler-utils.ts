@@ -123,15 +123,17 @@ export function completeInstallations(state: GameState, events: DomainEvent[]): 
       applyUpgradeEffects(state, upgrade.upgradeType);
 
       const upgradeDef = UPGRADE_CATALOG[upgrade.upgradeType];
-      events.push(createGameEvent(
-        'facility.upgrade.completed',
-        {
-          upgradeType: upgrade.upgradeType,
-          category: upgradeDef?.category,
-          tierLevel: upgrade.tierLevel,
-        },
-        state.updatedAt,
-      ));
+      events.push(
+        createGameEvent(
+          'facility.upgrade.completed',
+          {
+            upgradeType: upgrade.upgradeType,
+            category: upgradeDef?.category,
+            tierLevel: upgrade.tierLevel,
+          },
+          state.updatedAt,
+        ),
+      );
     }
   }
 }

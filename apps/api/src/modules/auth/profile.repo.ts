@@ -2,7 +2,7 @@ import { eq, and, sql } from 'drizzle-orm';
 
 import { type DB } from '../../shared/database/connection.js';
 import { userProfiles } from '../../db/schema/auth/user-profiles.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 export type ProfileData = {
   tenantId: string;

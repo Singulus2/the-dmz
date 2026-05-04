@@ -14,7 +14,7 @@ import {
   type TenantTier,
 } from '../../shared/database/schema/index.js';
 import { hashPassword } from '../auth/index.js';
-import { generateSecurePassword } from '../../shared/utils/password.js';
+import { generateSecurePassword } from '../../shared/utils/index.js';
 
 import type { NewTenant, TenantWithStatus } from './tenant-provisioning.types.js';
 

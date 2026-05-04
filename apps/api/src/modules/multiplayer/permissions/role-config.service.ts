@@ -6,7 +6,7 @@ import {
   type CoopSession,
   type CoopRole,
 } from '../../../db/schema/multiplayer/index.js';
-import { generateId } from '../../../shared/utils/id.js';
+import { generateId } from '../../../shared/utils/index.js';
 
 import {
   type PermissionMatrixConfig,

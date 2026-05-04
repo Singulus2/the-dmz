@@ -4,7 +4,7 @@ import { eq, and, sql, isNull, lt, desc, gte } from 'drizzle-orm';
 import { type DB } from '../../shared/database/connection.js';
 import { users } from '../../shared/database/schema/users.js';
 import { sessions as sessionsTable } from '../../db/schema/auth/sessions.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 import type { AuthSession } from './auth.types.js';
 

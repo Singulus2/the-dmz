@@ -7,7 +7,7 @@ import {
   type Scenario,
   type ScenarioBeat,
 } from '../../../db/schema/content/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 export type { Scenario, ScenarioBeat };
 

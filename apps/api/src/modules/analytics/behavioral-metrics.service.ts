@@ -1,4 +1,4 @@
-import { getOutcome, getCompetencyTags, getThreatTier } from '../../shared/utils/payload.js';
+import { getOutcome, getCompetencyTags, getThreatTier } from '../../shared/utils/index.js';
 
 import type { DomainEvent } from '../../shared/events/event-types.js';
 

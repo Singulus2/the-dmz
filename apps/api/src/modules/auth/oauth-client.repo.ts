@@ -2,7 +2,7 @@ import { eq, and } from 'drizzle-orm';
 
 import { type DB } from '../../shared/database/connection.js';
 import { oauthClients } from '../../db/schema/auth/oauth-clients.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 export type OAuthClientData = {
   tenantId: string;

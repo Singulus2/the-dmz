@@ -2,8 +2,7 @@ import { and, eq, isNull, or } from 'drizzle-orm';
 
 import { type DB } from '../../../shared/database/connection.js';
 import { emailTemplates, type EmailTemplate } from '../../../db/schema/content/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
-import { isRecord } from '../../../shared/utils/type-guards.js';
+import { assertCreated, isRecord } from '../../../shared/utils/index.js';
 
 export type { EmailTemplate };
 

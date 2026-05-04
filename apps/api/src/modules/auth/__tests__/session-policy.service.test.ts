@@ -377,7 +377,10 @@ describe('session-policy.service', () => {
     });
 
     it('should detect IP binding violation', () => {
-      const policy = { ...DEFAULT_TENANT_SESSION_POLICY, sessionBindingMode: SessionBindingMode.IP };
+      const policy = {
+        ...DEFAULT_TENANT_SESSION_POLICY,
+        sessionBindingMode: SessionBindingMode.IP,
+      };
       const original = { ipAddress: '192.168.1.1', deviceFingerprint: null };
       const current = { ipAddress: '10.0.0.1', deviceFingerprint: null };
 
@@ -417,7 +420,10 @@ describe('session-policy.service', () => {
     });
 
     it('should allow when no original context', () => {
-      const policy = { ...DEFAULT_TENANT_SESSION_POLICY, sessionBindingMode: SessionBindingMode.IP };
+      const policy = {
+        ...DEFAULT_TENANT_SESSION_POLICY,
+        sessionBindingMode: SessionBindingMode.IP,
+      };
       const original = { ipAddress: null, deviceFingerprint: null };
       const current = { ipAddress: '10.0.0.1', deviceFingerprint: null };
 

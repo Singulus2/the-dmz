@@ -268,10 +268,19 @@ describe('PlayerProfileService', () => {
           createdAt: new Date(),
           calibrationPhase: 'active' as const,
           calibrationStartDate: new Date(),
-          trend30d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
-          trend90d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
+          trend30d: {} as Record<
+            string,
+            { slope: number; dataPoints: number; lastCalculated: string }
+          >,
+          trend90d: {} as Record<
+            string,
+            { slope: number; dataPoints: number; lastCalculated: string }
+          >,
           recommendedFocus: [] as string[],
-          confidenceIntervals: {} as Record<string, { lower: number; upper: number; confidence: number }>,
+          confidenceIntervals: {} as Record<
+            string,
+            { lower: number; upper: number; confidence: number }
+          >,
           lastSnapshotAt: new Date(),
         };
 
@@ -320,10 +329,19 @@ describe('PlayerProfileService', () => {
         createdAt: new Date(),
         calibrationPhase: 'active' as const,
         calibrationStartDate: new Date(),
-        trend30d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
-        trend90d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
+        trend30d: {} as Record<
+          string,
+          { slope: number; dataPoints: number; lastCalculated: string }
+        >,
+        trend90d: {} as Record<
+          string,
+          { slope: number; dataPoints: number; lastCalculated: string }
+        >,
         recommendedFocus: [] as string[],
-        confidenceIntervals: {} as Record<string, { lower: number; upper: number; confidence: number }>,
+        confidenceIntervals: {} as Record<
+          string,
+          { lower: number; upper: number; confidence: number }
+        >,
         lastSnapshotAt: new Date(),
       };
 
@@ -391,10 +409,19 @@ describe('PlayerProfileService', () => {
         createdAt: new Date(),
         calibrationPhase: 'active' as const,
         calibrationStartDate: new Date(),
-        trend30d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
-        trend90d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
+        trend30d: {} as Record<
+          string,
+          { slope: number; dataPoints: number; lastCalculated: string }
+        >,
+        trend90d: {} as Record<
+          string,
+          { slope: number; dataPoints: number; lastCalculated: string }
+        >,
         recommendedFocus: [] as string[],
-        confidenceIntervals: {} as Record<string, { lower: number; upper: number; confidence: number }>,
+        confidenceIntervals: {} as Record<
+          string,
+          { lower: number; upper: number; confidence: number }
+        >,
         lastSnapshotAt: new Date(),
       };
 
@@ -415,10 +442,19 @@ describe('PlayerProfileService', () => {
         createdAt: new Date(),
         calibrationPhase: 'active' as const,
         calibrationStartDate: new Date(),
-        trend30d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
-        trend90d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
+        trend30d: {} as Record<
+          string,
+          { slope: number; dataPoints: number; lastCalculated: string }
+        >,
+        trend90d: {} as Record<
+          string,
+          { slope: number; dataPoints: number; lastCalculated: string }
+        >,
         recommendedFocus: [] as string[],
-        confidenceIntervals: {} as Record<string, { lower: number; upper: number; confidence: number }>,
+        confidenceIntervals: {} as Record<
+          string,
+          { lower: number; upper: number; confidence: number }
+        >,
         lastSnapshotAt: new Date(),
       };
 
@@ -430,7 +466,11 @@ describe('PlayerProfileService', () => {
         tenantId: 'tenant-1',
         userId: 'user-1',
         source: 'game',
-        payload: { competency_tags: [inactiveDomain], outcome: 'correct', difficulty_tier: 'tier_3' },
+        payload: {
+          competency_tags: [inactiveDomain],
+          outcome: 'correct',
+          difficulty_tier: 'tier_3',
+        },
         version: 1,
       };
 
@@ -482,10 +522,19 @@ describe('PlayerProfileService', () => {
           createdAt: new Date(),
           calibrationPhase: 'active' as const,
           calibrationStartDate: new Date(),
-          trend30d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
-          trend90d: {} as Record<string, { slope: number; dataPoints: number; lastCalculated: string }>,
+          trend30d: {} as Record<
+            string,
+            { slope: number; dataPoints: number; lastCalculated: string }
+          >,
+          trend90d: {} as Record<
+            string,
+            { slope: number; dataPoints: number; lastCalculated: string }
+          >,
           recommendedFocus: [] as string[],
-          confidenceIntervals: {} as Record<string, { lower: number; upper: number; confidence: number }>,
+          confidenceIntervals: {} as Record<
+            string,
+            { lower: number; upper: number; confidence: number }
+          >,
           lastSnapshotAt: new Date(),
         };
 

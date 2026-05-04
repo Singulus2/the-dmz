@@ -7,7 +7,7 @@ import {
   type DifficultyHistory,
   type EmailFeature,
 } from '../../../db/schema/content/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 export type { DifficultyHistory, EmailFeature };
 

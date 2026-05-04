@@ -1,6 +1,6 @@
 import type { DayPhase } from '@the-dmz/shared/game';
 
-import { generateId } from '../../shared/utils/id.js';
+import { generateId } from '../../shared/utils/index.js';
 import { type CoopRole, type CoopSessionStatus } from '../../db/schema/multiplayer/index.js';
 
 import { createPermissionDeniedEvent } from './permissions/index.js';

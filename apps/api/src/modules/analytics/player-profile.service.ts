@@ -1,7 +1,7 @@
 import { COMPETENCY_DOMAINS } from '@the-dmz/shared';
 import type { CompetencyDomain } from '@the-dmz/shared';
 
-import { getPayloadField } from '../../shared/utils/payload.js';
+import { getPayloadField } from '../../shared/utils/index.js';
 
 import type { PlayerProfile } from '../../db/schema/analytics/index.js';
 import type { DomainEvent } from '../../shared/events/event-types.js';

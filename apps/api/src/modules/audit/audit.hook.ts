@@ -1,6 +1,6 @@
 import { LOG_REDACTION_KEYS } from '@the-dmz/shared/contracts';
 
-import { sanitizeForLogging } from '../../shared/utils/sanitizer.js';
+import { sanitizeForLogging } from '../../shared/utils/index.js';
 
 import { createAuditLog } from './audit.service.js';
 

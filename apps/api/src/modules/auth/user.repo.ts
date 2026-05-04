@@ -2,7 +2,7 @@ import { eq, and } from 'drizzle-orm';
 
 import { type DB } from '../../shared/database/connection.js';
 import { users } from '../../shared/database/schema/users.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 import { UserExistsError } from './auth.errors.js';
 

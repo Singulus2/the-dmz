@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 
 import { type DB } from '../../../shared/database/connection.js';
 import { localizedContent, type LocalizedContent } from '../../../db/schema/content/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 export type { LocalizedContent };
 

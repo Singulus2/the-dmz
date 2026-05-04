@@ -11,7 +11,7 @@ import {
   type QualityFlag,
   type QualityHistory,
 } from '../../../db/schema/content/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 export type { QualityScore, QualityThreshold, QualityFlag, QualityHistory };
 

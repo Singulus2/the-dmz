@@ -1,3 +1,5 @@
+import { isRecord } from '../../shared/utils/index.js';
+
 import { parseStructuredOutput } from './output-parser.service.js';
 
 import type {
@@ -6,8 +8,6 @@ import type {
   PromptTemplateCategory,
   UsageMetrics,
 } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 const clampDifficulty = (value: number): number => Math.min(5, Math.max(1, Math.round(value)));
 

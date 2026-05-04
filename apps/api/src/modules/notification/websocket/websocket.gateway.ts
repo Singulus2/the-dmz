@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 
-import { generateId } from '../../../shared/utils/id.js';
+import { generateId } from '../../../shared/utils/index.js';
 import {
   recordWebSocketConnection,
   recordWebSocketMessage,

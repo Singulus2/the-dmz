@@ -4,7 +4,7 @@ import type { GameThreatTier } from '@the-dmz/shared/game';
 
 import { type DB } from '../../../shared/database/connection.js';
 import { gameSessions } from '../../../db/schema/game/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 import type { GameSession } from '../../../db/schema/game/index.js';
 

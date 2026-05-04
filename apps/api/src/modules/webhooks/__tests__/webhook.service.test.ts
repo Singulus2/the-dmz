@@ -1175,7 +1175,9 @@ describe('queueEvent error paths', () => {
         failureDisabledAt: null,
       };
 
-      mockRepo.getActiveSubscriptionsForEvent.mockResolvedValue([mockSubscription as WebhookSubscriptionDb]);
+      mockRepo.getActiveSubscriptionsForEvent.mockResolvedValue([
+        mockSubscription as WebhookSubscriptionDb,
+      ]);
       mockRepo.createDelivery.mockResolvedValue({
         id: randomUUID(),
         subscriptionId: mockSubscriptionId,

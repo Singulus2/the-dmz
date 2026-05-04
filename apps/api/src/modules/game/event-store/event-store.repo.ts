@@ -9,7 +9,7 @@ import {
   type GameStateSnapshot,
   type NewGameStateSnapshot,
 } from '../../../db/schema/game/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 export type { GameEvent, NewGameEvent };
 export type { GameStateSnapshot, NewGameStateSnapshot };

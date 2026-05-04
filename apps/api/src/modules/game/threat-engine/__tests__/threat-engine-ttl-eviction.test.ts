@@ -1,10 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import {
-  type GameState,
-  type FacilityState,
-  createInitialBreachState,
-} from '@the-dmz/shared/game';
+import { type GameState, type FacilityState, createInitialBreachState } from '@the-dmz/shared/game';
 
 import { ThreatDetectionService } from '../threat-detection.service.js';
 import { ThreatResponseService } from '../threat-response.service.js';

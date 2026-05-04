@@ -1,6 +1,5 @@
-import { generateId } from '../../shared/utils/id.js';
+import { generateId, getPayloadField } from '../../shared/utils/index.js';
 import { analyticsEvents, deadLetterQueue } from '../../db/schema/analytics/index.js';
-import { getPayloadField } from '../../shared/utils/payload.js';
 
 import { DEFAULT_ANALYTICS_CONFIG } from './analytics.types.js';
 import { CircuitBreaker } from './circuit-breaker.js';

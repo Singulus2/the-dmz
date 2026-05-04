@@ -1,3 +1,5 @@
+import { isRecord } from '../../shared/utils/index.js';
+
 import { EXECUTABLE_ATTACHMENT_TYPES } from './safety-validator.data.js';
 import { checkBlocklistForStrings } from './blocklist-validator.js';
 import {
@@ -14,8 +16,6 @@ import type {
   SafetyFinding,
   SafetyValidationResult,
 } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 const collectStrings = (
   value: unknown,

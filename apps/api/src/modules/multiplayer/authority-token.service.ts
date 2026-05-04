@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { getDatabaseClient } from '../../shared/database/connection.js';
 import { coopSession, coopRoleAssignment } from '../../db/schema/multiplayer/index.js';
 import { deleteCachedCoopSession } from '../../shared/cache/index.js';
-import { generateId } from '../../shared/utils/id.js';
+import { generateId } from '../../shared/utils/index.js';
 
 import { createAuthorityTokenRelinquishedEvent } from './arbitration.events.js';
 

@@ -2,7 +2,7 @@ import { and, desc, eq, ilike } from 'drizzle-orm';
 
 import { aiGenerationLog } from '../../shared/database/schema/index.js';
 import { promptTemplates, type PromptTemplate } from '../../db/schema/ai/prompt-templates.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 import type {
   PromptTemplateFilters,

@@ -3,7 +3,11 @@ import { GAME_ACTIONS, type GameState, type ProcessThreatsPayload } from '@the-d
 import { GAME_ENGINE_EVENTS } from '../events/shared-types.js';
 import { ThreatEngineService } from '../../threat-engine/index.js';
 
-import { isActionAllowedInPhase, aggregateSecurityDeltas, createGameEvent } from './handler-utils.js';
+import {
+  isActionAllowedInPhase,
+  aggregateSecurityDeltas,
+  createGameEvent,
+} from './handler-utils.js';
 
 import type { DomainEvent } from './handler-utils.js';
 
@@ -42,30 +46,34 @@ export function handleProcessThreats(
   }
   state.threats = [...state.threats, ...threatResult.attacks];
 
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.THREATS_GENERATED,
-    {
-      day: action.dayNumber,
-      attacks: threatResult.attacks,
-      threatTier: threatResult.newThreatTier,
-      coopScalingApplied: threatResult.coopScalingApplied,
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.THREATS_GENERATED,
+      {
+        day: action.dayNumber,
+        attacks: threatResult.attacks,
+        threatTier: threatResult.newThreatTier,
+        coopScalingApplied: threatResult.coopScalingApplied,
+      },
+      state.updatedAt,
+    ),
+  );
 
   if (threatResult.tierChanged) {
     const tierChangeResult = threatEngine.calculateThreatTier(state, sessionId);
     if (tierChangeResult.event) {
-      events.push(createGameEvent(
-        GAME_ENGINE_EVENTS.THREAT_LEVEL_CHANGED,
-        {
-          previousTier: tierChangeResult.event.previousTier,
-          newTier: tierChangeResult.event.newTier,
-          reason: tierChangeResult.event.reason,
-          narrativeMessage: tierChangeResult.event.narrativeMessage,
-        },
-        state.updatedAt,
-      ));
+      events.push(
+        createGameEvent(
+          GAME_ENGINE_EVENTS.THREAT_LEVEL_CHANGED,
+          {
+            previousTier: tierChangeResult.event.previousTier,
+            newTier: tierChangeResult.event.newTier,
+            reason: tierChangeResult.event.reason,
+            narrativeMessage: tierChangeResult.event.narrativeMessage,
+          },
+          state.updatedAt,
+        ),
+      );
     }
   }
 }

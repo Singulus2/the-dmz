@@ -2,7 +2,7 @@ import { eq, and, isNull } from 'drizzle-orm';
 
 import { type DB } from '../../shared/database/connection.js';
 import { passwordResetTokens } from '../../db/schema/auth/password-reset-tokens.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 export interface PasswordResetTokenRecord {
   id: string;

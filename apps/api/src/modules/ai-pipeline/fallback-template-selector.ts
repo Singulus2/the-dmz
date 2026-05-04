@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+import { isRecord } from '../../shared/utils/index.js';
+
 import type { ContentGateway, ContentGenerationRequest } from './ai-pipeline.types.js';
 
 export const fictionalFactions = [
@@ -286,8 +288,6 @@ export const listDifficultyPoolEmailTemplates = async (
 
   return templates;
 };
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 const hasGeneratedFallbackPayload = (template: { metadata?: Record<string, unknown> }): boolean =>
   isRecord(template.metadata) &&

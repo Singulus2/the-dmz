@@ -49,7 +49,12 @@ export class ThreatResponseService {
     return entry.value;
   }
 
-  private setWithTTL<T>(map: Map<string, TTLCacheEntry<T>>, sessionId: string, value: T, ttlMs: number): void {
+  private setWithTTL<T>(
+    map: Map<string, TTLCacheEntry<T>>,
+    sessionId: string,
+    value: T,
+    ttlMs: number,
+  ): void {
     map.set(sessionId, {
       value,
       expiresAt: this.getCurrentTime() + ttlMs,

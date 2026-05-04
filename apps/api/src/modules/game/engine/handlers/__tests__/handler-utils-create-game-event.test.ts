@@ -36,7 +36,11 @@ describe('createGameEvent', () => {
   });
 
   it('should return an object that satisfies DomainEvent interface', () => {
-    const event = createGameEvent('game.email.received', { emailId: 'email-1' }, '2024-01-01T00:00:00.000Z');
+    const event = createGameEvent(
+      'game.email.received',
+      { emailId: 'email-1' },
+      '2024-01-01T00:00:00.000Z',
+    );
 
     const _typeCheck: DomainEvent = event;
     expect(_typeCheck.eventId).toBeDefined();
@@ -75,7 +79,11 @@ describe('createGameEvent', () => {
   });
 
   it('should handle string payload', () => {
-    const event = createGameEvent('game.test.string', 'simple string payload', '2024-01-01T00:00:00.000Z');
+    const event = createGameEvent(
+      'game.test.string',
+      'simple string payload',
+      '2024-01-01T00:00:00.000Z',
+    );
 
     expect(event.payload).toBe('simple string payload');
   });

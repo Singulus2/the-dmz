@@ -1,10 +1,10 @@
+import { isRecord } from '../../shared/utils/index.js';
+
 import type {
   PromptTemplateCategory,
   QualityScoreBreakdown,
   QualityScoreResult,
 } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 const clamp = (value: number, min = 0, max = 1): number => Math.min(max, Math.max(min, value));
 

@@ -1,4 +1,4 @@
-import { generateId } from '../../../shared/utils/id.js';
+import { generateId } from '../../../shared/utils/index.js';
 import { SSE_SECURITY_HEADERS } from '../../../shared/middleware/security-headers-config.js';
 
 import type { FastifyRequest, FastifyReply } from 'fastify';

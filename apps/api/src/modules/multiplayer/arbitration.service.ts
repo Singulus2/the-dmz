@@ -10,7 +10,7 @@ import {
   type CoopDecisionProposal,
 } from '../../db/schema/multiplayer/index.js';
 import { deleteCachedCoopSession } from '../../shared/cache/index.js';
-import { generateId } from '../../shared/utils/id.js';
+import { generateId } from '../../shared/utils/index.js';
 
 import { validateRationale } from './authority-token.service.js';
 import {

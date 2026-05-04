@@ -25,7 +25,7 @@ import {
   type NewWebhookEvent,
   type SubscriptionStatus,
 } from '../../db/schema/billing/index.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 import type { AppConfig } from '../../config.js';
 

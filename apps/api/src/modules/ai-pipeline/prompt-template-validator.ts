@@ -1,10 +1,9 @@
 import { badRequest } from '../../shared/middleware/error-handler.js';
+import { isRecord } from '../../shared/utils/index.js';
 
 import { assertCategoryOutputSchema } from './output-parser.service.js';
 
 import type { PromptTemplateInput, PromptTemplateUpdate } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 export { isRecord };
 

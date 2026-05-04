@@ -12,7 +12,7 @@ import {
   type WebhookCircuitBreakerDb,
   type NewWebhookCircuitBreakerDb,
 } from '../../db/schema/webhooks.js';
-import { assertCreated } from '../../shared/utils/db-utils.js';
+import { assertCreated } from '../../shared/utils/index.js';
 
 const db = getDatabaseClient();
 

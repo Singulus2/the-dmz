@@ -2,7 +2,7 @@ import { eq, and, sql, desc } from 'drizzle-orm';
 
 import { type DB } from '../../../shared/database/connection.js';
 import { incidents, type Incident, type NewIncident } from '../../../db/schema/game/index.js';
-import { assertCreated } from '../../../shared/utils/db-utils.js';
+import { assertCreated } from '../../../shared/utils/index.js';
 
 import type { IncidentStatus } from '../../../db/schema/game/incidents.schema.js';
 

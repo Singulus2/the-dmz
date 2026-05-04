@@ -50,7 +50,13 @@ export function handleAbandonSession(
     throw new Error('Cannot abandon from current state');
   }
   state.currentMacroState = SESSION_MACRO_STATES.SESSION_ABANDONED;
-  events.push(createGameEvent(GAME_ENGINE_EVENTS.SESSION_ABANDONED, { reason: action.reason }, state.updatedAt));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.SESSION_ABANDONED,
+      { reason: action.reason },
+      state.updatedAt,
+    ),
+  );
 }
 
 export function handleAdvanceDay(
@@ -79,21 +85,25 @@ export function handleAdvanceDay(
 
   state.analyticsState.totalEmailsProcessed += processedEmails.length;
 
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.DAY_ENDED,
-    {
-      day: state.currentDay - 1,
-      emailsProcessed: processedEmails.length,
-      emailsDeferred: deferredEmails.length,
-    },
-    state.updatedAt,
-  ));
-  events.push(createGameEvent(
-    GAME_ENGINE_EVENTS.DAY_STARTED,
-    {
-      day: state.currentDay,
-      deferredEmailsCarried: deferredEmails.length,
-    },
-    state.updatedAt,
-  ));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.DAY_ENDED,
+      {
+        day: state.currentDay - 1,
+        emailsProcessed: processedEmails.length,
+        emailsDeferred: deferredEmails.length,
+      },
+      state.updatedAt,
+    ),
+  );
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.DAY_STARTED,
+      {
+        day: state.currentDay,
+        deferredEmailsCarried: deferredEmails.length,
+      },
+      state.updatedAt,
+    ),
+  );
 }

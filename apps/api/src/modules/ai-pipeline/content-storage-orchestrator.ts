@@ -1,3 +1,5 @@
+import { isRecord } from '../../shared/utils/index.js';
+
 import { composeEmailBody, composeDocumentBody, deriveDocumentTitle } from './content-builder.js';
 
 import type {
@@ -7,8 +9,6 @@ import type {
   StoredContentReference,
   UsageMetrics,
 } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 type ResolvedRequestContext = Pick<
   ContentGenerationRequest,

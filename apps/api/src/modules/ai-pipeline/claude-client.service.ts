@@ -1,3 +1,5 @@
+import { isRecord } from '../../shared/utils/index.js';
+
 import type { AppConfig } from '../../config.js';
 import type {
   AiPipelineLogger,
@@ -6,8 +8,6 @@ import type {
   ClaudeCompletionResult,
   ClaudeModelAlias,
 } from './ai-pipeline.types.js';
-
-import { isRecord } from '../../shared/utils/type-guards.js';
 
 export interface ClaudeTransportRequest {
   model: string;
