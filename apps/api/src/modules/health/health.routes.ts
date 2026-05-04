@@ -16,13 +16,15 @@ export const registerHealthRoutes = async (fastify: FastifyInstance): Promise<vo
         rateLimit: false,
       },
       schema: {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         querystring: healthQueryJsonSchema,
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: healthResponseJsonSchema,
         },
       },
     },
-    async () => getHealth(),
+    async () => ({ success: true, data: getHealth() }),
   );
 
   fastify.get(
@@ -32,9 +34,12 @@ export const registerHealthRoutes = async (fastify: FastifyInstance): Promise<vo
         rateLimit: false,
       },
       schema: {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         querystring: healthQueryJsonSchema,
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: readinessResponseJsonSchema,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           503: readinessResponseJsonSchema,
         },
       },
@@ -45,7 +50,7 @@ export const registerHealthRoutes = async (fastify: FastifyInstance): Promise<vo
         reply.code(503);
       }
 
-      return readiness;
+      return { success: true, data: readiness };
     },
   );
 };

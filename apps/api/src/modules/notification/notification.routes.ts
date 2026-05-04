@@ -67,8 +67,11 @@ const notificationRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async () => {
       return {
-        totalConnections: fastify.wsGateway.getConnectionCount(),
-        timestamp: Date.now(),
+        success: true,
+        data: {
+          totalConnections: fastify.wsGateway.getConnectionCount(),
+          timestamp: Date.now(),
+        },
       };
     },
   );
