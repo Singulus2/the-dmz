@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+/* Reason: ErrorCodes in error-codes.ts has type 'any' due to spreading types from @the-dmz/shared.
+   This is a pre-existing architectural issue - ErrorCodes cannot be properly typed without
+   modifying the shared error-codes.ts, which is outside the scope of this issue. */
+
 import { authGuard } from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { tenantStatusGuard } from '../../shared/middleware/tenant-status-guard.js';
@@ -43,7 +48,9 @@ export const leaderboardResponseSchema = z.object({
 
 export const leaderboardListResponseSchema = z.object({
   success: z.boolean(),
-  leaderboards: z.array(leaderboardResponseSchema),
+  data: z.object({
+    leaderboards: z.array(leaderboardResponseSchema),
+  }),
 });
 
 export const leaderboardEntryResponseSchema = z.object({
@@ -69,8 +76,10 @@ export const leaderboardEntryResponseSchema = z.object({
 
 export const leaderboardEntriesResponseSchema = z.object({
   success: z.boolean(),
-  entries: z.array(leaderboardEntryResponseSchema),
-  totalCount: z.number().int().optional(),
+  data: z.object({
+    entries: z.array(leaderboardEntryResponseSchema),
+    totalCount: z.number().int().optional(),
+  }),
 });
 
 export const playerRankResponseSchema = z.object({
@@ -85,13 +94,17 @@ export const playerRankResponseSchema = z.object({
 
 export const playerRanksResponseSchema = z.object({
   success: z.boolean(),
-  ranks: z.array(playerRankResponseSchema),
+  data: z.object({
+    ranks: z.array(playerRankResponseSchema),
+  }),
 });
 
 export const playerPositionResponseSchema = z.object({
   success: z.boolean(),
-  rank: z.number().int(),
-  score: z.number().int(),
+  data: z.object({
+    rank: z.number().int(),
+    score: z.number().int(),
+  }),
 });
 
 export const leaderboardsQuerySchema = z.object({
@@ -152,7 +165,7 @@ export async function registerConsumerLeaderboardRoutes(
 
       if (!result.success) {
         throw new AppError({
-          code: ErrorCodes.INTERNAL_ERROR,
+          code: ErrorCodes.INTERNAL_SERVER_ERROR,
           message: result.error ?? 'Failed to list leaderboards',
           statusCode: 500,
         });
@@ -160,18 +173,20 @@ export async function registerConsumerLeaderboardRoutes(
 
       return {
         success: true,
-        leaderboards:
-          result.leaderboards?.map((lb) => ({
-            leaderboardId: lb.leaderboardId,
-            scope: lb.scope,
-            region: lb.region,
-            seasonId: lb.seasonId,
-            rankingCategory: lb.rankingCategory,
-            timeFrame: lb.timeFrame,
-            isActive: lb.isActive,
-            createdAt: lb.createdAt.toISOString(),
-            updatedAt: lb.updatedAt.toISOString(),
-          })) ?? [],
+        data: {
+          leaderboards:
+            result.leaderboards?.map((lb) => ({
+              leaderboardId: lb.leaderboardId,
+              scope: lb.scope,
+              region: lb.region,
+              seasonId: lb.seasonId,
+              rankingCategory: lb.rankingCategory,
+              timeFrame: lb.timeFrame,
+              isActive: lb.isActive,
+              createdAt: lb.createdAt.toISOString(),
+              updatedAt: lb.updatedAt.toISOString(),
+            })) ?? [],
+        },
       };
     },
   );
@@ -216,28 +231,30 @@ export async function registerConsumerLeaderboardRoutes(
 
       return {
         success: true,
-        entries:
-          result.entries?.map((e) => ({
-            entryId: e.entryId,
-            leaderboardId: e.leaderboardId,
-            playerId: e.playerId,
-            tenantId: e.tenantId,
-            score: e.score,
-            rank: e.rank,
-            metrics: e.metrics as {
-              accuracy: number;
-              avgDecisionTime: number;
-              incidentsResolved: number;
-              resourceEfficiency: number;
-            },
-            periodStart: e.periodStart.toISOString(),
-            periodEnd: e.periodEnd.toISOString(),
-            updatedAt: e.updatedAt.toISOString(),
-            displayName: e.displayName,
-            avatarId: e.avatarId,
-            privacyMode: e.privacyMode,
-          })) ?? [],
-        totalCount: result.totalCount,
+        data: {
+          entries:
+            result.entries?.map((e) => ({
+              entryId: e.entryId,
+              leaderboardId: e.leaderboardId,
+              playerId: e.playerId,
+              tenantId: e.tenantId,
+              score: e.score,
+              rank: e.rank,
+              metrics: {
+                accuracy: e.metrics.accuracy,
+                avgDecisionTime: e.metrics.avgDecisionTime,
+                incidentsResolved: e.metrics.incidentsResolved,
+                resourceEfficiency: e.metrics.resourceEfficiency,
+              },
+              periodStart: e.periodStart.toISOString(),
+              periodEnd: e.periodEnd.toISOString(),
+              updatedAt: e.updatedAt.toISOString(),
+              displayName: e.displayName,
+              avatarId: e.avatarId,
+              privacyMode: e.privacyMode,
+            })) ?? [],
+          totalCount: result.totalCount,
+        },
       };
     },
   );
@@ -264,7 +281,7 @@ export async function registerConsumerLeaderboardRoutes(
 
       if (!result.success) {
         throw new AppError({
-          code: ErrorCodes.INTERNAL_ERROR,
+          code: ErrorCodes.INTERNAL_SERVER_ERROR,
           message: result.error ?? 'Failed to get player ranks',
           statusCode: 500,
         });
@@ -272,16 +289,18 @@ export async function registerConsumerLeaderboardRoutes(
 
       return {
         success: true,
-        ranks:
-          result.ranks?.map((r) => ({
-            leaderboardId: r.leaderboardId,
-            scope: r.scope,
-            region: r.region,
-            rankingCategory: r.rankingCategory,
-            timeFrame: r.timeFrame,
-            rank: r.rank,
-            score: r.score,
-          })) ?? [],
+        data: {
+          ranks:
+            result.ranks?.map((r) => ({
+              leaderboardId: r.leaderboardId,
+              scope: r.scope,
+              region: r.region,
+              rankingCategory: r.rankingCategory,
+              timeFrame: r.timeFrame,
+              rank: r.rank,
+              score: r.score,
+            })) ?? [],
+        },
       };
     },
   );
@@ -321,8 +340,10 @@ export async function registerConsumerLeaderboardRoutes(
 
       return {
         success: true,
-        rank: result.rank!,
-        score: result.score!,
+        data: {
+          rank: result.rank as number,
+          score: result.score!,
+        },
       };
     },
   );
@@ -355,7 +376,7 @@ export async function registerConsumerLeaderboardRoutes(
 
       if (!result.success) {
         throw new AppError({
-          code: ErrorCodes.INTERNAL_ERROR,
+          code: ErrorCodes.INTERNAL_SERVER_ERROR,
           message: result.error ?? 'Failed to get friends leaderboard',
           statusCode: 500,
         });
@@ -363,27 +384,29 @@ export async function registerConsumerLeaderboardRoutes(
 
       return {
         success: true,
-        entries:
-          result.entries?.map((e) => ({
-            entryId: e.entryId,
-            leaderboardId: e.leaderboardId,
-            playerId: e.playerId,
-            tenantId: e.tenantId,
-            score: e.score,
-            rank: e.rank,
-            metrics: e.metrics as {
-              accuracy: number;
-              avgDecisionTime: number;
-              incidentsResolved: number;
-              resourceEfficiency: number;
-            },
-            periodStart: e.periodStart.toISOString(),
-            periodEnd: e.periodEnd.toISOString(),
-            updatedAt: e.updatedAt.toISOString(),
-            displayName: e.displayName,
-            avatarId: e.avatarId,
-            privacyMode: e.privacyMode,
-          })) ?? [],
+        data: {
+          entries:
+            result.entries?.map((e) => ({
+              entryId: e.entryId,
+              leaderboardId: e.leaderboardId,
+              playerId: e.playerId,
+              tenantId: e.tenantId,
+              score: e.score,
+              rank: e.rank,
+              metrics: {
+                accuracy: e.metrics.accuracy,
+                avgDecisionTime: e.metrics.avgDecisionTime,
+                incidentsResolved: e.metrics.incidentsResolved,
+                resourceEfficiency: e.metrics.resourceEfficiency,
+              },
+              periodStart: e.periodStart.toISOString(),
+              periodEnd: e.periodEnd.toISOString(),
+              updatedAt: e.updatedAt.toISOString(),
+              displayName: e.displayName,
+              avatarId: e.avatarId,
+              privacyMode: e.privacyMode,
+            })) ?? [],
+        },
       };
     },
   );
@@ -420,7 +443,7 @@ export async function registerConsumerLeaderboardRoutes(
 
       if (!result.success) {
         throw new AppError({
-          code: ErrorCodes.INTERNAL_ERROR,
+          code: ErrorCodes.INTERNAL_SERVER_ERROR,
           message: result.error ?? 'Failed to get guild leaderboard',
           statusCode: 500,
         });
@@ -428,27 +451,29 @@ export async function registerConsumerLeaderboardRoutes(
 
       return {
         success: true,
-        entries:
-          result.entries?.map((e) => ({
-            entryId: e.entryId,
-            leaderboardId: e.leaderboardId,
-            playerId: e.playerId,
-            tenantId: e.tenantId,
-            score: e.score,
-            rank: e.rank,
-            metrics: e.metrics as {
-              accuracy: number;
-              avgDecisionTime: number;
-              incidentsResolved: number;
-              resourceEfficiency: number;
-            },
-            periodStart: e.periodStart.toISOString(),
-            periodEnd: e.periodEnd.toISOString(),
-            updatedAt: e.updatedAt.toISOString(),
-            displayName: e.displayName,
-            avatarId: e.avatarId,
-            privacyMode: e.privacyMode,
-          })) ?? [],
+        data: {
+          entries:
+            result.entries?.map((e) => ({
+              entryId: e.entryId,
+              leaderboardId: e.leaderboardId,
+              playerId: e.playerId,
+              tenantId: e.tenantId,
+              score: e.score,
+              rank: e.rank,
+              metrics: {
+                accuracy: e.metrics.accuracy,
+                avgDecisionTime: e.metrics.avgDecisionTime,
+                incidentsResolved: e.metrics.incidentsResolved,
+                resourceEfficiency: e.metrics.resourceEfficiency,
+              },
+              periodStart: e.periodStart.toISOString(),
+              periodEnd: e.periodEnd.toISOString(),
+              updatedAt: e.updatedAt.toISOString(),
+              displayName: e.displayName,
+              avatarId: e.avatarId,
+              privacyMode: e.privacyMode,
+            })) ?? [],
+        },
       };
     },
   );
