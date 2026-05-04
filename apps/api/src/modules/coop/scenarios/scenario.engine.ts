@@ -1,6 +1,7 @@
 import {
   COOP_SCALING_2_PLAYER,
   calculateEffectiveScaling,
+  PARTY_DIFFICULTY_TIERS,
   type PartyDifficultyTier,
   type CoopThreatScaling,
 } from '@the-dmz/shared/game';
@@ -277,8 +278,7 @@ export function validateScenarioConfig(config: { scenarioId: string; difficultyT
     };
   }
 
-  const validTiers: PartyDifficultyTier[] = ['training', 'standard', 'hardened', 'nightmare'];
-  if (!validTiers.includes(config.difficultyTier as PartyDifficultyTier)) {
+  if (!PARTY_DIFFICULTY_TIERS.includes(config.difficultyTier as PartyDifficultyTier)) {
     return {
       valid: false,
       error: `Invalid difficulty tier: ${config.difficultyTier}`,

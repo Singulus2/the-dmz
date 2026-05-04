@@ -555,4 +555,86 @@ describe('scenario engine - validateScenarioConfig', () => {
     expect(result.valid).toBe(false);
     expect(result.error).toContain('does not support');
   });
+
+  it('accepts training tier for bandwidth_siege', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'bandwidth_siege',
+      difficultyTier: 'training',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts standard tier for bandwidth_siege', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'bandwidth_siege',
+      difficultyTier: 'standard',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts standard tier for cascade_failure', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'cascade_failure',
+      difficultyTier: 'standard',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts hardened tier for cascade_failure', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'cascade_failure',
+      difficultyTier: 'hardened',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts hardened tier for the_insider', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'the_insider',
+      difficultyTier: 'hardened',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts nightmare tier for the_insider', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'the_insider',
+      difficultyTier: 'nightmare',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts hardened tier for data_exodus', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'data_exodus',
+      difficultyTier: 'hardened',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts nightmare tier for data_exodus', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'data_exodus',
+      difficultyTier: 'nightmare',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('rejects training tier for cascade_failure', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'cascade_failure',
+      difficultyTier: 'training',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.error).toContain('does not support');
+  });
+
+  it('rejects nightmare tier for bandwidth_siege', () => {
+    const result = validateScenarioConfig({
+      scenarioId: 'bandwidth_siege',
+      difficultyTier: 'nightmare',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.error).toContain('does not support');
+  });
 });

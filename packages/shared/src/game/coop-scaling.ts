@@ -4,6 +4,8 @@ export type { CoopRole } from '../schemas/coop-session.schema.js';
 
 export type PartyDifficultyTier = 'training' | 'standard' | 'hardened' | 'nightmare';
 
+export const PARTY_DIFFICULTY_TIERS = ['training', 'standard', 'hardened', 'nightmare'] as const;
+
 export interface CoopThreatScaling {
   emailVolumeMultiplier: number;
   threatProbabilityBonus: number;
