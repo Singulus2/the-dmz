@@ -139,20 +139,33 @@ export async function getCacheStatus(): Promise<{
   }
 
   const cacheNames = await caches.keys();
-  let totalSize = 0;
 
-  for (const name of cacheNames) {
-    const cache = await caches.open(name);
-    const requests = await cache.keys();
-    for (const req of requests) {
-      const response = await cache.match(req);
-      if (response) {
-        const blob = await response.blob();
-        totalSize += blob.size;
-      }
-    }
+  if (cacheNames.length === 0) {
+    return { caches: [], estimatedSize: '0 B' };
   }
 
+  const sizePromises = cacheNames.map(async (name) => {
+    const cache = await caches.open(name);
+    const requests = await cache.keys();
+
+    if (requests.length === 0) {
+      return 0;
+    }
+
+    const requestSizes = await Promise.all(
+      requests.map(async (req) => {
+        const response = await cache.match(req);
+        if (!response) return 0;
+        const blob = await response.blob();
+        return blob.size;
+      }),
+    );
+
+    return requestSizes.reduce((sum, size) => sum + size, 0);
+  });
+
+  const sizes = await Promise.all(sizePromises);
+  const totalSize = sizes.reduce((sum, size) => sum + size, 0);
   const sizeStr = formatBytes(totalSize);
 
   return {

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('$app/environment', () => ({
@@ -590,6 +591,217 @@ describe('pwa/index', () => {
         const { getCacheStatus } = await import('$lib/pwa');
         const status = await getCacheStatus();
         expect(status.estimatedSize).toBe('0 B');
+      } finally {
+        Object.defineProperty(global, 'caches', {
+          value: originalCaches,
+          writable: true,
+          configurable: true,
+        });
+      }
+    });
+
+    it('should process multiple caches concurrently', async () => {
+      const callTimes: number[] = [];
+      const mockCaches = {
+        keys: vi.fn().mockResolvedValue(['cache-1', 'cache-2', 'cache-3']),
+        open: vi.fn().mockImplementation(() => {
+          callTimes.push(Date.now());
+          return new Promise((resolve) => {
+            setTimeout(() => resolve({}), 50);
+          });
+        }),
+        delete: vi.fn().mockResolvedValue(true),
+      };
+
+      const originalCaches = global.caches;
+      Object.defineProperty(global, 'caches', {
+        value: mockCaches,
+        writable: true,
+        configurable: true,
+      });
+
+      try {
+        const { getCacheStatus } = await import('$lib/pwa');
+        const startTime = Date.now();
+        await getCacheStatus();
+        const elapsed = Date.now() - startTime;
+        expect(callTimes.length).toBe(3);
+        const maxGap = Math.max(...callTimes.map((t, i) => (i > 0 ? t - callTimes[i - 1] : 0)));
+        expect(maxGap).toBeLessThan(40);
+        expect(elapsed).toBeLessThan(150);
+      } finally {
+        Object.defineProperty(global, 'caches', {
+          value: originalCaches,
+          writable: true,
+          configurable: true,
+        });
+      }
+    });
+
+    it('should process requests within each cache concurrently', async () => {
+      const matchCallTimes: number[] = [];
+      const mockRequests = [{}, {}, {}];
+      const mockCache = {
+        keys: vi.fn().mockResolvedValue(mockRequests),
+        match: vi.fn().mockImplementation(() => {
+          matchCallTimes.push(Date.now());
+          return new Promise((resolve) => {
+            setTimeout(
+              () =>
+                resolve({
+                  blob: vi.fn().mockResolvedValue(new Blob([], { size: 100 } as BlobPropertyBag)),
+                }),
+              30,
+            );
+          });
+        }),
+      };
+
+      const mockCaches = {
+        keys: vi.fn().mockResolvedValue(['test-cache']),
+        open: vi.fn().mockResolvedValue(mockCache),
+        delete: vi.fn().mockResolvedValue(true),
+      };
+
+      const originalCaches = global.caches;
+      Object.defineProperty(global, 'caches', {
+        value: mockCaches,
+        writable: true,
+        configurable: true,
+      });
+
+      try {
+        const { getCacheStatus } = await import('$lib/pwa');
+        const startTime = Date.now();
+        const status = await getCacheStatus();
+        const elapsed = Date.now() - startTime;
+        expect(mockCache.match).toHaveBeenCalledTimes(3);
+        const maxGap = Math.max(
+          ...matchCallTimes.map((t, i) => (i > 0 ? t - matchCallTimes[i - 1] : 0)),
+        );
+        expect(maxGap).toBeLessThan(20);
+        expect(elapsed).toBeLessThan(80);
+        expect(status.estimatedSize).toBe('300 B');
+      } finally {
+        Object.defineProperty(global, 'caches', {
+          value: originalCaches,
+          writable: true,
+          configurable: true,
+        });
+      }
+    });
+
+    it('should return correct total size when multiple caches with multiple requests exist', async () => {
+      const cache1Requests = [{}, {}];
+      const cache2Requests = [{}, {}, {}];
+
+      const mockCache1 = {
+        keys: vi.fn().mockResolvedValue(cache1Requests),
+        match: vi.fn().mockResolvedValue({
+          blob: vi.fn().mockResolvedValue(new Blob([], { size: 500 } as BlobPropertyBag)),
+        }),
+      };
+      const mockCache2 = {
+        keys: vi.fn().mockResolvedValue(cache2Requests),
+        match: vi.fn().mockResolvedValue({
+          blob: vi.fn().mockResolvedValue(new Blob([], { size: 1000 } as BlobPropertyBag)),
+        }),
+      };
+
+      let openCallCount = 0;
+      const mockCaches = {
+        keys: vi.fn().mockResolvedValue(['cache-v1', 'cache-v2']),
+        open: vi.fn().mockImplementation(() => {
+          openCallCount++;
+          return Promise.resolve(openCallCount === 1 ? mockCache1 : mockCache2);
+        }),
+        delete: vi.fn().mockResolvedValue(true),
+      };
+
+      const originalCaches = global.caches;
+      Object.defineProperty(global, 'caches', {
+        value: mockCaches,
+        writable: true,
+        configurable: true,
+      });
+
+      try {
+        const { getCacheStatus } = await import('$lib/pwa');
+        const status = await getCacheStatus();
+        expect(status.caches).toEqual(['cache-v1', 'cache-v2']);
+        expect(status.estimatedSize).toBe('4 KB');
+      } finally {
+        Object.defineProperty(global, 'caches', {
+          value: originalCaches,
+          writable: true,
+          configurable: true,
+        });
+      }
+    });
+
+    it('should handle cache match failure gracefully', async () => {
+      const mockRequest = {};
+      const mockCache = {
+        keys: vi.fn().mockResolvedValue([mockRequest]),
+        match: vi.fn().mockResolvedValue(null),
+      };
+
+      const mockCaches = {
+        keys: vi.fn().mockResolvedValue(['test-cache']),
+        open: vi.fn().mockResolvedValue(mockCache),
+        delete: vi.fn().mockResolvedValue(true),
+      };
+
+      const originalCaches = global.caches;
+      Object.defineProperty(global, 'caches', {
+        value: mockCaches,
+        writable: true,
+        configurable: true,
+      });
+
+      try {
+        const { getCacheStatus } = await import('$lib/pwa');
+        const status = await getCacheStatus();
+        expect(status.caches).toEqual(['test-cache']);
+        expect(status.estimatedSize).toBe('0 B');
+      } finally {
+        Object.defineProperty(global, 'caches', {
+          value: originalCaches,
+          writable: true,
+          configurable: true,
+        });
+      }
+    });
+
+    it('should handle blob extraction failure gracefully', async () => {
+      const mockRequest = {};
+      const mockResponse = {
+        blob: vi.fn().mockRejectedValue(new Error('Blob error')),
+      };
+      const mockCache = {
+        keys: vi.fn().mockResolvedValue([mockRequest]),
+        match: vi.fn().mockResolvedValue(mockResponse),
+      };
+
+      const mockCaches = {
+        keys: vi.fn().mockResolvedValue(['test-cache']),
+        open: vi.fn().mockResolvedValue(mockCache),
+        delete: vi.fn().mockResolvedValue(true),
+      };
+
+      const originalCaches = global.caches;
+      Object.defineProperty(global, 'caches', {
+        value: mockCaches,
+        writable: true,
+        configurable: true,
+      });
+
+      try {
+        const { getCacheStatus } = await import('$lib/pwa');
+        await expect(getCacheStatus()).resolves.toEqual({
+          caches: ['test-cache'],
+          estimatedSize: '0 B',
+        });
       } finally {
         Object.defineProperty(global, 'caches', {
           value: originalCaches,
