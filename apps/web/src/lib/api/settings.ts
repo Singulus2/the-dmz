@@ -19,7 +19,7 @@ export async function fetchSettings(category?: SettingsCategory | 'all'): Promis
   const url = category ? `/api/v1/settings/${category}` : '/api/v1/settings/all';
 
   const response = await client.get(url);
-  const apiSettings = response as ApiSettingsState;
+  const apiSettings = response.data as ApiSettingsState;
   const performance = get(performanceStore);
 
   return {
@@ -46,7 +46,7 @@ export async function exportSettings(): Promise<{
   exportedAt: string;
 }> {
   const response = await client.get('/api/v1/settings/export');
-  return response as { settings: SettingsState; exportedAt: string };
+  return response.data as { settings: SettingsState; exportedAt: string };
 }
 
 export async function requestDataExport(): Promise<{
