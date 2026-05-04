@@ -98,12 +98,7 @@ export const seatService = {
     const currentSeats = await billingRepo.countSeats(tenantId, config);
 
     if (!isUnlimited && currentSeats >= seatLimit) {
-      if (overagePolicy === 'allow') {
-        // Allow overage - proceed with allocation
-      } else if (overagePolicy === 'notify') {
-        // Allow but log for notification (proceed with allocation)
-      } else {
-        // deny
+      if (overagePolicy !== 'allow' && overagePolicy !== 'notify') {
         return {
           success: false,
           allocated: false,
