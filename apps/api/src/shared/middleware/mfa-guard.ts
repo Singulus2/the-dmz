@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { getDatabaseClient } from '../../shared/database/connection.js';
 import { sessions as sessionsTable } from '../../db/schema/auth/sessions.js';
 import { users } from '../../shared/database/schema/users.js';
-import { MfaRequiredError } from '../../modules/auth/auth.errors.js';
+import { MfaRequiredError } from '../../modules/auth/index.js';
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { AppConfig } from '../../config.js';

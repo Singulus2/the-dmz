@@ -7,8 +7,7 @@ import {
   setABACCachedPermissions,
   invalidateABACCache,
 } from '../cache/abac-cache.js';
-import { AuthError } from '../../modules/auth/auth.errors.js';
-import * as authService from '../../modules/auth/auth.service.js';
+import { AuthError, authService } from '../../modules/auth/index.js';
 
 import { AppError, ErrorCodes, insufficientPermissions } from './error-handler.js';
 import {

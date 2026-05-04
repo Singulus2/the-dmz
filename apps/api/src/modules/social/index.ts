@@ -13,3 +13,4 @@ export * from './reputation.service.js';
 export * from './reputation.routes.js';
 export * from './rate-limit.service.js';
 export * from './content-filter.service.js';
+export * from './moderation-enforcement.service.js';

@@ -54,3 +54,4 @@ export * from './csrf.js';
 export * from './cookies.js';
 export * from './jwt-keys.service.js';
 export * from './auth.crypto.js';
+export * from './api-key.service.js';

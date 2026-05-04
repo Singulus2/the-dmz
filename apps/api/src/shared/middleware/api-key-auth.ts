@@ -5,7 +5,7 @@ import {
 } from '@the-dmz/shared/auth/api-key-contract';
 
 import { getDatabaseClient } from '../database/connection.js';
-import { apiKeyService } from '../../modules/auth/api-key.service.js';
+import { apiKeyService } from '../../modules/auth/index.js';
 
 import { createAppError, ErrorCodes } from './error-handler.js';
 

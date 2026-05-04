@@ -1,7 +1,7 @@
 import {
   isActionAllowed,
   type EnforcementResult,
-} from '../../modules/social/moderation-enforcement.service.js';
+} from '../../modules/social/index.js';
 
 import { AppError, ErrorCodes } from './error-handler.js';
 
