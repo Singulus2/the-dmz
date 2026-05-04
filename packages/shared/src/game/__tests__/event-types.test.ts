@@ -82,6 +82,16 @@ describe('GAME_EVENT_TYPES', () => {
     expect(GAME_EVENT_TYPES.EMAIL_INDICATOR_MARKED).toBe('game.email.indicator_marked');
     expect(GAME_EVENT_TYPES.EMAIL_VERIFICATION_REQUESTED).toBe('game.email.verification_requested');
   });
+
+  it('should contain all game.facility.* events', () => {
+    expect(GAME_EVENT_TYPES.FACILITY_CLIENT_ONBOARDED).toBe('game.facility.client.onboarded');
+    expect(GAME_EVENT_TYPES.FACILITY_CLIENT_EVICTED).toBe('game.facility.client.evicted');
+    expect(GAME_EVENT_TYPES.FACILITY_RESOURCE_CRITICAL).toBe('game.facility.resource.critical');
+    expect(GAME_EVENT_TYPES.FACILITY_TIER_UPGRADED).toBe('game.facility.tier.upgraded');
+    expect(GAME_EVENT_TYPES.FACILITY_UPGRADE_PURCHASED).toBe('game.facility.upgrade.purchased');
+    expect(GAME_EVENT_TYPES.FACILITY_UPGRADE_COMPLETED).toBe('game.facility.upgrade.completed');
+    expect(GAME_EVENT_TYPES.FACILITY_TICK_PROCESSED).toBe('game.facility.tick.processed');
+  });
 });
 
 describe('isValidGameEventType', () => {
@@ -90,6 +100,13 @@ describe('isValidGameEventType', () => {
     expect(isValidGameEventType('game.day.started')).toBe(true);
     expect(isValidGameEventType('game.email.opened')).toBe(true);
     expect(isValidGameEventType('game.session.completed')).toBe(true);
+    expect(isValidGameEventType('game.facility.client.onboarded')).toBe(true);
+    expect(isValidGameEventType('game.facility.client.evicted')).toBe(true);
+    expect(isValidGameEventType('game.facility.resource.critical')).toBe(true);
+    expect(isValidGameEventType('game.facility.tier.upgraded')).toBe(true);
+    expect(isValidGameEventType('game.facility.upgrade.purchased')).toBe(true);
+    expect(isValidGameEventType('game.facility.upgrade.completed')).toBe(true);
+    expect(isValidGameEventType('game.facility.tick.processed')).toBe(true);
   });
 
   it('should return false for invalid event types', () => {
@@ -97,6 +114,13 @@ describe('isValidGameEventType', () => {
     expect(isValidGameEventType('')).toBe(false);
     expect(isValidGameEventType('game.invalid')).toBe(false);
     expect(isValidGameEventType('session.started')).toBe(false);
+    expect(isValidGameEventType('facility.client.onboarded')).toBe(false);
+    expect(isValidGameEventType('facility.client.evicted')).toBe(false);
+    expect(isValidGameEventType('facility.resource.critical')).toBe(false);
+    expect(isValidGameEventType('facility.tier.upgraded')).toBe(false);
+    expect(isValidGameEventType('facility.upgrade.purchased')).toBe(false);
+    expect(isValidGameEventType('facility.upgrade.completed')).toBe(false);
+    expect(isValidGameEventType('facility.tick.processed')).toBe(false);
   });
 
   it('should narrow type correctly', () => {

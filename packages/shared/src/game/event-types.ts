@@ -62,13 +62,13 @@ export const GAME_EVENT_TYPES = {
   INTEL_CHANGED: 'game.economy.intel_changed',
   LEVEL_UP: 'game.economy.level_up',
   INCIDENT_RESPONSE_ACTION_TAKEN: 'incident.response.action_taken',
-  FACILITY_CLIENT_ONBOARDED: 'facility.client.onboarded',
-  FACILITY_CLIENT_EVICTED: 'facility.client.evicted',
-  FACILITY_RESOURCE_CRITICAL: 'facility.resource.critical',
-  FACILITY_TIER_UPGRADED: 'facility.tier.upgraded',
-  FACILITY_UPGRADE_PURCHASED: 'facility.upgrade.purchased',
-  FACILITY_UPGRADE_COMPLETED: 'facility.upgrade.completed',
-  FACILITY_TICK_PROCESSED: 'facility.tick.processed',
+  FACILITY_CLIENT_ONBOARDED: 'game.facility.client.onboarded',
+  FACILITY_CLIENT_EVICTED: 'game.facility.client.evicted',
+  FACILITY_RESOURCE_CRITICAL: 'game.facility.resource.critical',
+  FACILITY_TIER_UPGRADED: 'game.facility.tier.upgraded',
+  FACILITY_UPGRADE_PURCHASED: 'game.facility.upgrade.purchased',
+  FACILITY_UPGRADE_COMPLETED: 'game.facility.upgrade.completed',
+  FACILITY_TICK_PROCESSED: 'game.facility.tick.processed',
 } as const;
 
 export type GameEventType = (typeof GAME_EVENT_TYPES)[keyof typeof GAME_EVENT_TYPES];
