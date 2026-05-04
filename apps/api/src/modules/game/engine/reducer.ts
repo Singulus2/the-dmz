@@ -1,8 +1,10 @@
 import {
   SESSION_MACRO_STATES,
   DAY_PHASES,
+  GAME_ACTIONS,
   type GameState,
   type GameActionPayload,
+  type GameActionType,
   createInitialBreachState,
 } from '@the-dmz/shared';
 
@@ -136,116 +138,54 @@ export const createInitialGameState = (
   return createInitialState(sessionId, userId, tenantId, gameSeed);
 };
 
+type GameActionHandler = (
+  state: GameState,
+  action: GameActionPayload,
+  events: DomainEvent[],
+) => void;
+
+const noopHandler: GameActionHandler = () => {};
+
+const ACTION_HANDLERS: Record<GameActionType, GameActionHandler> = {
+  [GAME_ACTIONS.ACK_DAY_START]: handleAckDayStart,
+  [GAME_ACTIONS.LOAD_INBOX]: handleLoadInbox,
+  [GAME_ACTIONS.OPEN_EMAIL]: handleOpenEmail,
+  [GAME_ACTIONS.MARK_INDICATOR]: handleMarkIndicator,
+  [GAME_ACTIONS.REQUEST_VERIFICATION]: handleRequestVerification,
+  [GAME_ACTIONS.SUBMIT_DECISION]: handleSubmitDecision,
+  [GAME_ACTIONS.PROCESS_THREATS]: handleProcessThreats,
+  [GAME_ACTIONS.RESOLVE_INCIDENT]: handleResolveIncident,
+  [GAME_ACTIONS.TRIGGER_BREACH]: handleTriggerBreach,
+  [GAME_ACTIONS.PAY_RANSOM]: handlePayRansom,
+  [GAME_ACTIONS.REFUSE_RANSOM]: handleRefuseRansom,
+  [GAME_ACTIONS.ADVANCE_RECOVERY]: handleAdvanceRecovery,
+  [GAME_ACTIONS.PURCHASE_UPGRADE]: handlePurchaseUpgrade,
+  [GAME_ACTIONS.ADJUST_RESOURCE]: handleAdjustResource,
+  [GAME_ACTIONS.ONBOARD_CLIENT]: handleOnboardClient,
+  [GAME_ACTIONS.EVICT_CLIENT]: handleEvictClient,
+  [GAME_ACTIONS.PROCESS_FACILITY_TICK]: handleProcessFacilityTick,
+  [GAME_ACTIONS.UPGRADE_FACILITY_TIER]: handleUpgradeFacilityTier,
+  [GAME_ACTIONS.PURCHASE_FACILITY_UPGRADE]: handlePurchaseFacilityUpgrade,
+  [GAME_ACTIONS.PAUSE_SESSION]: handlePauseSession,
+  [GAME_ACTIONS.RESUME_SESSION]: handleResumeSession,
+  [GAME_ACTIONS.ABANDON_SESSION]: handleAbandonSession,
+  [GAME_ACTIONS.ADVANCE_DAY]: handleAdvanceDay,
+  [GAME_ACTIONS.APPLY_CONSEQUENCES]: noopHandler,
+  [GAME_ACTIONS.CLOSE_VERIFICATION]: noopHandler,
+  [GAME_ACTIONS.OPEN_VERIFICATION]: noopHandler,
+  [GAME_ACTIONS.FLAG_DISCREPANCY]: handleFlagDiscrepancy,
+};
+
 export const reduce = (state: GameState, action: GameActionPayload): ActionResult => {
   const events: DomainEvent[] = [];
   const newState = { ...state, updatedAt: new Date().toISOString() };
 
   try {
-    switch (action.type) {
-      case 'ACK_DAY_START':
-        handleAckDayStart(newState, action, events);
-        break;
-
-      case 'LOAD_INBOX':
-        handleLoadInbox(newState, action, events);
-        break;
-
-      case 'OPEN_EMAIL':
-        handleOpenEmail(newState, action, events);
-        break;
-
-      case 'MARK_INDICATOR':
-        handleMarkIndicator(newState, action, events);
-        break;
-
-      case 'REQUEST_VERIFICATION':
-        handleRequestVerification(newState, action, events);
-        break;
-
-      case 'SUBMIT_DECISION':
-        handleSubmitDecision(newState, action, events);
-        break;
-
-      case 'PROCESS_THREATS':
-        handleProcessThreats(newState, action, events);
-        break;
-
-      case 'RESOLVE_INCIDENT':
-        handleResolveIncident(newState, action, events);
-        break;
-
-      case 'TRIGGER_BREACH':
-        handleTriggerBreach(newState, action, events);
-        break;
-
-      case 'PAY_RANSOM':
-        handlePayRansom(newState, action, events);
-        break;
-
-      case 'REFUSE_RANSOM':
-        handleRefuseRansom(newState, action, events);
-        break;
-
-      case 'ADVANCE_RECOVERY':
-        handleAdvanceRecovery(newState, action, events);
-        break;
-
-      case 'PURCHASE_UPGRADE':
-        handlePurchaseUpgrade(newState, action, events);
-        break;
-
-      case 'ADJUST_RESOURCE':
-        handleAdjustResource(newState, action, events);
-        break;
-
-      case 'ONBOARD_CLIENT':
-        handleOnboardClient(newState, action, events);
-        break;
-
-      case 'EVICT_CLIENT':
-        handleEvictClient(newState, action, events);
-        break;
-
-      case 'PROCESS_FACILITY_TICK':
-        handleProcessFacilityTick(newState, action, events);
-        break;
-
-      case 'UPGRADE_FACILITY_TIER':
-        handleUpgradeFacilityTier(newState, action, events);
-        break;
-
-      case 'PURCHASE_FACILITY_UPGRADE':
-        handlePurchaseFacilityUpgrade(newState, action, events);
-        break;
-
-      case 'PAUSE_SESSION':
-        handlePauseSession(newState, action, events);
-        break;
-
-      case 'RESUME_SESSION':
-        handleResumeSession(newState, action, events);
-        break;
-
-      case 'ABANDON_SESSION':
-        handleAbandonSession(newState, action, events);
-        break;
-
-      case 'ADVANCE_DAY':
-        handleAdvanceDay(newState, action, events);
-        break;
-
-      case 'APPLY_CONSEQUENCES':
-      case 'CLOSE_VERIFICATION':
-      case 'OPEN_VERIFICATION':
-        break;
-
-      case 'FLAG_DISCREPANCY':
-        handleFlagDiscrepancy(newState, action, events);
-        break;
-
-      default:
-        throw new Error(`Unknown action type: ${(action as GameActionPayload).type}`);
+    const handler = ACTION_HANDLERS[action.type as GameActionType];
+    if (!handler) {
+      throw new Error(`Unknown action type: ${action.type}`);
     }
+    handler(newState, action, events);
 
     newState.sequenceNumber++;
     return { success: true, newState, events };
