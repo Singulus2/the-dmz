@@ -270,7 +270,6 @@ export const registerSSORoutes = async (fastify: FastifyInstance): Promise<void>
       const defaultRedirectUri = `${config.CORS_ORIGINS_LIST[0] || 'http://localhost:5173'}/auth/sso/oidc/callback/${providerId}`;
       const finalRedirectUri = redirectUri || defaultRedirectUri;
 
-      // Get OIDC provider configuration (fetch discovery metadata)
       const { metadata, clientId } = await ssoService.getOIDCProviderConfig(provider);
 
       const scopes = ['openid', 'email', 'profile'];
@@ -278,7 +277,6 @@ export const registerSSORoutes = async (fastify: FastifyInstance): Promise<void>
         scopes.push('groups');
       }
 
-      // Build authorization URL with PKCE
       const params = new URLSearchParams({
         response_type: 'code',
         client_id: clientId,
