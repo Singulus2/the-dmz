@@ -169,9 +169,38 @@ describe('SessionLifecycleManager', () => {
 
       expect(result.success).toBe(true);
       expect(result.events).toHaveLength(1);
-      const event = result.events[0] as { eventType: string; payload: { sessionId: string } };
+      const event = result.events[0] as {
+        eventType: string;
+        payload: { sessionId: string; userId: string };
+      };
       expect(event.eventType).toBe(GAME_ENGINE_EVENTS.SESSION_PAUSED);
       expect(event.payload.sessionId).toBe('test-session-123');
+      expect(event.payload.userId).toBe('test-user-456');
+    });
+
+    it('emits event with userId matching state userId', () => {
+      const state = createTestState({
+        currentMacroState: 'SESSION_ACTIVE',
+        userId: 'custom-user-id',
+      });
+      mockedTransitionMacroState.mockReturnValue({
+        success: true,
+        newState: { ...state, currentMacroState: 'SESSION_PAUSED' },
+        events: [],
+      });
+
+      const managerWithoutBus = new SessionLifecycleManager(eventMapper, undefined);
+      const result = managerWithoutBus.pauseSession(state);
+
+      expect(result.success).toBe(true);
+      expect(result.events).toHaveLength(1);
+      const event = result.events[0] as {
+        eventType: string;
+        payload: { sessionId: string; userId: string };
+      };
+      expect(event.eventType).toBe(GAME_ENGINE_EVENTS.SESSION_PAUSED);
+      expect(event.payload.sessionId).toBe('test-session-123');
+      expect(event.payload.userId).toBe('custom-user-id');
     });
   });
 
@@ -216,9 +245,38 @@ describe('SessionLifecycleManager', () => {
 
       expect(result.success).toBe(true);
       expect(result.events).toHaveLength(1);
-      const event = result.events[0] as { eventType: string; payload: { sessionId: string } };
+      const event = result.events[0] as {
+        eventType: string;
+        payload: { sessionId: string; userId: string };
+      };
       expect(event.eventType).toBe(GAME_ENGINE_EVENTS.SESSION_RESUMED);
       expect(event.payload.sessionId).toBe('test-session-123');
+      expect(event.payload.userId).toBe('test-user-456');
+    });
+
+    it('emits event with userId matching state userId', () => {
+      const state = createTestState({
+        currentMacroState: 'SESSION_PAUSED',
+        userId: 'custom-user-id',
+      });
+      mockedTransitionMacroState.mockReturnValue({
+        success: true,
+        newState: { ...state, currentMacroState: 'SESSION_ACTIVE' },
+        events: [],
+      });
+
+      const managerWithoutBus = new SessionLifecycleManager(eventMapper, undefined);
+      const result = managerWithoutBus.resumeSession(state);
+
+      expect(result.success).toBe(true);
+      expect(result.events).toHaveLength(1);
+      const event = result.events[0] as {
+        eventType: string;
+        payload: { sessionId: string; userId: string };
+      };
+      expect(event.eventType).toBe(GAME_ENGINE_EVENTS.SESSION_RESUMED);
+      expect(event.payload.sessionId).toBe('test-session-123');
+      expect(event.payload.userId).toBe('custom-user-id');
     });
   });
 
