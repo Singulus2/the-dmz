@@ -1,5 +1,5 @@
 import { apiClient } from './client.js';
-import { createInvalidResponseError } from './errors.js';
+import { apiCall } from './api-call.js';
 
 import type { CategorizedApiError } from './types.js';
 
@@ -67,53 +67,23 @@ export async function getComplianceSummary(): Promise<{
   data?: ComplianceDashboardData;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<ComplianceDashboardData>('/admin/compliance');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<ComplianceDashboardData>('/admin/compliance'));
 }
 
 export async function getComplianceDetail(frameworkId: string): Promise<{
   data?: ComplianceDetail;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<ComplianceDetail>(`/admin/compliance/${frameworkId}`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<ComplianceDetail>(`/admin/compliance/${frameworkId}`));
 }
 
 export async function getFrameworkRequirements(frameworkId: string): Promise<{
   data?: FrameworkRequirement[];
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<FrameworkRequirement[]>(
-    `/admin/compliance/${frameworkId}/requirements`,
+  return apiCall(() =>
+    apiClient.get<FrameworkRequirement[]>(`/admin/compliance/${frameworkId}/requirements`),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
 }
 
 export async function calculateCompliance(frameworkId?: string): Promise<{
@@ -124,15 +94,5 @@ export async function calculateCompliance(frameworkId?: string): Promise<{
     ? `/admin/compliance/${frameworkId}/calculate`
     : '/admin/compliance/calculate';
 
-  const result = await apiClient.post<ComplianceDashboardData | ComplianceDetail>(url, {});
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<ComplianceDashboardData | ComplianceDetail>(url, {}));
 }

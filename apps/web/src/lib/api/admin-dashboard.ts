@@ -1,5 +1,5 @@
 import { apiClient } from './client.js';
-import { createInvalidResponseError } from './errors.js';
+import { apiCall } from './api-call.js';
 
 import type { CategorizedApiError } from './types.js';
 
@@ -67,15 +67,5 @@ export async function getDashboard(): Promise<{
   data?: DashboardData;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<DashboardData>('/admin/dashboard');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<DashboardData>('/admin/dashboard'));
 }

@@ -1,5 +1,5 @@
 import { apiClient } from './client.js';
-import { createInvalidResponseError } from './errors.js';
+import { apiCall } from './api-call.js';
 
 import type { CategorizedApiError } from './types.js';
 
@@ -59,51 +59,24 @@ export async function getSAMLProviders(): Promise<{
   data?: SAMLProviderConfig[];
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<SAMLProviderListResponse>('/admin/saml/config');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data.providers };
+  return apiCall(
+    () => apiClient.get<SAMLProviderListResponse>('/admin/saml/config'),
+    (data) => data.providers,
+  );
 }
 
 export async function getSAMLProvider(id: string): Promise<{
   data?: SAMLProviderConfig;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<SAMLProviderResponse>(`/admin/saml/config/${id}`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<SAMLProviderResponse>(`/admin/saml/config/${id}`));
 }
 
 export async function createSAMLProvider(provider: CreateSAMLProviderRequest): Promise<{
   data?: SAMLProviderConfig;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<SAMLProviderResponse>('/admin/saml/config', provider);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<SAMLProviderResponse>('/admin/saml/config', provider));
 }
 
 export async function updateSAMLProvider(
@@ -113,49 +86,22 @@ export async function updateSAMLProvider(
   data?: SAMLProviderConfig;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.put<SAMLProviderResponse>(`/admin/saml/config/${id}`, provider);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.put<SAMLProviderResponse>(`/admin/saml/config/${id}`, provider));
 }
 
 export async function deleteSAMLProvider(id: string): Promise<{
   data?: boolean;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.delete<{ success: boolean }>(`/admin/saml/config/${id}`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data.success };
+  return apiCall(
+    () => apiClient.delete<{ success: boolean }>(`/admin/saml/config/${id}`),
+    (data) => data.success,
+  );
 }
 
 export async function testSAMLConnection(id: string): Promise<{
   data?: SAMLTestConnectionResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<SAMLTestConnectionResponse>(`/admin/saml/test/${id}`, {});
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<SAMLTestConnectionResponse>(`/admin/saml/test/${id}`, {}));
 }

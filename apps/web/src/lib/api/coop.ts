@@ -9,6 +9,7 @@ import {
 } from '@the-dmz/shared/schemas';
 
 import { apiClient } from './client.js';
+import { apiCall } from './api-call.js';
 import { createInvalidResponseError } from './errors.js';
 
 import type { CategorizedApiError } from './types.js';
@@ -38,164 +39,122 @@ export type OverrideProposalRequest = {
 export async function getCoopSession(
   sessionId: string,
 ): Promise<{ data?: CoopSessionBootstrap; error?: CategorizedApiError }> {
-  const result = await apiClient.get<CoopSessionResponse>(`/coop/sessions/${sessionId}`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopSessionBootstrapSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid co-op session response from server') };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () => apiClient.get<CoopSessionResponse>(`/coop/sessions/${sessionId}`),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopSessionBootstrapSchema.parse(data.data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid co-op session response from server') };
+      }
+    },
+  );
 }
 
 export async function createCoopSession(): Promise<{
   data?: CoopSessionBootstrap;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<CoopSessionResponse>('/coop/sessions', undefined);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopSessionBootstrapSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return {
-        error: createInvalidResponseError('Invalid co-op session creation response from server'),
-      };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () => apiClient.post<CoopSessionResponse>('/coop/sessions', undefined),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopSessionBootstrapSchema.parse(data.data) };
+      } catch {
+        return {
+          error: createInvalidResponseError('Invalid co-op session creation response from server'),
+        };
+      }
+    },
+  );
 }
 
 export async function assignCoopRoles(
   sessionId: string,
   roles: Array<{ playerId: string; role: CoopRole }>,
 ): Promise<{ data?: CoopSessionBootstrap; error?: CategorizedApiError }> {
-  const result = await apiClient.post<CoopSessionResponse>(`/coop/sessions/${sessionId}/roles`, {
-    roles,
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopSessionBootstrapSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return {
-        error: createInvalidResponseError('Invalid co-op role assignment response from server'),
-      };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () => apiClient.post<CoopSessionResponse>(`/coop/sessions/${sessionId}/roles`, { roles }),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopSessionBootstrapSchema.parse(data.data) };
+      } catch {
+        return {
+          error: createInvalidResponseError('Invalid co-op role assignment response from server'),
+        };
+      }
+    },
+  );
 }
 
 export async function submitProposal(
   sessionId: string,
   request: SubmitProposalRequest,
 ): Promise<{ data?: CoopDecisionProposal; error?: CategorizedApiError }> {
-  const result = await apiClient.post<CoopProposalResponse>(
-    `/coop/sessions/${sessionId}/proposals`,
-    request,
+  return apiCall(
+    () => apiClient.post<CoopProposalResponse>(`/coop/sessions/${sessionId}/proposals`, request),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopDecisionProposalSchema.parse(data.data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid proposal response from server') };
+      }
+    },
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopDecisionProposalSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid proposal response from server') };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function confirmProposal(
   sessionId: string,
   request: ConfirmProposalRequest,
 ): Promise<{ data?: CoopDecisionProposal; error?: CategorizedApiError }> {
-  const result = await apiClient.post<CoopProposalResponse>(
-    `/coop/sessions/${sessionId}/confirm`,
-    request,
+  return apiCall(
+    () => apiClient.post<CoopProposalResponse>(`/coop/sessions/${sessionId}/confirm`, request),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopDecisionProposalSchema.parse(data.data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid confirm response from server') };
+      }
+    },
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopDecisionProposalSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid confirm response from server') };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function overrideProposal(
   sessionId: string,
   request: OverrideProposalRequest,
 ): Promise<{ data?: CoopDecisionProposal; error?: CategorizedApiError }> {
-  const result = await apiClient.post<CoopProposalResponse>(
-    `/coop/sessions/${sessionId}/override`,
-    request,
+  return apiCall(
+    () => apiClient.post<CoopProposalResponse>(`/coop/sessions/${sessionId}/override`, request),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopDecisionProposalSchema.parse(data.data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid override response from server') };
+      }
+    },
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopDecisionProposalSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid override response from server') };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function advanceCoopDay(
   sessionId: string,
 ): Promise<{ data?: CoopSessionBootstrap; error?: CategorizedApiError }> {
-  const result = await apiClient.post<CoopSessionResponse>(
-    `/coop/sessions/${sessionId}/advance-day`,
-    undefined,
+  return apiCall(
+    () => apiClient.post<CoopSessionResponse>(`/coop/sessions/${sessionId}/advance-day`, undefined),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopSessionBootstrapSchema.parse(data.data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid advance day response from server') };
+      }
+    },
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopSessionBootstrapSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid advance day response from server') };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function endCoopSession(sessionId: string): Promise<{ error?: CategorizedApiError }> {
@@ -224,23 +183,20 @@ export async function rotateAuthority(
   sessionId: string,
   newAuthorityPlayerId: string,
 ): Promise<{ data?: CoopSessionBootstrap; error?: CategorizedApiError }> {
-  const result = await apiClient.put<CoopSessionResponse>(`/coop/sessions/${sessionId}/authority`, {
-    newAuthorityPlayerId,
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = coopSessionBootstrapSchema.safeParse(result.data.data);
-    if (!validation.success) {
-      return {
-        error: createInvalidResponseError('Invalid authority rotation response from server'),
-      };
-    }
-    return { data: result.data.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () =>
+      apiClient.put<CoopSessionResponse>(`/coop/sessions/${sessionId}/authority`, {
+        newAuthorityPlayerId,
+      }),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: coopSessionBootstrapSchema.parse(data.data) };
+      } catch {
+        return {
+          error: createInvalidResponseError('Invalid authority rotation response from server'),
+        };
+      }
+    },
+  );
 }

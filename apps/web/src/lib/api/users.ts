@@ -1,5 +1,5 @@
 import { apiClient } from './client.js';
-import { createInvalidResponseError } from './errors.js';
+import { apiCall } from './api-call.js';
 
 import type { CategorizedApiError } from './types.js';
 
@@ -101,51 +101,21 @@ export async function listUsers(params: UserListParams = {}): Promise<{
   error?: CategorizedApiError;
 }> {
   const queryString = buildQueryString(params);
-  const result = await apiClient.get<PaginatedUsers>(`/admin/users${queryString}`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<PaginatedUsers>(`/admin/users${queryString}`));
 }
 
 export async function getUser(userId: string): Promise<{
   data?: UserWithRoles;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<UserWithRoles>(`/admin/users/${userId}`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<UserWithRoles>(`/admin/users/${userId}`));
 }
 
 export async function createUser(input: CreateUserInput): Promise<{
   data?: UserWithRoles;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<UserWithRoles, CreateUserInput>('/admin/users', input);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<UserWithRoles, CreateUserInput>('/admin/users', input));
 }
 
 export async function updateUser(
@@ -155,20 +125,9 @@ export async function updateUser(
   data?: UserWithRoles;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.patch<UserWithRoles, UpdateUserInput>(
-    `/admin/users/${userId}`,
-    input,
+  return apiCall(() =>
+    apiClient.patch<UserWithRoles, UpdateUserInput>(`/admin/users/${userId}`, input),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
 }
 
 export async function deleteUser(userId: string): Promise<{
@@ -239,15 +198,5 @@ export async function getUserActivity(userId: string): Promise<{
   data?: UserActivity;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<UserActivity>(`/admin/users/${userId}/activity`);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<UserActivity>(`/admin/users/${userId}/activity`));
 }

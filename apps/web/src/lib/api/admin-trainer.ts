@@ -1,5 +1,5 @@
 import { apiClient } from './client.js';
-import { createInvalidResponseError } from './errors.js';
+import { apiCall } from './api-call.js';
 
 import type { CategorizedApiError } from './types.js';
 
@@ -63,17 +63,7 @@ export async function getTrainerDashboard(dateRange?: {
   const queryString = params.toString();
   const url = `/admin/trainer/dashboard${queryString ? `?${queryString}` : ''}`;
 
-  const result = await apiClient.get<TrainerDashboardData>(url);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<TrainerDashboardData>(url));
 }
 
 export async function getTrainerCompetencies(dateRange?: {
@@ -90,17 +80,7 @@ export async function getTrainerCompetencies(dateRange?: {
   const queryString = params.toString();
   const url = `/admin/trainer/competencies${queryString ? `?${queryString}` : ''}`;
 
-  const result = await apiClient.get<CompetencyDistribution[]>(url);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<CompetencyDistribution[]>(url));
 }
 
 export async function getTrainerErrors(dateRange?: {
@@ -117,34 +97,14 @@ export async function getTrainerErrors(dateRange?: {
   const queryString = params.toString();
   const url = `/admin/trainer/errors${queryString ? `?${queryString}` : ''}`;
 
-  const result = await apiClient.get<ErrorPattern[]>(url);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<ErrorPattern[]>(url));
 }
 
 export async function getTrainerCampaigns(): Promise<{
   data?: CampaignCompletion[];
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<CampaignCompletion[]>('/admin/trainer/campaigns');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<CampaignCompletion[]>('/admin/trainer/campaigns'));
 }
 
 export async function getTrainerLearners(
@@ -154,17 +114,7 @@ export async function getTrainerLearners(
   data?: LearnerSummary[];
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<LearnerSummary[]>(
-    `/admin/trainer/learners/${domain}?threshold=${threshold}`,
+  return apiCall(() =>
+    apiClient.get<LearnerSummary[]>(`/admin/trainer/learners/${domain}?threshold=${threshold}`),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
 }

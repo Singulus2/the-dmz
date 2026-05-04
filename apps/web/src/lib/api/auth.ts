@@ -15,6 +15,7 @@ import {
 } from '@the-dmz/shared/schemas';
 
 import { apiClient } from './client.js';
+import { apiCall } from './api-call.js';
 import { createInvalidResponseError } from './errors.js';
 
 import type { CategorizedApiError } from './types.js';
@@ -38,123 +39,90 @@ export interface RefreshResponse {
 export async function login(
   credentials: LoginInput,
 ): Promise<{ data?: AuthResponse; error?: CategorizedApiError }> {
-  const result = await apiClient.post<AuthResponse, LoginInput>('/auth/login', credentials);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    if (!result.data.user || !result.data.accessToken) {
-      return { error: createInvalidResponseError('No data received from server') };
-    }
-
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () => apiClient.post<AuthResponse, LoginInput>('/auth/login', credentials),
+    (data) => {
+      if (!data.user || !data.accessToken) {
+        return { error: createInvalidResponseError('No data received from server') };
+      }
+      return data;
+    },
+  );
 }
 
 export async function updatePreferences(
   preferences: UpdatePreferencesInput,
 ): Promise<{ data?: ProfileData; error?: CategorizedApiError }> {
-  const result = await apiClient.patch<ProfileData, UpdatePreferencesInput>(
-    '/auth/profile',
-    preferences,
+  return apiCall(() =>
+    apiClient.patch<ProfileData, UpdatePreferencesInput>('/auth/profile', preferences),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function register(
   credentials: RegisterInput,
 ): Promise<{ data?: AuthResponse; error?: CategorizedApiError }> {
-  const result = await apiClient.post<AuthResponse, RegisterInput>('/auth/register', credentials);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    if (!result.data.user || !result.data.accessToken) {
-      return { error: createInvalidResponseError('Invalid register response from server') };
-    }
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () => apiClient.post<AuthResponse, RegisterInput>('/auth/register', credentials),
+    (data) => {
+      if (!data.user || !data.accessToken) {
+        return { error: createInvalidResponseError('Invalid register response from server') };
+      }
+      return data;
+    },
+  );
 }
 
 export async function refresh(): Promise<{ data?: RefreshResponse; error?: CategorizedApiError }> {
   const csrfToken = apiClient.getCsrfToken();
 
-  const result = await apiClient.post<RefreshResponse>('/auth/refresh', undefined, {
-    headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    if (!result.data.accessToken) {
-      return { error: createInvalidResponseError('Invalid refresh response from server') };
-    }
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () =>
+      apiClient.post<RefreshResponse>('/auth/refresh', undefined, {
+        headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
+      }),
+    (data) => {
+      if (!data.accessToken) {
+        return { error: createInvalidResponseError('Invalid refresh response from server') };
+      }
+      return data;
+    },
+  );
 }
 
 export async function logout(): Promise<{ data?: LogoutResponse; error?: CategorizedApiError }> {
   const csrfToken = apiClient.getCsrfToken();
 
-  const result = await apiClient.delete<LogoutResponse>('/auth/logout', {
-    headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = logoutResponseSchema.safeParse(result.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid logout response from server') };
-    }
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () =>
+      apiClient.delete<LogoutResponse>('/auth/logout', {
+        headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
+      }),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: logoutResponseSchema.parse(data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid logout response from server') };
+      }
+    },
+  );
 }
 
 export async function getCurrentUser(): Promise<{
   data?: MeResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<MeResponse>('/auth/me');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    const validation = meResponseSchema.safeParse(result.data);
-    if (!validation.success) {
-      return { error: createInvalidResponseError('Invalid me response from server') };
-    }
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(
+    () => apiClient.get<MeResponse>('/auth/me'),
+    (data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        return { data: meResponseSchema.parse(data) };
+      } catch {
+        return { error: createInvalidResponseError('Invalid me response from server') };
+      }
+    },
+  );
 }
 
 export type WebauthnChallengeRequest = {
@@ -165,37 +133,19 @@ export async function getMfaStatus(): Promise<{
   data?: MfaStatusResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<MfaStatusResponse>('/auth/mfa/status');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
+  return apiCall(() => apiClient.get<MfaStatusResponse>('/auth/mfa/status'));
 }
 
 export async function createWebauthnChallenge(request: WebauthnChallengeRequest): Promise<{
   data?: WebauthnChallengeResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<WebauthnChallengeResponse, WebauthnChallengeRequest>(
-    '/auth/mfa/webauthn/challenge',
-    request,
+  return apiCall(() =>
+    apiClient.post<WebauthnChallengeResponse, WebauthnChallengeRequest>(
+      '/auth/mfa/webauthn/challenge',
+      request,
+    ),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export type WebauthnRegistrationRequest = {
@@ -217,20 +167,12 @@ export async function registerWebauthnCredential(request: WebauthnRegistrationRe
   data?: WebauthnRegistrationResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<WebauthnRegistrationResponse, WebauthnRegistrationRequest>(
-    '/auth/mfa/webauthn/register',
-    request,
+  return apiCall(() =>
+    apiClient.post<WebauthnRegistrationResponse, WebauthnRegistrationRequest>(
+      '/auth/mfa/webauthn/register',
+      request,
+    ),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export type WebauthnVerificationRequest = {
@@ -253,39 +195,21 @@ export async function verifyWebauthnAssertion(request: WebauthnVerificationReque
   data?: WebauthnVerificationResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<WebauthnVerificationResponse, WebauthnVerificationRequest>(
-    '/auth/mfa/webauthn/verify',
-    request,
+  return apiCall(() =>
+    apiClient.post<WebauthnVerificationResponse, WebauthnVerificationRequest>(
+      '/auth/mfa/webauthn/verify',
+      request,
+    ),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function listWebauthnCredentials(): Promise<{
   data?: WebauthnCredentialsListResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<WebauthnCredentialsListResponse>(
-    '/auth/mfa/webauthn/credentials',
+  return apiCall(() =>
+    apiClient.get<WebauthnCredentialsListResponse>('/auth/mfa/webauthn/credentials'),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (result.data) {
-    return { data: result.data };
-  }
-
-  return { error: createInvalidResponseError('No data received from server') };
 }
 
 export async function deleteWebauthnCredential(

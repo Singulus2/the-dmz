@@ -1,5 +1,5 @@
 import { apiClient } from './client.js';
-import { createInvalidResponseError } from './errors.js';
+import { apiCall } from './api-call.js';
 
 import type { CategorizedApiError } from './types.js';
 
@@ -86,88 +86,37 @@ export async function getOnboardingSteps(): Promise<{
   data?: OnboardingStatus;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.get<OnboardingStatus>('/admin/onboarding/steps');
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.get<OnboardingStatus>('/admin/onboarding/steps'));
 }
 
 export async function startOnboarding(): Promise<{
   data?: OnboardingStatus;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<OnboardingStatus>('/admin/onboarding/start', {});
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<OnboardingStatus>('/admin/onboarding/start', {}));
 }
 
 export async function saveOrgProfile(profile: OrgProfileData): Promise<{
   data?: OnboardingStatus;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.put<OnboardingStatus>('/admin/onboarding/org-profile', profile);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.put<OnboardingStatus>('/admin/onboarding/org-profile', profile));
 }
 
 export async function saveIdpConfig(config: IdpConfigData): Promise<{
   data?: OnboardingStatus;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.put<OnboardingStatus>('/admin/onboarding/idp-config', config);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.put<OnboardingStatus>('/admin/onboarding/idp-config', config));
 }
 
 export async function testIdpConnection(config: IdpConfigData): Promise<{
   data?: IdpTestConnectionResult;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<IdpTestConnectionResult>(
-    '/admin/onboarding/test-connection',
-    config,
+  return apiCall(() =>
+    apiClient.post<IdpTestConnectionResult>('/admin/onboarding/test-connection', config),
   );
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
 }
 
 export interface ScimTokenResponse {
@@ -183,20 +132,12 @@ export async function generateScimToken(
   data?: ScimTokenResponse;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<ScimTokenResponse>('/admin/onboarding/scim-token', {
-    name,
-    expiresInDays,
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() =>
+    apiClient.post<ScimTokenResponse>('/admin/onboarding/scim-token', {
+      name,
+      expiresInDays,
+    }),
+  );
 }
 
 export async function saveComplianceFrameworks(data: {
@@ -222,49 +163,19 @@ export async function saveComplianceFrameworks(data: {
     payload['complianceCoordinatorContact'] = data.complianceCoordinatorContact;
   }
 
-  const result = await apiClient.put<OnboardingStatus>('/admin/onboarding/compliance', payload);
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.put<OnboardingStatus>('/admin/onboarding/compliance', payload));
 }
 
 export async function completeOnboarding(): Promise<{
   data?: OnboardingStatus;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<OnboardingStatus>('/admin/onboarding/complete', {});
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<OnboardingStatus>('/admin/onboarding/complete', {}));
 }
 
 export async function resetOnboarding(): Promise<{
   data?: OnboardingStatus;
   error?: CategorizedApiError;
 }> {
-  const result = await apiClient.post<OnboardingStatus>('/admin/onboarding/reset', {});
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  if (!result.data) {
-    return { error: createInvalidResponseError() };
-  }
-
-  return { data: result.data };
+  return apiCall(() => apiClient.post<OnboardingStatus>('/admin/onboarding/reset', {}));
 }
