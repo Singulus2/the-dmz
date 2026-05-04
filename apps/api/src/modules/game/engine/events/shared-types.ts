@@ -33,6 +33,7 @@ export const GAME_ENGINE_EVENTS = {
   VERIFICATION_PACKET_GENERATED: GAME_EVENT_TYPES.VERIFICATION_PACKET_GENERATED as string,
   VERIFICATION_OUT_OF_BAND_INITIATED: GAME_EVENT_TYPES.VERIFICATION_OUT_OF_BAND_INITIATED as string,
   VERIFICATION_RESULT: GAME_EVENT_TYPES.VERIFICATION_RESULT as string,
+  VERIFICATION_DISCREPANCY_FLAGGED: GAME_EVENT_TYPES.VERIFICATION_DISCREPANCY_FLAGGED as string,
   CONSEQUENCES_APPLIED: GAME_EVENT_TYPES.CONSEQUENCES_APPLIED as string,
   THREATS_GENERATED: GAME_EVENT_TYPES.THREATS_GENERATED as string,
   THREAT_ATTACK_LAUNCHED: GAME_EVENT_TYPES.THREAT_ATTACK_LAUNCHED as string,
@@ -57,6 +58,13 @@ export const GAME_ENGINE_EVENTS = {
   TRUST_CHANGED: GAME_EVENT_TYPES.TRUST_MODIFIED as string,
   INTEL_CHANGED: GAME_EVENT_TYPES.INTEL_CHANGED as string,
   LEVEL_UP: GAME_EVENT_TYPES.LEVEL_UP as string,
+  FACILITY_CLIENT_ONBOARDED: GAME_EVENT_TYPES.FACILITY_CLIENT_ONBOARDED as string,
+  FACILITY_CLIENT_EVICTED: GAME_EVENT_TYPES.FACILITY_CLIENT_EVICTED as string,
+  FACILITY_RESOURCE_CRITICAL: GAME_EVENT_TYPES.FACILITY_RESOURCE_CRITICAL as string,
+  FACILITY_TICK_PROCESSED: GAME_EVENT_TYPES.FACILITY_TICK_PROCESSED as string,
+  FACILITY_TIER_UPGRADED: GAME_EVENT_TYPES.FACILITY_TIER_UPGRADED as string,
+  FACILITY_UPGRADE_PURCHASED: GAME_EVENT_TYPES.FACILITY_UPGRADE_PURCHASED as string,
+  FACILITY_UPGRADE_COMPLETED: GAME_EVENT_TYPES.FACILITY_UPGRADE_COMPLETED as string,
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 } as const satisfies Record<string, string>;
 
@@ -120,6 +128,7 @@ export interface SessionBreachRecoveryPayload {
 export interface DayStartedPayload {
   sessionId: string;
   day: number;
+  deferredEmailsCarried?: number;
 }
 
 export interface DayPhaseChangedPayload {
@@ -132,6 +141,8 @@ export interface DayPhaseChangedPayload {
 export interface DayEndedPayload {
   sessionId: string;
   day: number;
+  emailsProcessed?: number;
+  emailsDeferred?: number;
 }
 
 export interface InboxLoadedPayload {
@@ -343,6 +354,9 @@ export interface BreachOccurredPayload {
   sessionId: string;
   userId: string;
   severity: number;
+  triggerType?: string;
+  isBreach?: boolean;
+  trustPenalty?: number;
   ransomCost?: number;
 }
 
@@ -430,6 +444,70 @@ export interface LevelUpPayload {
   xpAwarded: number;
 }
 
+export interface VerificationDiscrepancyFlaggedPayload {
+  emailId: string;
+  packetId: string;
+  artifactId: string;
+  documentType: string;
+  reason: string;
+}
+
+export interface FacilityClientOnboardedPayload {
+  clientId: string;
+  clientName: string;
+  organization: string;
+  resources: {
+    rackUnitsU: number;
+    powerKw: number;
+    coolingTons: number;
+    bandwidthMbps: number;
+  };
+  dailyRate: number;
+}
+
+export interface FacilityClientEvictedPayload {
+  clientId: string;
+  reason: string;
+}
+
+export interface FacilityResourceCriticalPayload {
+  utilizationPercent: number;
+  maintenanceDebt: number;
+  facilityHealth: number;
+}
+
+export interface FacilityTickProcessedPayload {
+  dayNumber: number;
+  revenue: number;
+  operatingCost: number;
+  baseOperatingCost: number;
+  securityToolOpEx: number;
+  utilizationPercent: number;
+  maintenanceDebt: number;
+  facilityHealth: number;
+}
+
+export interface FacilityTierUpgradedPayload {
+  fromTier: string;
+  toTier: string;
+  cost: number;
+}
+
+export interface FacilityUpgradePurchasedPayload {
+  upgradeType: string;
+  category: string;
+  cost: number;
+  installationDays: number;
+  completesDay: number;
+}
+
+export interface FacilityUpgradeCompletedPayload {
+  upgradeType: string;
+  category: string;
+  tierLevel?: number;
+  cost?: number;
+}
+
 export function createGameEngineEvent<T extends GameEngineEventType>(
   eventType: T,
   params: GameEngineEventParams,
@@ -502,4 +580,12 @@ export type GameEngineEventPayloadMap = {
   [GAME_ENGINE_EVENTS.TRUST_CHANGED]: TrustChangedPayload;
   [GAME_ENGINE_EVENTS.INTEL_CHANGED]: IntelChangedPayload;
   [GAME_ENGINE_EVENTS.LEVEL_UP]: LevelUpPayload;
+  [GAME_ENGINE_EVENTS.VERIFICATION_DISCREPANCY_FLAGGED]: VerificationDiscrepancyFlaggedPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_CLIENT_ONBOARDED]: FacilityClientOnboardedPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_CLIENT_EVICTED]: FacilityClientEvictedPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_RESOURCE_CRITICAL]: FacilityResourceCriticalPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_TICK_PROCESSED]: FacilityTickProcessedPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_TIER_UPGRADED]: FacilityTierUpgradedPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_UPGRADE_PURCHASED]: FacilityUpgradePurchasedPayload;
+  [GAME_ENGINE_EVENTS.FACILITY_UPGRADE_COMPLETED]: FacilityUpgradeCompletedPayload;
 };

@@ -8,6 +8,7 @@ import {
 } from '@the-dmz/shared';
 
 import { isActionAllowedInPhase } from '../state-machine.js';
+import { GAME_ENGINE_EVENTS, type GameEngineEventType, type GameEngineEventPayloadMap } from '../events/index.js';
 
 import { UPGRADE_CATALOG } from './upgrade-catalog.js';
 
@@ -20,9 +21,9 @@ export interface DomainEvent {
   payload: Record<string, unknown>;
 }
 
-export function createGameEvent<T extends string>(
+export function createGameEvent<T extends GameEngineEventType>(
   eventType: T,
-  payload: unknown,
+  payload: GameEngineEventPayloadMap[T],
   timestamp: string,
 ): DomainEvent {
   return {
@@ -125,7 +126,7 @@ export function completeInstallations(state: GameState, events: DomainEvent[]): 
       const upgradeDef = UPGRADE_CATALOG[upgrade.upgradeType];
       events.push(
         createGameEvent(
-          'facility.upgrade.completed',
+          GAME_ENGINE_EVENTS.FACILITY_UPGRADE_COMPLETED,
           {
             upgradeType: upgrade.upgradeType,
             category: upgradeDef?.category,

@@ -21,6 +21,7 @@ import {
   installUpgrade,
   applyUpgradeEffects,
 } from './handler-utils.js';
+import { GAME_ENGINE_EVENTS } from '../events/index.js';
 
 import type { DomainEvent } from './handler-utils.js';
 
@@ -33,7 +34,7 @@ export function handlePurchaseUpgrade(
     throw new Error('PURCHASE_UPGRADE not allowed in current phase');
   }
   events.push(
-    createGameEvent('game.upgrade.purchased', { upgradeId: action.upgradeId }, state.updatedAt),
+    createGameEvent(GAME_ENGINE_EVENTS.UPGRADE_PURCHASED, { upgradeId: action.upgradeId }, state.updatedAt),
   );
 }
 
@@ -47,7 +48,7 @@ export function handleAdjustResource(
   }
   events.push(
     createGameEvent(
-      'game.resource.adjusted',
+      GAME_ENGINE_EVENTS.RESOURCE_ADJUSTED,
       { resourceId: action.resourceId, delta: action.delta },
       state.updatedAt,
     ),
@@ -118,7 +119,7 @@ function pushClientOnboardedEvent(
 ): void {
   events.push(
     createGameEvent(
-      'facility.client.onboarded',
+      GAME_ENGINE_EVENTS.FACILITY_CLIENT_ONBOARDED,
       {
         clientId: action.clientId,
         clientName: action.clientName,
@@ -182,7 +183,7 @@ export function handleEvictClient(
   facility.clients.splice(clientIndex, 1);
   events.push(
     createGameEvent(
-      'facility.client.evicted',
+      GAME_ENGINE_EVENTS.FACILITY_CLIENT_EVICTED,
       {
         clientId: action.clientId,
         reason: action.reason,
@@ -240,7 +241,7 @@ function applyUtilizationEffects(
     facility.facilityHealth = Math.max(0, facility.facilityHealth - 2);
     events.push(
       createGameEvent(
-        'facility.resource.critical',
+        GAME_ENGINE_EVENTS.FACILITY_RESOURCE_CRITICAL,
         {
           utilizationPercent,
           maintenanceDebt: facility.maintenanceDebt,
@@ -273,7 +274,7 @@ function calculateAndDeductOperatingCosts(
   if (totalOpEx > 0) {
     events.push(
       createGameEvent(
-        'game.economy.credits_changed',
+        GAME_ENGINE_EVENTS.CREDITS_CHANGED,
         {
           sessionId: state.sessionId,
           amount: -totalOpEx,
@@ -301,7 +302,7 @@ function pushRevenueEvent(ctx: RevenueEventContext): void {
   if (ctx.totalRevenue > 0) {
     ctx.events.push(
       createGameEvent(
-        'game.economy.credits_changed',
+        GAME_ENGINE_EVENTS.CREDITS_CHANGED,
         {
           sessionId: ctx.state.sessionId,
           amount: ctx.totalRevenue,
@@ -348,7 +349,7 @@ export function handleProcessFacilityTick(
   facility.lastTickDay = action.dayNumber;
   events.push(
     createGameEvent(
-      'facility.tick.processed',
+      GAME_ENGINE_EVENTS.FACILITY_TICK_PROCESSED,
       {
         dayNumber: action.dayNumber,
         revenue: totalRevenue,
@@ -391,7 +392,7 @@ export function handleUpgradeFacilityTier(
   state.funds -= upgrade.cost;
   events.push(
     createGameEvent(
-      'game.economy.credits_changed',
+      GAME_ENGINE_EVENTS.CREDITS_CHANGED,
       {
         sessionId: state.sessionId,
         amount: -upgrade.cost,
@@ -411,7 +412,7 @@ export function handleUpgradeFacilityTier(
   state.facility.capacities.bandwidthCapacityMbps = upgrade.bandwidth;
   events.push(
     createGameEvent(
-      'facility.tier.upgraded',
+      GAME_ENGINE_EVENTS.FACILITY_TIER_UPGRADED,
       {
         fromTier: state.facilityTier,
         toTier: action.targetTier,
@@ -430,7 +431,7 @@ function pushUpgradePurchasedEvent(
 ): void {
   events.push(
     createGameEvent(
-      'facility.upgrade.purchased',
+      GAME_ENGINE_EVENTS.FACILITY_UPGRADE_PURCHASED,
       {
         upgradeType: action.upgradeType,
         category: upgradeDef.category,
@@ -452,7 +453,7 @@ function handleZeroDayInstallation(
   applyUpgradeEffects(state, action.upgradeType);
   events.push(
     createGameEvent(
-      'facility.upgrade.completed',
+      GAME_ENGINE_EVENTS.FACILITY_UPGRADE_COMPLETED,
       {
         upgradeType: action.upgradeType,
         category: upgradeDef.category,
@@ -479,7 +480,7 @@ export function handlePurchaseFacilityUpgrade(
 
   events.push(
     createGameEvent(
-      'game.economy.credits_changed',
+      GAME_ENGINE_EVENTS.CREDITS_CHANGED,
       {
         sessionId: state.sessionId,
         amount: -upgradeDef.baseCost,

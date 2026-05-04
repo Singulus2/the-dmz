@@ -1,6 +1,7 @@
 import { GAME_ACTIONS, type GameState, type FlagDiscrepancyPayload } from '@the-dmz/shared';
 
 import { isActionAllowedInPhase, createGameEvent } from './handler-utils.js';
+import { GAME_ENGINE_EVENTS } from '../events/index.js';
 
 import type { DomainEvent } from './handler-utils.js';
 
@@ -24,7 +25,7 @@ export function handleFlagDiscrepancy(
 
   events.push(
     createGameEvent(
-      'game.verification.discrepancy_flagged',
+      GAME_ENGINE_EVENTS.VERIFICATION_DISCREPANCY_FLAGGED,
       {
         emailId: action.emailId,
         packetId: packet.packetId,
