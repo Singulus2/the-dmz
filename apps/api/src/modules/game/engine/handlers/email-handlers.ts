@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   DAY_PHASES,
   EMAIL_STATUS,
@@ -102,7 +103,11 @@ export function handleOpenEmail(
     email.openedAt = state.updatedAt;
   }
   events.push(
-    createGameEvent(GAME_ENGINE_EVENTS.EMAIL_OPENED, { emailId: action.emailId }, state.updatedAt),
+    createGameEvent(
+      GAME_ENGINE_EVENTS.EMAIL_OPENED,
+      { sessionId: state.sessionId, emailId: action.emailId },
+      state.updatedAt,
+    ),
   );
 }
 
@@ -123,7 +128,7 @@ export function handleMarkIndicator(
   events.push(
     createGameEvent(
       GAME_ENGINE_EVENTS.EMAIL_INDICATOR_MARKED,
-      { emailId: action.emailId, indicatorType: action.indicatorType },
+      { sessionId: state.sessionId, emailId: action.emailId, indicatorType: action.indicatorType },
       state.updatedAt,
     ),
   );
@@ -538,11 +543,9 @@ export function assertDecisionPhase(state: GameState): void {
     throw new Error('SUBMIT_DECISION not allowed in current phase');
   }
 }
-
 export function findEmailForDecision(inbox: EmailState[], emailId: string): EmailState | undefined {
   return inbox.find((e) => e.emailId === emailId);
 }
-
 export function mapDecisionToStatus(
   decision: SubmitDecisionPayload['decision'],
 ): EmailState['status'] {
