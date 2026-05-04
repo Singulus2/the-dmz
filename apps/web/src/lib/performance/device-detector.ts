@@ -83,44 +83,63 @@ function isLowEndDevice(): boolean {
   return false;
 }
 
-function calculateTier(
+export function getHardwareScore(cores: number): number {
+  if (cores >= MEDIUM_END_HARDWARE_THRESHOLD) {
+    return 2;
+  }
+  if (cores >= LOW_END_HARDWARE_THRESHOLD) {
+    return 1;
+  }
+  return 0;
+}
+
+export function getMemoryScore(memory: number | undefined, isMobile: boolean): number {
+  if (memory !== undefined) {
+    if (memory >= 8) {
+      return 2;
+    }
+    if (memory >= LOW_END_MEMORY_THRESHOLD) {
+      return 1;
+    }
+    return 0;
+  }
+  if (isMobile) {
+    return -1;
+  }
+  return 0;
+}
+
+export function getNetworkScore(effectiveType: string | undefined): number {
+  if (effectiveType === '4g') {
+    return 1;
+  }
+  if (effectiveType === '3g' || effectiveType === '2g') {
+    return -1;
+  }
+  return 0;
+}
+
+export function classifyScore(totalScore: number): PerformanceTier {
+  if (totalScore <= 1) {
+    return 'low';
+  }
+  if (totalScore <= 3) {
+    return 'medium';
+  }
+  return 'high';
+}
+
+export function calculateTier(
   hardwareConcurrency: number,
   deviceMemory: number | undefined,
   connectionEffectiveType: string | undefined,
   isMobile: boolean,
 ): PerformanceTier {
-  let score = 0;
-
-  if (hardwareConcurrency >= MEDIUM_END_HARDWARE_THRESHOLD) {
-    score += 2;
-  } else if (hardwareConcurrency >= LOW_END_HARDWARE_THRESHOLD) {
-    score += 1;
-  }
-
-  if (deviceMemory !== undefined) {
-    if (deviceMemory >= 8) {
-      score += 2;
-    } else if (deviceMemory >= LOW_END_MEMORY_THRESHOLD) {
-      score += 1;
-    }
-  } else if (isMobile) {
-    score -= 1;
-  }
-
-  if (connectionEffectiveType) {
-    if (connectionEffectiveType === '4g') {
-      score += 1;
-    } else if (connectionEffectiveType === '3g' || connectionEffectiveType === '2g') {
-      score -= 1;
-    }
-  }
-
-  if (score <= 1) {
-    return 'low';
-  } else if (score <= 3) {
-    return 'medium';
-  }
-  return 'high';
+  const hardwareScore = getHardwareScore(hardwareConcurrency);
+  const memoryScore = getMemoryScore(deviceMemory, isMobile);
+  const networkScore = getNetworkScore(connectionEffectiveType);
+  const totalScore = hardwareScore + memoryScore + networkScore;
+  return classifyScore(totalScore);
 }
 
 export function detectDevicePerformance(): DevicePerformanceInfo {
