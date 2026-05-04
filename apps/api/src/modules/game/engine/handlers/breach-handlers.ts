@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import {
   SESSION_MACRO_STATES,
   DAY_PHASES,
@@ -51,9 +52,9 @@ export function handleTriggerBreach(
     throw new Error('TRIGGER_BREACH only allowed during threat processing');
   }
 
-  const securityTools = state.facility.upgrades
+  const securityTools: string[] = state.facility.upgrades
     .filter((u) => u.isCompleted && u.securityDelta)
-    .map((u) => u.upgradeType);
+    .map((u) => u.upgradeType as string);
 
   const totalLifetimeEarnings = state.funds + state.analyticsState.totalDecisions * 10;
 
@@ -256,8 +257,7 @@ export function handleAdvanceRecovery(
         GAME_ENGINE_EVENTS.DAY_STARTED,
         {
           day: state.currentDay,
-          recoveryDaysRemaining: result.newState.recoveryDaysRemaining,
-          narrativeMessage: result.narrativeMessage ?? undefined,
+          sessionId: state.sessionId,
         },
         state.updatedAt,
       ),

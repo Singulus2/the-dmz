@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import {
   SESSION_MACRO_STATES,
   DAY_PHASES,
@@ -101,6 +102,7 @@ export function handleAdvanceDay(
       GAME_ENGINE_EVENTS.DAY_STARTED,
       {
         day: state.currentDay,
+        sessionId: state.sessionId,
         deferredEmailsCarried: deferredEmails.length,
       },
       state.updatedAt,

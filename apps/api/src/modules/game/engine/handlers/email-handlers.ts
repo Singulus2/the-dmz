@@ -44,7 +44,11 @@ export function handleAckDayStart(
   }
   state.currentPhase = DAY_PHASES.PHASE_EMAIL_INTAKE;
   events.push(
-    createGameEvent(GAME_ENGINE_EVENTS.DAY_STARTED, { day: state.currentDay }, state.updatedAt),
+    createGameEvent(
+      GAME_ENGINE_EVENTS.DAY_STARTED,
+      { day: state.currentDay, sessionId: state.sessionId },
+      state.updatedAt,
+    ),
   );
 }
 
