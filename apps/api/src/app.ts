@@ -35,7 +35,6 @@ import {
   registerAdminRateLimitRoutes,
   registerAdminTenantRoutes,
   registerAdminTenantProvisioningRoutes,
-  registerAdminTenantManagementRoutes,
   registerAdminRoleRoutes,
   registerAdminDashboardRoutes,
   registerAdminUserRoutes,
@@ -291,7 +290,6 @@ export const buildApp = async (
 
   app.register(registerAdminTenantRoutes);
   app.register(registerAdminTenantProvisioningRoutes);
-  app.register(registerAdminTenantManagementRoutes);
 
   app.register(registerAdminRoleRoutes);
 
