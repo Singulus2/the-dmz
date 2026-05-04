@@ -49,31 +49,6 @@ export interface TrainerDashboardData {
   averageScore: number;
 }
 
-export interface TrainerDashboardResponse {
-  success: boolean;
-  data: TrainerDashboardData;
-}
-
-export interface TrainerCompetenciesResponse {
-  success: boolean;
-  data: CompetencyDistribution[];
-}
-
-export interface TrainerErrorsResponse {
-  success: boolean;
-  data: ErrorPattern[];
-}
-
-export interface TrainerCampaignsResponse {
-  success: boolean;
-  data: CampaignCompletion[];
-}
-
-export interface TrainerLearnersResponse {
-  success: boolean;
-  data: LearnerSummary[];
-}
-
 export async function getTrainerDashboard(dateRange?: {
   startDate?: string;
   endDate?: string;
