@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+import { apiErrorEnvelopeSchema } from '@the-dmz/shared/schemas';
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+/* Reason: ErrorCodes in error-codes.ts has type 'any' due to spreading types from @the-dmz/shared.
+   This is a pre-existing architectural issue - ErrorCodes cannot be properly typed without
+   modifying the shared error-codes.ts, which is outside the scope of this issue. */
+
 import { authGuard } from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { tenantStatusGuard } from '../../shared/middleware/tenant-status-guard.js';
@@ -25,14 +32,20 @@ const sendMessageBodySchema = z.object({
   content: z.string().min(1).max(280),
 });
 
-const sendMessageResponseSchema = z.object({
-  success: z.boolean(),
-  messageId: z.string().uuid().optional(),
-  moderationStatus: z.enum(['approved', 'flagged', 'rejected']).optional(),
-  rateLimited: z.boolean().optional(),
-  retryAfterMs: z.number().optional(),
-  error: z.string().optional(),
+const sendMessageSuccessSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    messageId: z.string().uuid(),
+    moderationStatus: z.enum(['approved', 'flagged', 'rejected']),
+    rateLimited: z.boolean().optional(),
+    retryAfterMs: z.number().optional(),
+  }),
 });
+
+const sendMessageResponseSchema = z.discriminatedUnion('success', [
+  sendMessageSuccessSchema,
+  apiErrorEnvelopeSchema,
+]);
 
 const getMessagesQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(50),
@@ -49,25 +62,41 @@ const chatMessageSchema = z.object({
   createdAt: z.string().datetime(),
 });
 
-const getMessagesResponseSchema = z.object({
-  success: z.boolean(),
-  messages: z.array(chatMessageSchema).optional(),
-  error: z.string().optional(),
+const getMessagesSuccessSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    messages: z.array(chatMessageSchema),
+  }),
 });
 
-const deleteMessageResponseSchema = z.object({
-  success: z.boolean(),
-  error: z.string().optional(),
+const getMessagesResponseSchema = z.discriminatedUnion('success', [
+  getMessagesSuccessSchema,
+  apiErrorEnvelopeSchema,
+]);
+
+const deleteMessageSuccessSchema = z.object({
+  success: z.literal(true),
+  data: z.object({}),
 });
+
+const deleteMessageResponseSchema = z.discriminatedUnion('success', [
+  deleteMessageSuccessSchema,
+  apiErrorEnvelopeSchema,
+]);
 
 const reportMessageBodySchema = z.object({
   reason: z.string().min(1).max(500),
 });
 
-const reportMessageResponseSchema = z.object({
-  success: z.boolean(),
-  error: z.string().optional(),
+const reportMessageSuccessSchema = z.object({
+  success: z.literal(true),
+  data: z.object({}),
 });
+
+const reportMessageResponseSchema = z.discriminatedUnion('success', [
+  reportMessageSuccessSchema,
+  apiErrorEnvelopeSchema,
+]);
 
 const chatChannelSchema = z.object({
   channelId: z.string().uuid(),
@@ -79,17 +108,29 @@ const chatChannelSchema = z.object({
   createdAt: z.string().datetime(),
 });
 
-const listChannelsResponseSchema = z.object({
-  success: z.boolean(),
-  channels: z.array(chatChannelSchema).optional(),
-  error: z.string().optional(),
+const listChannelsSuccessSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    channels: z.array(chatChannelSchema),
+  }),
 });
 
-const getChannelResponseSchema = z.object({
-  success: z.boolean(),
-  channel: chatChannelSchema.optional(),
-  error: z.string().optional(),
+const listChannelsResponseSchema = z.discriminatedUnion('success', [
+  listChannelsSuccessSchema,
+  apiErrorEnvelopeSchema,
+]);
+
+const getChannelSuccessSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    channel: chatChannelSchema,
+  }),
 });
+
+const getChannelResponseSchema = z.discriminatedUnion('success', [
+  getChannelSuccessSchema,
+  apiErrorEnvelopeSchema,
+]);
 
 export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): Promise<void> {
   fastify.get(
@@ -117,7 +158,7 @@ export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): P
         });
       }
 
-      return result;
+      return { success: true, data: { channels: result.channels } };
     },
   );
 
@@ -150,7 +191,7 @@ export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): P
         });
       }
 
-      return result;
+      return { success: true, data: { channel: result.channel } };
     },
   );
 
@@ -192,7 +233,7 @@ export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): P
         });
       }
 
-      return result;
+      return { success: true, data: { messages: result.messages } };
     },
   );
 
@@ -246,7 +287,15 @@ export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): P
         });
       }
 
-      return result;
+      return {
+        success: true,
+        data: {
+          messageId: result.message?.messageId ?? '',
+          moderationStatus: result.moderationStatus ?? 'approved',
+          rateLimited: result.rateLimited,
+          retryAfterMs: result.retryAfterMs,
+        },
+      };
     },
   );
 
@@ -290,7 +339,7 @@ export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): P
         });
       }
 
-      return result;
+      return { success: true, data: {} };
     },
   );
 
@@ -336,7 +385,7 @@ export async function chatRoutes(fastify: FastifyInstance, config: AppConfig): P
         });
       }
 
-      return result;
+      return { success: true, data: {} };
     },
   );
 }
