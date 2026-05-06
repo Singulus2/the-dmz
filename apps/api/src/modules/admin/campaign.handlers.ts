@@ -95,7 +95,7 @@ export async function handleCreateCampaign(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -139,7 +139,7 @@ export async function handleCreateCampaign(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_CREATE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_CREATE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -152,7 +152,7 @@ export async function handleListCampaigns(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -190,7 +190,7 @@ export async function handleListCampaigns(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_LIST_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_LIST_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -203,7 +203,7 @@ export async function handleGetCampaign(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -215,7 +215,7 @@ export async function handleGetCampaign(
     if (!campaign) {
       reply.code(404).send({
         success: false,
-        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found' },
+        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found', details: {} },
       });
       return;
     }
@@ -271,7 +271,7 @@ export async function handleGetCampaign(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_GET_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_GET_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -284,7 +284,7 @@ export async function handleUpdateCampaign(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -302,7 +302,7 @@ export async function handleUpdateCampaign(
     if (!campaign) {
       reply.code(404).send({
         success: false,
-        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found' },
+        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found', details: {} },
       });
       return;
     }
@@ -334,7 +334,7 @@ export async function handleUpdateCampaign(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_UPDATE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_UPDATE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -347,7 +347,7 @@ export async function handleUpdateCampaignStatus(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -361,7 +361,7 @@ export async function handleUpdateCampaignStatus(
     if (!campaign) {
       reply.code(404).send({
         success: false,
-        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found' },
+        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found', details: {} },
       });
       return;
     }
@@ -385,7 +385,7 @@ export async function handleUpdateCampaignStatus(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_STATUS_UPDATE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_STATUS_UPDATE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -398,7 +398,7 @@ export async function handleDeleteCampaign(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -415,7 +415,7 @@ export async function handleDeleteCampaign(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_DELETE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_DELETE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -428,7 +428,7 @@ export async function handleSetCampaignAudience(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -463,7 +463,7 @@ export async function handleSetCampaignAudience(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_AUDIENCE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_AUDIENCE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -476,7 +476,7 @@ export async function handleAddCampaignContent(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -518,7 +518,7 @@ export async function handleAddCampaignContent(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_CONTENT_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_CONTENT_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -531,7 +531,7 @@ export async function handleRemoveCampaignContent(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -548,7 +548,7 @@ export async function handleRemoveCampaignContent(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_CONTENT_DELETE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_CONTENT_DELETE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -561,7 +561,7 @@ export async function handleGetCampaignProgress(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -573,7 +573,7 @@ export async function handleGetCampaignProgress(
     if (!progress) {
       reply.code(404).send({
         success: false,
-        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found' },
+        error: { code: 'CAMPAIGN_NOT_FOUND', message: 'Campaign not found', details: {} },
       });
       return;
     }
@@ -595,7 +595,7 @@ export async function handleGetCampaignProgress(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_PROGRESS_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_PROGRESS_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -608,7 +608,7 @@ export async function handleSaveCampaignAsTemplate(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -633,7 +633,7 @@ export async function handleSaveCampaignAsTemplate(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_TEMPLATE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_TEMPLATE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -646,7 +646,7 @@ export async function handleListCampaignTemplates(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -671,7 +671,7 @@ export async function handleListCampaignTemplates(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'TEMPLATE_LIST_ERROR', message: errorMessage },
+      error: { code: 'TEMPLATE_LIST_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -684,7 +684,7 @@ export async function handleCreateCampaignFromTemplate(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -710,7 +710,7 @@ export async function handleCreateCampaignFromTemplate(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_FROM_TEMPLATE_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_FROM_TEMPLATE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -723,7 +723,7 @@ export async function handleDeleteCampaignTemplate(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -740,7 +740,7 @@ export async function handleDeleteCampaignTemplate(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'TEMPLATE_DELETE_ERROR', message: errorMessage },
+      error: { code: 'TEMPLATE_DELETE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -753,7 +753,7 @@ export async function handleEnrollUsersInCampaign(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -788,7 +788,7 @@ export async function handleEnrollUsersInCampaign(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_ENROLL_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_ENROLL_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -801,7 +801,7 @@ export async function handleGetEligibleUsers(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -821,7 +821,7 @@ export async function handleGetEligibleUsers(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'ELIGIBLE_USERS_ERROR', message: errorMessage },
+      error: { code: 'ELIGIBLE_USERS_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -834,7 +834,7 @@ export async function handleThrottleCheck(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -854,7 +854,7 @@ export async function handleThrottleCheck(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'THROTTLE_CHECK_ERROR', message: errorMessage },
+      error: { code: 'THROTTLE_CHECK_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -867,7 +867,7 @@ export async function handleUpdateEnrollmentStatus(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -881,7 +881,7 @@ export async function handleUpdateEnrollmentStatus(
     if (!enrollment) {
       reply.code(404).send({
         success: false,
-        error: { code: 'ENROLLMENT_NOT_FOUND', message: 'Enrollment not found' },
+        error: { code: 'ENROLLMENT_NOT_FOUND', message: 'Enrollment not found', details: {} },
       });
       return;
     }
@@ -906,7 +906,7 @@ export async function handleUpdateEnrollmentStatus(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'ENROLLMENT_STATUS_UPDATE_ERROR', message: errorMessage },
+      error: { code: 'ENROLLMENT_STATUS_UPDATE_ERROR', message: errorMessage, details: {} },
     });
   }
 }
@@ -919,7 +919,7 @@ export async function handleSetCampaignEscalations(
   if (!tenantId) {
     reply.code(401).send({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Tenant context required' },
+      error: { code: 'UNAUTHORIZED', message: 'Tenant context required', details: {} },
     });
     return;
   }
@@ -961,7 +961,7 @@ export async function handleSetCampaignEscalations(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     reply.code(500).send({
       success: false,
-      error: { code: 'CAMPAIGN_ESCALATION_ERROR', message: errorMessage },
+      error: { code: 'CAMPAIGN_ESCALATION_ERROR', message: errorMessage, details: {} },
     });
   }
 }

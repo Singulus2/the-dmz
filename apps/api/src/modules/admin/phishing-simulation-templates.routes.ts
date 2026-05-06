@@ -131,7 +131,7 @@ export async function registerPhishingSimulationTemplateRoutes(fastify: FastifyI
       if (!template) {
         return reply.code(404).send({
           success: false,
-          error: { code: 'NOT_FOUND', message: 'Template not found' },
+          error: { code: 'NOT_FOUND', message: 'Template not found', details: {} },
         });
       }
 
@@ -179,7 +179,7 @@ export async function registerPhishingSimulationTemplateRoutes(fastify: FastifyI
         if (!template) {
           return reply.code(404).send({
             success: false,
-            error: { code: 'NOT_FOUND', message: 'Template not found' },
+            error: { code: 'NOT_FOUND', message: 'Template not found', details: {} },
           });
         }
         return reply.send({
@@ -190,7 +190,7 @@ export async function registerPhishingSimulationTemplateRoutes(fastify: FastifyI
         const message = error instanceof Error ? error.message : 'Failed to update template';
         return reply.code(400).send({
           success: false,
-          error: { code: 'UPDATE_FAILED', message },
+          error: { code: 'UPDATE_FAILED', message, details: {} },
         });
       }
     },
@@ -218,7 +218,7 @@ export async function registerPhishingSimulationTemplateRoutes(fastify: FastifyI
         const message = error instanceof Error ? error.message : 'Failed to delete template';
         return reply.code(400).send({
           success: false,
-          error: { code: 'DELETE_FAILED', message },
+          error: { code: 'DELETE_FAILED', message, details: {} },
         });
       }
     },

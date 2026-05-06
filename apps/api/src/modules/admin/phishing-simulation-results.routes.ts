@@ -59,7 +59,7 @@ export async function registerPhishingSimulationResultRoutes(fastify: FastifyIns
         if (!summary) {
           return reply.code(404).send({
             success: false,
-            error: { code: 'NOT_FOUND', message: 'Simulation not found' },
+            error: { code: 'NOT_FOUND', message: 'Simulation not found', details: {} },
           });
         }
         return reply.send({

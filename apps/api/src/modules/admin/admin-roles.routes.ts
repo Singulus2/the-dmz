@@ -67,7 +67,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       if (!user) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -185,7 +185,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       if (!user) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 

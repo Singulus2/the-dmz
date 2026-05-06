@@ -104,6 +104,7 @@ export const registerAdminTenantRoutes = async (fastify: FastifyInstance): Promi
           error: {
             code: 'TENANT_CREATION_FAILED',
             message: errorMessage,
+            details: {},
           },
         });
       }

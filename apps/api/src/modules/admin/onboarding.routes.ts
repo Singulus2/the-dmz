@@ -212,7 +212,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -257,7 +257,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -303,7 +303,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -356,7 +356,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -416,7 +416,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -476,7 +476,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -514,7 +514,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -565,7 +565,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 
@@ -610,7 +610,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       if (!ctx) {
         return reply.code(401).send({
           success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required', details: {} },
         });
       }
 

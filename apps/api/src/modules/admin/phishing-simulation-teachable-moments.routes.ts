@@ -89,7 +89,7 @@ export async function registerPhishingSimulationTeachableMomentRoutes(fastify: F
       if (!moment) {
         return reply.code(404).send({
           success: false,
-          error: { code: 'NOT_FOUND', message: 'Teachable moment not found' },
+          error: { code: 'NOT_FOUND', message: 'Teachable moment not found', details: {} },
         });
       }
 

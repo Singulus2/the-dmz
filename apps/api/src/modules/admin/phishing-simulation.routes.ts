@@ -173,7 +173,7 @@ export async function registerPhishingSimulationRoutes(fastify: FastifyInstance)
       if (!simulation) {
         return reply.code(404).send({
           success: false,
-          error: { code: 'NOT_FOUND', message: 'Simulation not found' },
+          error: { code: 'NOT_FOUND', message: 'Simulation not found', details: {} },
         });
       }
 
@@ -237,7 +237,7 @@ export async function registerPhishingSimulationRoutes(fastify: FastifyInstance)
       if (!simulation) {
         return reply.code(404).send({
           success: false,
-          error: { code: 'NOT_FOUND', message: 'Simulation not found' },
+          error: { code: 'NOT_FOUND', message: 'Simulation not found', details: {} },
         });
       }
 
@@ -294,7 +294,7 @@ export async function registerPhishingSimulationRoutes(fastify: FastifyInstance)
         const message = error instanceof Error ? error.message : 'Failed to launch simulation';
         return reply.code(400).send({
           success: false,
-          error: { code: 'LAUNCH_FAILED', message },
+          error: { code: 'LAUNCH_FAILED', message, details: {} },
         });
       }
     },
@@ -325,7 +325,7 @@ export async function registerPhishingSimulationRoutes(fastify: FastifyInstance)
         const message = error instanceof Error ? error.message : 'Failed to pause simulation';
         return reply.code(400).send({
           success: false,
-          error: { code: 'PAUSE_FAILED', message },
+          error: { code: 'PAUSE_FAILED', message, details: {} },
         });
       }
     },
@@ -356,7 +356,7 @@ export async function registerPhishingSimulationRoutes(fastify: FastifyInstance)
         const message = error instanceof Error ? error.message : 'Failed to resume simulation';
         return reply.code(400).send({
           success: false,
-          error: { code: 'RESUME_FAILED', message },
+          error: { code: 'RESUME_FAILED', message, details: {} },
         });
       }
     },
@@ -417,7 +417,7 @@ export async function registerPhishingSimulationRoutes(fastify: FastifyInstance)
       if (!audience) {
         return reply.code(404).send({
           success: false,
-          error: { code: 'NOT_FOUND', message: 'Audience not found' },
+          error: { code: 'NOT_FOUND', message: 'Audience not found', details: {} },
         });
       }
 
