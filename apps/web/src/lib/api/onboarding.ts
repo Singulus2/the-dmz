@@ -67,6 +67,7 @@ export interface OnboardingStatus {
   state: OnboardingState;
   canProceed: boolean;
   nextStep: OnboardingStep | null;
+  completed: boolean;
 }
 
 export interface IdpTestConnectionResult {

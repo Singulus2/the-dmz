@@ -99,6 +99,7 @@ export const onboardingStatusResponseSchema = z.object({
   state: onboardingStateSchema,
   canProceed: z.boolean(),
   nextStep: z.enum(ONBOARDING_STEPS).nullable(),
+  completed: z.boolean(),
 });
 
 export type OnboardingStatusResponse = z.infer<typeof onboardingStatusResponseSchema>;

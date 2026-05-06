@@ -80,6 +80,7 @@ export interface OnboardingStatus {
   state: OnboardingState;
   canProceed: boolean;
   nextStep: OnboardingStep | null;
+  completed: boolean;
 }
 
 export interface StartOnboardingResult {
@@ -122,6 +123,7 @@ export const getOnboardingStatus = async (
     state,
     canProceed,
     nextStep,
+    completed: state.currentStep === 'complete',
   };
 };
 

@@ -5,10 +5,7 @@ import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { tenantStatusGuard } from '../../shared/middleware/tenant-status-guard.js';
 import { validateCsrf } from '../auth/index.js';
 import { errorResponseSchemas } from '../../shared/schemas/error-schemas.js';
-import {
-  type RegulatoryRegion,
-  type ComplianceCoordinatorContact,
-} from '../../shared/database/schema/index.js';
+import { type RegulatoryRegion } from '../../shared/database/schema/index.js';
 
 import * as onboardingService from './onboarding.service.js';
 
@@ -19,6 +16,7 @@ const onboardingStatusResponseSchema = {
     state: { type: 'object' },
     canProceed: { type: 'boolean' },
     nextStep: { type: ['string', 'null'] },
+    completed: { type: 'boolean' },
   },
 } as const;
 
@@ -531,9 +529,7 @@ export const registerOnboardingRoutes = async (fastify: FastifyInstance): Promis
       const result = await onboardingService.saveComplianceFrameworks(ctx.tenantId, ctx.userId, {
         frameworks,
         regulatoryRegion: regulatoryRegion as RegulatoryRegion | undefined,
-        complianceCoordinatorContact: complianceCoordinatorContact as
-          | ComplianceCoordinatorContact
-          | undefined,
+        complianceCoordinatorContact: complianceCoordinatorContact,
       });
       return result;
     },

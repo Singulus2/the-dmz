@@ -89,6 +89,124 @@ describe('onboarding routes security', () => {
       const body = response.json();
       expect(body.tenantId).toBeDefined();
     });
+
+    it('returns completed field set to false when onboarding is not complete', async () => {
+      const { accessToken, user } = await registerUser(app);
+      await seedTenantAuthModel(testConfig, user.tenantId, [
+        { userId: user.id, role: 'tenant_admin' },
+      ]);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/onboarding/status',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.completed).toBeDefined();
+      expect(body.completed).toBe(false);
+    });
+
+    it('returns completed field set to true when onboarding is complete', async () => {
+      const { accessToken, user } = await registerUser(app);
+      await seedTenantAuthModel(testConfig, user.tenantId, [
+        { userId: user.id, role: 'tenant_admin' },
+      ]);
+
+      await app.inject({
+        method: 'POST',
+        url: '/api/v1/onboarding/start',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const completeResponse = await app.inject({
+        method: 'POST',
+        url: '/api/v1/onboarding/complete',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      expect(completeResponse.statusCode).toBe(200);
+
+      const statusResponse = await app.inject({
+        method: 'GET',
+        url: '/api/v1/onboarding/status',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      expect(statusResponse.statusCode).toBe(200);
+      const body = statusResponse.json();
+      expect(body.completed).toBeDefined();
+      expect(body.completed).toBe(true);
+    });
+  });
+
+  describe('GET /admin/onboarding/steps (completed field)', () => {
+    it('returns completed field set to false when onboarding is not complete', async () => {
+      const { accessToken, user } = await registerUser(app);
+      await seedTenantAuthModel(testConfig, user.tenantId, [
+        { userId: user.id, role: 'tenant_admin' },
+      ]);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/admin/onboarding/steps',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.completed).toBeDefined();
+      expect(body.completed).toBe(false);
+    });
+
+    it('returns completed field set to true when onboarding is complete', async () => {
+      const { accessToken, user } = await registerUser(app);
+      await seedTenantAuthModel(testConfig, user.tenantId, [
+        { userId: user.id, role: 'tenant_admin' },
+      ]);
+
+      await app.inject({
+        method: 'POST',
+        url: '/api/v1/onboarding/start',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const completeResponse = await app.inject({
+        method: 'POST',
+        url: '/api/v1/onboarding/complete',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      expect(completeResponse.statusCode).toBe(200);
+
+      const statusResponse = await app.inject({
+        method: 'GET',
+        url: '/admin/onboarding/steps',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      expect(statusResponse.statusCode).toBe(200);
+      const body = statusResponse.json();
+      expect(body.completed).toBeDefined();
+      expect(body.completed).toBe(true);
+    });
   });
 
   describe('POST /api/v1/onboarding/start', () => {
