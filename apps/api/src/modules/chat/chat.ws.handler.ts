@@ -14,14 +14,6 @@ import type { FastifyRequest } from 'fastify';
 import type { AppConfig } from '../../config.js';
 import type { EventBus } from '../../shared/events/event-types.js';
 
-interface JWTPayload {
-  sub: string;
-  tenantId: string;
-  sessionId?: string;
-  iat?: number;
-  exp?: number;
-}
-
 const TYPING_TIMEOUT_MS = 3000;
 const typingTimers = new Map<string, NodeJS.Timeout>();
 
@@ -100,21 +92,19 @@ async function authenticateWebSocket(
       return { valid: false, error: 'Invalid token' };
     }
 
-    const jwtPayload = result.payload as unknown as JWTPayload;
-
     const payload: JWTAuthPayload = {
-      userId: jwtPayload.sub,
-      tenantId: jwtPayload.tenantId,
+      userId: result.payload.sub,
+      tenantId: result.payload.tenantId,
     };
 
-    if (jwtPayload.sessionId) {
-      payload.sessionId = jwtPayload.sessionId;
+    if (result.payload.sessionId) {
+      payload.sessionId = result.payload.sessionId;
     }
-    if (jwtPayload.iat !== undefined) {
-      payload.iat = jwtPayload.iat;
+    if (result.payload.iat !== undefined) {
+      payload.iat = result.payload.iat;
     }
-    if (jwtPayload.exp !== undefined) {
-      payload.exp = jwtPayload.exp;
+    if (result.payload.exp !== undefined) {
+      payload.exp = result.payload.exp;
     }
 
     return {

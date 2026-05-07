@@ -26,13 +26,72 @@ import {
   MissingKeyIdError,
   JWTIssuerValidationError,
   JWTAudienceValidationError,
+  JWTPayloadValidationError,
 } from './auth.errors.js';
+
+import type { VerifiedJWTPayload, VerifiedJWTHeader } from './auth.types.js';
 
 import type { AppConfig } from '../../config.js';
 
 type KeyStatus = (typeof KEY_STATUS)[keyof typeof KEY_STATUS];
 type JWTSigningAlgorithm = (typeof JWT_SIGNING_ALGORITHM)[keyof typeof JWT_SIGNING_ALGORITHM];
 type KeyType = (typeof KEY_TYPE)[keyof typeof KEY_TYPE];
+
+export const isString = (value: unknown): value is string => typeof value === 'string';
+
+const isValidJWTPayload = (payload: Record<string, unknown>): VerifiedJWTPayload | null => {
+  const missingFields: string[] = [];
+  const invalidTypes: string[] = [];
+
+  if (!isString(payload.sub)) {
+    if (payload.sub === undefined) {
+      missingFields.push('sub');
+    } else {
+      invalidTypes.push('sub');
+    }
+  }
+
+  if (!isString(payload.tenantId)) {
+    if (payload.tenantId === undefined) {
+      missingFields.push('tenantId');
+    } else {
+      invalidTypes.push('tenantId');
+    }
+  }
+
+  if (!isString(payload.sessionId)) {
+    if (payload.sessionId === undefined) {
+      missingFields.push('sessionId');
+    } else {
+      invalidTypes.push('sessionId');
+    }
+  }
+
+  if (payload.role !== undefined && !isString(payload.role)) {
+    invalidTypes.push('role');
+  }
+
+  if (payload.iat !== undefined && typeof payload.iat !== 'number') {
+    invalidTypes.push('iat');
+  }
+
+  if (payload.exp !== undefined && typeof payload.exp !== 'number') {
+    invalidTypes.push('exp');
+  }
+
+  if (missingFields.length > 0 || invalidTypes.length > 0) {
+    return null;
+  }
+
+  return {
+    sub: payload.sub as string,
+    tenantId: payload.tenantId as string,
+    sessionId: payload.sessionId as string,
+    role: payload.role as string | undefined,
+    iat: payload.iat as number | undefined,
+    exp: payload.exp as number | undefined,
+  };
+};
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -426,8 +485,8 @@ export const verifyJWT = async (
   config: AppConfig,
   token: string,
 ): Promise<{
-  payload: Record<string, unknown>;
-  header: { kid: string; alg: string };
+  payload: VerifiedJWTPayload;
+  header: VerifiedJWTHeader;
 }> => {
   try {
     const { payload, protectedHeader } = await jwtVerify(token, getKeyForVerificationFunc(config), {
@@ -435,9 +494,55 @@ export const verifyJWT = async (
       audience: config.JWT_AUDIENCE,
     });
 
+    const payloadRecord = payload as Record<string, unknown>;
+    const validatedPayload = isValidJWTPayload(payloadRecord);
+
+    if (!validatedPayload) {
+      const missingFields: string[] = [];
+      const invalidTypes: string[] = [];
+
+      if (!isString(payloadRecord.sub)) {
+        if (payloadRecord.sub === undefined) {
+          missingFields.push('sub');
+        } else {
+          invalidTypes.push('sub');
+        }
+      }
+
+      if (!isString(payloadRecord.tenantId)) {
+        if (payloadRecord.tenantId === undefined) {
+          missingFields.push('tenantId');
+        } else {
+          invalidTypes.push('tenantId');
+        }
+      }
+
+      if (!isString(payloadRecord.sessionId)) {
+        if (payloadRecord.sessionId === undefined) {
+          missingFields.push('sessionId');
+        } else {
+          invalidTypes.push('sessionId');
+        }
+      }
+
+      if (payloadRecord.role !== undefined && !isString(payloadRecord.role)) {
+        invalidTypes.push('role');
+      }
+
+      if (payloadRecord.iat !== undefined && typeof payloadRecord.iat !== 'number') {
+        invalidTypes.push('iat');
+      }
+
+      if (payloadRecord.exp !== undefined && typeof payloadRecord.exp !== 'number') {
+        invalidTypes.push('exp');
+      }
+
+      throw new JWTPayloadValidationError(missingFields, invalidTypes);
+    }
+
     return {
-      payload: payload as Record<string, unknown>,
-      header: protectedHeader as { kid: string; alg: string },
+      payload: validatedPayload,
+      header: protectedHeader as VerifiedJWTHeader,
     };
   } catch (error) {
     if (

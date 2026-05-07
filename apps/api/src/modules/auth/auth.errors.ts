@@ -160,6 +160,21 @@ export class JWTAudienceValidationError extends AuthError {
   }
 }
 
+export class JWTPayloadValidationError extends AuthError {
+  constructor(missingFields: string[], invalidTypes: string[]) {
+    super({
+      code: JWT_ERROR_CODES.AUTH_JWT_INVALID_TOKEN,
+      message: 'Token payload validation failed',
+      statusCode: 401,
+      details: {
+        reason: 'payload_validation_failed',
+        missingFields,
+        invalidTypes,
+      },
+    });
+  }
+}
+
 export class InvalidCredentialsError extends AuthError {
   constructor() {
     super({

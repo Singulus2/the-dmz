@@ -29,7 +29,7 @@ import {
   OAuthInvalidClientError,
 } from './auth.errors.js';
 import { hashPassword } from './auth.crypto.js';
-import { signJWT, verifyJWT } from './jwt-keys.service.js';
+import { signJWT, verifyJWT, isString } from './jwt-keys.service.js';
 
 import type { AppConfig } from '../../config.js';
 
@@ -290,25 +290,45 @@ export const verifyOAuthToken = async (
 }> => {
   try {
     const { payload } = await verifyJWT(config, token);
-    const jwtPayload = payload as unknown as {
-      sub: string;
-      tenantId: string;
-      scopes: string[];
-      type?: string;
-    };
 
-    if (!jwtPayload.sub || !jwtPayload.tenantId || !jwtPayload.scopes) {
+    const missingFields: string[] = [];
+    const invalidTypes: string[] = [];
+
+    if (!isString(payload.sub)) {
+      missingFields.push('sub');
+    }
+
+    if (!isString(payload.tenantId)) {
+      missingFields.push('tenantId');
+    }
+
+    const scopes = payload['scopes'];
+    const type = payload['type'];
+
+    if (!Array.isArray(scopes) || !scopes.every((s) => typeof s === 'string')) {
+      if (scopes === undefined) {
+        missingFields.push('scopes');
+      } else {
+        invalidTypes.push('scopes');
+      }
+    }
+
+    if (type !== undefined && typeof type !== 'string') {
+      invalidTypes.push('type');
+    }
+
+    if (missingFields.length > 0 || invalidTypes.length > 0) {
       throw new Error('Invalid token payload');
     }
 
-    if (jwtPayload.type !== 'oauth_client_credentials') {
+    if (type !== 'oauth_client_credentials') {
       throw new Error('Invalid token type');
     }
 
     return {
-      clientId: jwtPayload.sub,
-      tenantId: jwtPayload.tenantId,
-      scopes: jwtPayload.scopes,
+      clientId: payload.sub,
+      tenantId: payload.tenantId,
+      scopes: scopes as string[],
     };
   } catch (error) {
     if (error instanceof Error && error.message === 'Invalid token payload') {

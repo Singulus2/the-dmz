@@ -224,21 +224,12 @@ export async function authenticateWebSocket(request: FastifyRequest): Promise<We
     const config = request.server.config;
     const { payload } = await verifyJWT(config, token);
 
-    const userId = payload['sub'] as string;
-    const tenantId = payload['tenantId'] as string;
-
-    if (!userId || !tenantId) {
-      return { valid: false, error: 'Invalid token payload' };
-    }
-
-    const sessionId = payload['sessionId'] as string | undefined;
-
     return {
       valid: true,
       payload: {
-        userId,
-        tenantId,
-        ...(sessionId !== undefined && { sessionId }),
+        userId: payload.sub,
+        tenantId: payload.tenantId,
+        ...(payload.sessionId !== undefined && { sessionId: payload.sessionId }),
       },
     };
   } catch (error) {

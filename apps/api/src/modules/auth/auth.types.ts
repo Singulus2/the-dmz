@@ -31,6 +31,20 @@ export type JwtPayload = {
   exp: number;
 };
 
+export interface VerifiedJWTPayload {
+  sub: string;
+  tenantId: string;
+  sessionId: string;
+  role?: string;
+  iat?: number;
+  exp?: number;
+}
+
+export interface VerifiedJWTHeader {
+  kid: string;
+  alg: string;
+}
+
 export type AuthTokens = {
   accessToken: string;
   refreshToken: string;

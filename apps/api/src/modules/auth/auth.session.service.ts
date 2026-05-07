@@ -44,7 +44,7 @@ import {
 } from './auth.errors.js';
 
 import type { AppConfig } from '../../config.js';
-import type { RefreshResponse, AuthenticatedUser, JwtPayload } from './auth.types.js';
+import type { RefreshResponse, AuthenticatedUser } from './auth.types.js';
 
 export interface RefreshOptions {
   ipAddress?: string;
@@ -236,14 +236,8 @@ export const verifyAccessToken = async (
   try {
     const { payload } = await verifyJWT(config, token);
 
-    const jwtPayload = payload as unknown as JwtPayload;
-
-    if (!jwtPayload.sub || !jwtPayload.tenantId || !jwtPayload.sessionId) {
-      throw new InvalidCredentialsError();
-    }
-
     const db = getDatabaseClient(config);
-    const session = await findSessionById(db, jwtPayload.sessionId);
+    const session = await findSessionById(db, payload.sessionId);
 
     if (!session) {
       throw new SessionRevokedError();
@@ -254,10 +248,10 @@ export const verifyAccessToken = async (
     }
 
     return {
-      userId: jwtPayload.sub,
-      tenantId: jwtPayload.tenantId,
-      sessionId: jwtPayload.sessionId,
-      role: jwtPayload.role,
+      userId: payload.sub,
+      tenantId: payload.tenantId,
+      sessionId: payload.sessionId,
+      role: payload.role,
     };
   } catch (error) {
     if (error instanceof SessionExpiredError || error instanceof SessionRevokedError) {
