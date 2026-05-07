@@ -4,13 +4,19 @@ import {
   contentWriteRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as emailTemplatesService from './email-templates.service.js';
+import {
+  findEmailTemplates,
+  findEmailTemplateById,
+  createEmailTemplate,
+} from './email-templates.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerEmailTemplateRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -62,11 +68,8 @@ export const registerEmailTemplateRoutes = async (fastify: FastifyInstance): Pro
         isActive?: boolean;
       };
 
-      const templates = await emailTemplatesService.listEmailTemplates(
-        config,
-        user.tenantId,
-        query,
-      );
+      const db = getDatabaseClient(config);
+      const templates = await findEmailTemplates(db, user.tenantId, query);
 
       return { data: templates };
     },
@@ -103,7 +106,8 @@ export const registerEmailTemplateRoutes = async (fastify: FastifyInstance): Pro
       const user = request.user as AuthenticatedUser;
       const { id } = request.params as { id: string };
 
-      const template = await emailTemplatesService.getEmailTemplate(config, user.tenantId, id);
+      const db = getDatabaseClient(config);
+      const template = await findEmailTemplateById(db, user.tenantId, id);
 
       if (!template) {
         return _reply.status(404).send({
@@ -186,11 +190,28 @@ export const registerEmailTemplateRoutes = async (fastify: FastifyInstance): Pro
         isActive?: boolean;
       };
 
-      const template = await emailTemplatesService.createEmailTemplateRecord(
-        config,
-        user.tenantId,
-        body,
-      );
+      const db = getDatabaseClient(config);
+      const template = await createEmailTemplate(db, {
+        tenantId: user.tenantId,
+        name: body.name,
+        subject: body.subject,
+        body: body.body,
+        fromName: body.fromName ?? null,
+        fromEmail: body.fromEmail ?? null,
+        replyTo: body.replyTo ?? null,
+        contentType: body.contentType,
+        difficulty: body.difficulty,
+        faction: body.faction ?? null,
+        attackType: body.attackType ?? null,
+        threatLevel: body.threatLevel,
+        season: body.season ?? null,
+        chapter: body.chapter ?? null,
+        language: body.language ?? 'en',
+        locale: body.locale ?? 'en-US',
+        metadata: body.metadata ?? {},
+        isAiGenerated: body.isAiGenerated ?? false,
+        isActive: body.isActive ?? true,
+      });
 
       return _reply.status(201).send({ data: template });
     },

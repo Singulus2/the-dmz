@@ -3,13 +3,15 @@ import {
   contentReadRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as localizedService from './localized.service.js';
+import { findLocalizedContent } from './localized.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerLocalizedRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -50,12 +52,8 @@ export const registerLocalizedRoutes = async (fastify: FastifyInstance): Promise
       const { id } = request.params as { id: string };
       const query = request.query as { locale?: string };
 
-      const content = await localizedService.getLocalizedContentRecord(
-        config,
-        user.tenantId,
-        id,
-        query.locale,
-      );
+      const db = getDatabaseClient(config);
+      const content = await findLocalizedContent(db, user.tenantId, id, query.locale);
 
       if (!content) {
         return _reply.status(404).send({

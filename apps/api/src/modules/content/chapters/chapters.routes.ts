@@ -5,13 +5,15 @@ import {
   contentReadRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as chaptersService from './chapters.service.js';
+import { findChaptersBySeason } from './chapters.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerChapterRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -35,6 +37,7 @@ export const registerChapterRoutes = async (fastify: FastifyInstance): Promise<v
           },
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: chapterListResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -50,12 +53,8 @@ export const registerChapterRoutes = async (fastify: FastifyInstance): Promise<v
         isActive?: boolean;
       };
 
-      const chapters = await chaptersService.listChaptersBySeason(
-        config,
-        user.tenantId,
-        seasonId,
-        query,
-      );
+      const db = getDatabaseClient(config);
+      const chapters = await findChaptersBySeason(db, user.tenantId, seasonId, query);
 
       return { data: chapters };
     },

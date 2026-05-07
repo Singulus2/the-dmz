@@ -3,13 +3,15 @@ import {
   contentReadRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as narrativeService from './narrative.service.js';
+import { findMorpheusMessagesByTrigger, findMorpheusMessageByKey } from './narrative.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerNarrativeRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -56,12 +58,8 @@ export const registerNarrativeRoutes = async (fastify: FastifyInstance): Promise
         factionKey?: string;
       };
 
-      const messages = await narrativeService.getMorpheusMessagesByTrigger(
-        config,
-        user.tenantId,
-        trigger,
-        query,
-      );
+      const db = getDatabaseClient(config);
+      const messages = await findMorpheusMessagesByTrigger(db, user.tenantId, trigger, query);
 
       return { data: messages };
     },
@@ -98,7 +96,8 @@ export const registerNarrativeRoutes = async (fastify: FastifyInstance): Promise
       const user = request.user as AuthenticatedUser;
       const { key } = request.params as { key: string };
 
-      const message = await narrativeService.getMorpheusMessageByKey(config, user.tenantId, key);
+      const db = getDatabaseClient(config);
+      const message = await findMorpheusMessageByKey(db, user.tenantId, key);
 
       if (!message) {
         return _reply.status(404).send({

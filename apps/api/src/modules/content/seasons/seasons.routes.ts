@@ -5,13 +5,15 @@ import {
   contentReadRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as seasonsService from './seasons.service.js';
+import { findSeasons, findSeasonById } from './seasons.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerSeasonRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -28,6 +30,7 @@ export const registerSeasonRoutes = async (fastify: FastifyInstance): Promise<vo
           },
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: seasonListResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -42,7 +45,8 @@ export const registerSeasonRoutes = async (fastify: FastifyInstance): Promise<vo
         isActive?: boolean;
       };
 
-      const seasons = await seasonsService.listSeasons(config, user.tenantId, query);
+      const db = getDatabaseClient(config);
+      const seasons = await findSeasons(db, user.tenantId, query);
 
       return { data: seasons };
     },
@@ -62,6 +66,7 @@ export const registerSeasonRoutes = async (fastify: FastifyInstance): Promise<vo
           required: ['id'],
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: seasonResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -74,7 +79,8 @@ export const registerSeasonRoutes = async (fastify: FastifyInstance): Promise<vo
       const user = request.user as AuthenticatedUser;
       const { id } = request.params as { id: string };
 
-      const season = await seasonsService.getSeason(config, user.tenantId, id);
+      const db = getDatabaseClient(config);
+      const season = await findSeasonById(db, user.tenantId, id);
 
       if (!season) {
         return _reply.status(404).send({

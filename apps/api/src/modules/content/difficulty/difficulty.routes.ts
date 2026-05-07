@@ -5,13 +5,21 @@ import {
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
 import * as difficultyClassifier from '../difficulty-classifier/index.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as difficultyService from './difficulty.service.js';
+import {
+  findDifficultyHistoryByTier,
+  findEmailFeaturesById,
+  findClassificationStats,
+  createDifficultyHistory,
+  createEmailFeature,
+} from './difficulty.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerDifficultyRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.post(
@@ -75,24 +83,38 @@ export const registerDifficultyRoutes = async (fastify: FastifyInstance): Promis
       const result = difficultyClassifier.classifyDifficulty(body, body.requestedDifficulty);
 
       if (body.emailTemplateId) {
-        await difficultyService.saveDifficultyHistory(config, user.tenantId, {
+        const db = getDatabaseClient(config);
+
+        await createDifficultyHistory(db, {
+          tenantId: user.tenantId,
           emailTemplateId: body.emailTemplateId,
-          requestedDifficulty: body.requestedDifficulty,
+          requestedDifficulty: body.requestedDifficulty ?? null,
           classifiedDifficulty: result.difficulty,
           classificationMethod: result.method,
-          confidence: result.confidence,
+          confidence: String(result.confidence),
           metadata: { features: result.features, scores: result.scores },
         });
 
-        await difficultyService.saveEmailFeatures(config, user.tenantId, {
+        await createEmailFeature(db, {
+          tenantId: user.tenantId,
           emailTemplateId: body.emailTemplateId,
           indicatorCount: result.features.indicatorCount,
           wordCount: result.features.wordCount,
           hasSpoofedHeaders: result.features.hasSpoofedHeaders,
-          impersonationQuality: result.features.impersonationQuality,
+          impersonationQuality:
+            result.features.impersonationQuality != null
+              ? String(result.features.impersonationQuality)
+              : null,
           hasVerificationHooks: result.features.hasVerificationHooks,
-          emotionalManipulationLevel: result.features.emotionalManipulationLevel,
-          grammarComplexity: result.features.grammarComplexity,
+          emotionalManipulationLevel:
+            result.features.emotionalManipulationLevel != null
+              ? String(result.features.emotionalManipulationLevel)
+              : null,
+          grammarComplexity:
+            result.features.grammarComplexity != null
+              ? String(result.features.grammarComplexity)
+              : null,
+          metadata: {},
         });
       }
 
@@ -169,12 +191,8 @@ export const registerDifficultyRoutes = async (fastify: FastifyInstance): Promis
         });
       }
 
-      const history = await difficultyService.getDifficultyHistoryByTier(
-        config,
-        user.tenantId,
-        difficultyTier,
-        query,
-      );
+      const db = getDatabaseClient(config);
+      const history = await findDifficultyHistoryByTier(db, user.tenantId, difficultyTier, query);
 
       return { data: history };
     },
@@ -227,7 +245,8 @@ export const registerDifficultyRoutes = async (fastify: FastifyInstance): Promis
       const user = request.user as AuthenticatedUser;
       const { id } = request.params as { id: string };
 
-      const features = await difficultyService.getEmailFeaturesById(config, user.tenantId, id);
+      const db = getDatabaseClient(config);
+      const features = await findEmailFeaturesById(db, user.tenantId, id);
 
       if (!features) {
         return _reply.status(404).send({
@@ -274,7 +293,8 @@ export const registerDifficultyRoutes = async (fastify: FastifyInstance): Promis
     async (request, _reply) => {
       const user = request.user as AuthenticatedUser;
 
-      const stats = await difficultyService.getClassificationStats(config, user.tenantId);
+      const db = getDatabaseClient(config);
+      const stats = await findClassificationStats(db, user.tenantId);
 
       return { data: stats };
     },

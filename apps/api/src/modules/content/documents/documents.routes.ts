@@ -5,13 +5,15 @@ import {
   contentReadRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
 
-import * as documentsService from './documents.service.js';
+import { findDocumentTemplateByType } from './documents.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerDocumentRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -36,6 +38,7 @@ export const registerDocumentRoutes = async (fastify: FastifyInstance): Promise<
           },
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: documentTemplateListResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -47,11 +50,8 @@ export const registerDocumentRoutes = async (fastify: FastifyInstance): Promise<
       const user = request.user as AuthenticatedUser;
       const { type } = request.params as { type: string };
 
-      const templates = await documentsService.getDocumentTemplatesByType(
-        config,
-        user.tenantId,
-        type,
-      );
+      const db = getDatabaseClient(config);
+      const templates = await findDocumentTemplateByType(db, user.tenantId, type);
 
       return { data: templates };
     },

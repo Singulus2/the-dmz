@@ -9,14 +9,16 @@ import {
   contentReadRoutePreHandlers,
   tenantInactiveOrForbiddenResponseJsonSchema,
 } from '../../../shared/routes/content-routes-config.js';
-import * as emailTemplatesService from '../email-templates/email-templates.service.js';
+import { getDatabaseClient } from '../../../shared/database/connection.js';
+import { findEmailTemplates } from '../email-templates/email-templates.repo.js';
 
-import * as scenariosService from './scenarios.service.js';
+import { findScenarios, findScenarioWithBeats } from './scenarios.repo.js';
 
 import type { AuthenticatedUser } from '../../auth/index.js';
 import type { FastifyInstance } from 'fastify';
 
 export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const config = fastify.config;
 
   fastify.get(
@@ -35,6 +37,7 @@ export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<
           },
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: scenarioListResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -51,7 +54,8 @@ export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<
         isActive?: boolean;
       };
 
-      const scenarios = await scenariosService.listScenarios(config, user.tenantId, query);
+      const db = getDatabaseClient(config);
+      const scenarios = await findScenarios(db, user.tenantId, query);
 
       return { data: scenarios };
     },
@@ -71,6 +75,7 @@ export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<
           required: ['id'],
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: scenarioResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -83,7 +88,8 @@ export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<
       const user = request.user as AuthenticatedUser;
       const { id } = request.params as { id: string };
 
-      const scenario = await scenariosService.getScenario(config, user.tenantId, id);
+      const db = getDatabaseClient(config);
+      const scenario = await findScenarioWithBeats(db, user.tenantId, id);
 
       if (!scenario) {
         return _reply.status(404).send({
@@ -114,6 +120,7 @@ export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<
           },
         },
         response: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           200: emailTemplateListResponseJsonSchema,
           401: errorResponseSchemas.Unauthorized,
           403: tenantInactiveOrForbiddenResponseJsonSchema,
@@ -145,7 +152,8 @@ export const registerScenarioRoutes = async (fastify: FastifyInstance): Promise<
         filters.faction = query.faction;
       }
 
-      const emails = await emailTemplatesService.listEmailTemplates(config, user.tenantId, filters);
+      const db = getDatabaseClient(config);
+      const emails = await findEmailTemplates(db, user.tenantId, filters);
 
       return { data: emails };
     },
