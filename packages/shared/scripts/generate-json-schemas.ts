@@ -75,11 +75,11 @@ import {
 } from '../src/schemas/password-recovery.schema.js';
 import {
   apiKeyListResponseSchema,
-  createApiKeySchema,
+  CREATE_API_KEY_SCHEMA as createApiKeySchema,
   rotateApiKeySchema,
-  revokeApiKeySchema,
-  apiKeyResponseSchema,
-  apiKeyWithSecretSchema,
+  REVOKE_API_KEY_SCHEMA as revokeApiKeySchema,
+  API_KEY_RESPONSE_SCHEMA as apiKeyResponseSchema,
+  API_KEY_WITH_SECRET_SCHEMA as apiKeyWithSecretSchema,
 } from '../src/auth/api-key-contract.js';
 import {
   createEmailIntegrationSchema,

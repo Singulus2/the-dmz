@@ -33,5 +33,4 @@ export type {
   EmailState,
   IncidentState,
   NarrativeState,
-  BreachState,
 } from '../types/game-state.js';

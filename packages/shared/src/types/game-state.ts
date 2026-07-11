@@ -10,9 +10,9 @@ import type {
   EmailStatus,
   VerificationPacket,
   GeneratedAttack,
-  BreachState,
   CoopContext,
 } from '../game/index.js';
+import type { BreachState } from '../game/breach.js';
 
 export interface GameState {
   sessionId: string;
