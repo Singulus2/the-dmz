@@ -237,6 +237,12 @@ const typeAwareRules = {
 };
 
 export default [
+  // Global ignores: an object with only `ignores` applies to every config and
+  // excludes matched files even when passed explicitly (e.g. by lint-staged).
+  // Auto-generated files are not hand-edited and must not be linted.
+  {
+    ignores: ['**/*.generated.ts'],
+  },
   {
     name: 'default',
     linterOptions: {
