@@ -8,6 +8,13 @@
 - **Active milestone:** M2 — Core Game Loop (issue #131 created, more to follow)
 - **Blocker:** Monorepo needs bootstrapping (M0)
 
+## Repository
+
+- **`origin`** → `github.com/Singulus2/the-dmz` (public fork, our working copy — push/pull here)
+- **`upstream`** → `github.com/TheMorpheus407/the-dmz` (original; sync via `git fetch upstream && git merge upstream/master`)
+- Forked from upstream on 2026-07-11; local `master` differs only by commit `8ea289a` (`PROMPT-HERKUNFT.md`, provenance analysis).
+- Git push auth uses gh credential helper (`credential.https://github.com.helper = !gh auth git-credential`, set globally).
+
 ## Completed Work
 
 - [x] Game premise and story (`docs/story.md`)
