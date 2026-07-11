@@ -18,6 +18,13 @@
       "undici": ">=7.24.0",
       "serialize-javascript": ">=7.0.3",
       "flatted": ">=3.4.2"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@storybook/svelte-vite>@sveltejs/vite-plugin-svelte": "6",
+        "vite-plugin-pwa>workbox-build": "7.4.0",
+        "vite-plugin-pwa>workbox-window": "7.4.0"
+      }
     }
   },
   "scripts": {
