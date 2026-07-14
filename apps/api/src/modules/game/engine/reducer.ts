@@ -138,15 +138,15 @@ export const createInitialGameState = (
   return createInitialState(sessionId, userId, tenantId, gameSeed);
 };
 
-type GameActionHandler = (
+type GameActionHandler<K extends GameActionType = GameActionType> = (
   state: GameState,
-  action: GameActionPayload,
+  action: Extract<GameActionPayload, { type: K }>,
   events: DomainEvent[],
 ) => void;
 
-const noopHandler: GameActionHandler = () => {};
+const noopHandler = (): void => {};
 
-const ACTION_HANDLERS: Record<GameActionType, GameActionHandler> = {
+export const ACTION_HANDLERS: { [K in GameActionType]: GameActionHandler<K> } = {
   [GAME_ACTIONS.ACK_DAY_START]: handleAckDayStart,
   [GAME_ACTIONS.LOAD_INBOX]: handleLoadInbox,
   [GAME_ACTIONS.OPEN_EMAIL]: handleOpenEmail,
@@ -181,7 +181,11 @@ export const reduce = (state: GameState, action: GameActionPayload): ActionResul
   const newState = { ...state, updatedAt: new Date().toISOString() };
 
   try {
-    const handler = ACTION_HANDLERS[action.type as GameActionType];
+    // ACTION_HANDLERS pairs each action type with its own payload type; the
+    // dynamic lookup cannot carry that correspondence, so widen at the call.
+    const handler = ACTION_HANDLERS[action.type] as
+      | ((state: GameState, action: GameActionPayload, events: DomainEvent[]) => void)
+      | undefined;
     if (!handler) {
       throw new Error(`Unknown action type: ${action.type}`);
     }

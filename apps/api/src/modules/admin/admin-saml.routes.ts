@@ -77,7 +77,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -136,7 +136,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Body: CreateSAMLProviderBody }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Body: CreateSAMLProviderBody }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -203,7 +203,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -279,7 +279,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
     },
     async (
       request: FastifyRequest<{ Params: SAMLProviderIdParams; Body: UpdateSAMLProviderBody }>,
-      reply: FastifyReply,
+      _reply: FastifyReply,
     ) => {
       const tenantContext = request.tenantContext;
 
@@ -351,7 +351,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -402,7 +402,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {

@@ -136,7 +136,7 @@ export class BehavioralMetricsService {
   private processVerification(
     currentMetrics: BehavioralMetrics,
     update: Partial<BehavioralMetrics>,
-    event: DomainEvent,
+    _event: DomainEvent,
     outcome: string | undefined,
   ): void {
     update.verificationActions = currentMetrics.verificationActions + 1;

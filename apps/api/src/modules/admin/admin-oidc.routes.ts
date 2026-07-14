@@ -80,7 +80,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -139,7 +139,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Body: CreateOIDCProviderBody }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Body: CreateOIDCProviderBody }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -197,7 +197,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -275,7 +275,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
     },
     async (
       request: FastifyRequest<{ Params: OIDCProviderIdParams; Body: UpdateOIDCProviderBody }>,
-      reply: FastifyReply,
+      _reply: FastifyReply,
     ) => {
       const tenantContext = request.tenantContext;
 
@@ -348,7 +348,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -399,7 +399,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {

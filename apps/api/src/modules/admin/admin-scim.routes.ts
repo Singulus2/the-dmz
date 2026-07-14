@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 
 import { ErrorCodes } from '@the-dmz/shared/constants';
@@ -108,7 +109,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -161,7 +162,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Body: CreateScimTokenBody }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Body: CreateScimTokenBody }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -225,7 +226,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: TokenIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: TokenIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -274,7 +275,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     },
     async (
       request: FastifyRequest<{ Params: TokenIdParams; Body: RotateScimTokenBody }>,
-      reply: FastifyReply,
+      _reply: FastifyReply,
     ) => {
       const tenantContext = request.tenantContext;
 
@@ -340,7 +341,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: TokenIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: TokenIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -384,7 +385,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest<{ Params: TokenIdParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: TokenIdParams }>, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -420,7 +421,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -485,7 +486,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, _reply: FastifyReply) => {
       const tenantContext = request.tenantContext;
 
       try {
@@ -545,7 +546,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
     },
     async (
       request: FastifyRequest<{ Params: TokenIdParams; Body: GroupRoleBody }>,
-      reply: FastifyReply,
+      _reply: FastifyReply,
     ) => {
       const tenantContext = request.tenantContext;
 

@@ -30,7 +30,6 @@ import {
 } from './auth.errors.js';
 
 import type { VerifiedJWTPayload, VerifiedJWTHeader } from './auth.types.js';
-
 import type { AppConfig } from '../../config.js';
 
 type KeyStatus = (typeof KEY_STATUS)[keyof typeof KEY_STATUS];
@@ -39,57 +38,70 @@ type KeyType = (typeof KEY_TYPE)[keyof typeof KEY_TYPE];
 
 export const isString = (value: unknown): value is string => typeof value === 'string';
 
-const isValidJWTPayload = (payload: Record<string, unknown>): VerifiedJWTPayload | null => {
-  const missingFields: string[] = [];
+interface JWTPayloadValidation {
+  payload: VerifiedJWTPayload | null;
+  missingFields: string[];
+  invalidTypes: string[];
+}
+
+const REQUIRED_JWT_STRING_FIELDS = ['sub', 'tenantId', 'sessionId'] as const;
+
+const collectInvalidOptionalFields = (payload: Record<string, unknown>): string[] => {
   const invalidTypes: string[] = [];
+  const role = payload['role'];
+  const iat = payload['iat'];
+  const exp = payload['exp'];
 
-  if (!isString(payload.sub)) {
-    if (payload.sub === undefined) {
-      missingFields.push('sub');
-    } else {
-      invalidTypes.push('sub');
-    }
-  }
-
-  if (!isString(payload.tenantId)) {
-    if (payload.tenantId === undefined) {
-      missingFields.push('tenantId');
-    } else {
-      invalidTypes.push('tenantId');
-    }
-  }
-
-  if (!isString(payload.sessionId)) {
-    if (payload.sessionId === undefined) {
-      missingFields.push('sessionId');
-    } else {
-      invalidTypes.push('sessionId');
-    }
-  }
-
-  if (payload.role !== undefined && !isString(payload.role)) {
+  if (role !== undefined && !isString(role)) {
     invalidTypes.push('role');
   }
 
-  if (payload.iat !== undefined && typeof payload.iat !== 'number') {
+  if (iat !== undefined && typeof iat !== 'number') {
     invalidTypes.push('iat');
   }
 
-  if (payload.exp !== undefined && typeof payload.exp !== 'number') {
+  if (exp !== undefined && typeof exp !== 'number') {
     invalidTypes.push('exp');
   }
 
+  return invalidTypes;
+};
+
+const validateJWTPayload = (payload: Record<string, unknown>): JWTPayloadValidation => {
+  const missingFields: string[] = [];
+  const invalidTypes: string[] = [];
+
+  for (const field of REQUIRED_JWT_STRING_FIELDS) {
+    const value = payload[field];
+
+    if (isString(value)) {
+      continue;
+    }
+
+    if (value === undefined) {
+      missingFields.push(field);
+    } else {
+      invalidTypes.push(field);
+    }
+  }
+
+  invalidTypes.push(...collectInvalidOptionalFields(payload));
+
   if (missingFields.length > 0 || invalidTypes.length > 0) {
-    return null;
+    return { payload: null, missingFields, invalidTypes };
   }
 
   return {
-    sub: payload.sub as string,
-    tenantId: payload.tenantId as string,
-    sessionId: payload.sessionId as string,
-    role: payload.role as string | undefined,
-    iat: payload.iat as number | undefined,
-    exp: payload.exp as number | undefined,
+    payload: {
+      sub: payload['sub'] as string,
+      tenantId: payload['tenantId'] as string,
+      sessionId: payload['sessionId'] as string,
+      role: payload['role'] as string | undefined,
+      iat: payload['iat'] as number | undefined,
+      exp: payload['exp'] as number | undefined,
+    },
+    missingFields,
+    invalidTypes,
   };
 };
 
@@ -278,7 +290,7 @@ export const getAllActiveSigningKeys = async (config: AppConfig): Promise<Signin
       ),
     );
 
-  return keys as unknown as SigningKeyRow[];
+  return keys;
 };
 
 export const rotateSigningKey = async (
@@ -444,7 +456,7 @@ export const signJWT = async (
 
     const token = await new SignJWT(payload)
       .setProtectedHeader({
-        alg: key.algorithm as JWTSigningAlgorithm,
+        alg: key.algorithm,
         typ: 'JWT',
         kid: key.id,
       })
@@ -495,48 +507,13 @@ export const verifyJWT = async (
     });
 
     const payloadRecord = payload as Record<string, unknown>;
-    const validatedPayload = isValidJWTPayload(payloadRecord);
+    const {
+      payload: validatedPayload,
+      missingFields,
+      invalidTypes,
+    } = validateJWTPayload(payloadRecord);
 
     if (!validatedPayload) {
-      const missingFields: string[] = [];
-      const invalidTypes: string[] = [];
-
-      if (!isString(payloadRecord.sub)) {
-        if (payloadRecord.sub === undefined) {
-          missingFields.push('sub');
-        } else {
-          invalidTypes.push('sub');
-        }
-      }
-
-      if (!isString(payloadRecord.tenantId)) {
-        if (payloadRecord.tenantId === undefined) {
-          missingFields.push('tenantId');
-        } else {
-          invalidTypes.push('tenantId');
-        }
-      }
-
-      if (!isString(payloadRecord.sessionId)) {
-        if (payloadRecord.sessionId === undefined) {
-          missingFields.push('sessionId');
-        } else {
-          invalidTypes.push('sessionId');
-        }
-      }
-
-      if (payloadRecord.role !== undefined && !isString(payloadRecord.role)) {
-        invalidTypes.push('role');
-      }
-
-      if (payloadRecord.iat !== undefined && typeof payloadRecord.iat !== 'number') {
-        invalidTypes.push('iat');
-      }
-
-      if (payloadRecord.exp !== undefined && typeof payloadRecord.exp !== 'number') {
-        invalidTypes.push('exp');
-      }
-
       throw new JWTPayloadValidationError(missingFields, invalidTypes);
     }
 

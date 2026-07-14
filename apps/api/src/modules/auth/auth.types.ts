@@ -35,9 +35,9 @@ export interface VerifiedJWTPayload {
   sub: string;
   tenantId: string;
   sessionId: string;
-  role?: string;
-  iat?: number;
-  exp?: number;
+  role?: string | undefined;
+  iat?: number | undefined;
+  exp?: number | undefined;
 }
 
 export interface VerifiedJWTHeader {

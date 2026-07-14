@@ -91,7 +91,6 @@ export interface ChangePasswordWithTokenResult {
 
 async function validatePasswordResetToken(
   db: ReturnType<typeof getDatabaseClient>,
-  token: string,
   tenantId: string,
   tokenHash: string,
 ) {
@@ -125,7 +124,7 @@ export const changePasswordWithToken = async (
   );
 
   const tokenHash = await hashToken(data.token, config.TOKEN_HASH_SALT);
-  const tokenRecord = await validatePasswordResetToken(db, data.token, tenantId, tokenHash);
+  const tokenRecord = await validatePasswordResetToken(db, tenantId, tokenHash);
 
   validatePasswordAgainstPolicy(data.password, tokenRecord.tenantId);
   await screenPasswordForCompromise(config, data.password);
