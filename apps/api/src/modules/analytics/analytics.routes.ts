@@ -130,7 +130,10 @@ declare module 'fastify' {
   }
 }
 
-const buildDateRange = (dateRange?: { startDate?: string; endDate?: string }) => {
+const buildDateRange = (dateRange?: {
+  startDate?: string | undefined;
+  endDate?: string | undefined;
+}) => {
   const startDate = dateRange?.startDate ? new Date(dateRange.startDate) : undefined;
   const endDate = dateRange?.endDate ? new Date(dateRange.endDate) : undefined;
   return { startDate, endDate };
@@ -139,8 +142,8 @@ const buildDateRange = (dateRange?: { startDate?: string; endDate?: string }) =>
 type ScoreInput = {
   tenantId: string;
   userId: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: Date | undefined;
+  endDate?: Date | undefined;
 };
 
 const computeSinglePlayerScore = async (fastify: FastifyInstance, input: ScoreInput) => {

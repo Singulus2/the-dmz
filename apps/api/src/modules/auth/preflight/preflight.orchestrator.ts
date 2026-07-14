@@ -209,16 +209,13 @@ export const runOIDCValidation = async (
 };
 
 async function runSAMLChecks(
-  connection: SsoConnection,
+  metadataUrl: string,
   correlationId: string,
 ): Promise<{ checks: SSOValidationCheckResult[]; overallStatus: ValidationStatus }> {
   const checks: SSOValidationCheckResult[] = [];
   let overallStatus: ValidationStatus = ValidationStatus.OK;
 
-  const metadataFetchCheck = await samlValidator.validateMetadataFetch(
-    connection.metadataUrl,
-    correlationId,
-  );
+  const metadataFetchCheck = await samlValidator.validateMetadataFetch(metadataUrl, correlationId);
   checks.push(metadataFetchCheck);
   if (metadataFetchCheck.status === ValidationStatus.FAILED) {
     overallStatus = ValidationStatus.FAILED;
@@ -227,7 +224,7 @@ async function runSAMLChecks(
   }
 
   if (metadataFetchCheck.status !== ValidationStatus.FAILED) {
-    const certCheck = samlValidator.validateCertificate(connection.metadataUrl, correlationId);
+    const certCheck = samlValidator.validateCertificate(metadataUrl, correlationId);
     checks.push(certCheck);
     if (certCheck.status === ValidationStatus.FAILED && overallStatus !== ValidationStatus.FAILED) {
       overallStatus = ValidationStatus.FAILED;
@@ -264,7 +261,7 @@ export const runSAMLValidation = async (
     throw createConfigurationError('SAML provider metadata URL not configured', correlationId);
   }
 
-  const { checks, overallStatus } = await runSAMLChecks(connection, correlationId);
+  const { checks, overallStatus } = await runSAMLChecks(connection.metadataUrl, correlationId);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + DEFAULT_VALIDATION_FRESHNESS_SECONDS * 1000);
 
@@ -316,8 +313,8 @@ interface SCIMValidationParams {
   baseUrl: string;
   bearerToken: string;
   tenantId: string;
-  dryRunEmail?: string;
-  executedBy?: string;
+  dryRunEmail?: string | undefined;
+  executedBy?: string | undefined;
 }
 
 async function runSCIMChecks(

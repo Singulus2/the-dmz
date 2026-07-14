@@ -39,8 +39,7 @@ export const logAuthorizationDenial = (
   reason: DenialReason,
   options?: Partial<AuthorizationLoggingOptions>,
 ): void => {
-  const config = request.server.config;
-  const nodeEnv = config.NODE_ENV;
+  const nodeEnv = request.server?.config?.NODE_ENV;
   const opts = { ...defaultOptions, ...options };
 
   const user = request.user;
@@ -92,8 +91,7 @@ export const logInsufficientPermissions = (
   params: InsufficientPermissionsParams,
   options?: Partial<AuthorizationLoggingOptions>,
 ): void => {
-  const config = request.server.config;
-  const nodeEnv = config.NODE_ENV;
+  const nodeEnv = request.server?.config?.NODE_ENV;
   const opts = { ...defaultOptions, ...options };
 
   const user = request.user;
@@ -154,8 +152,7 @@ export const logNoRoles = (
   request: HttpRequest,
   options?: Partial<AuthorizationLoggingOptions>,
 ): void => {
-  const config = request.server.config;
-  const nodeEnv = config.NODE_ENV;
+  const nodeEnv = request.server?.config?.NODE_ENV;
   const opts = { ...defaultOptions, ...options };
 
   const user = request.user;

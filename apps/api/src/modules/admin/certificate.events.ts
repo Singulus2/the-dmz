@@ -101,10 +101,10 @@ export const unregisterCertificateEventHandlers = (
   eventBus: {
     unsubscribe: (eventType: string, handler: (event: DomainEvent) => void | Promise<void>) => void;
   },
-  handler: (event: DomainEvent) => void | Promise<void>,
+  handler: (event: DomainEvent<SessionCompletedPayload>) => Promise<void>,
 ): void => {
   eventBus.unsubscribe(
     SESSION_COMPLETED_EVENT,
-    handler as (event: DomainEvent) => void | Promise<void>,
+    handler as unknown as (event: DomainEvent) => void | Promise<void>,
   );
 };

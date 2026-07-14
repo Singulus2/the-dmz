@@ -400,7 +400,14 @@ export interface SessionGameOverPayload {
 export interface UpgradePurchasedPayload {
   sessionId: string;
   upgradeId: string;
-  cost: number;
+  /**
+   * Absent while handlePurchaseUpgrade remains a stub: UPGRADE_CATALOG is keyed by
+   * UpgradeType ('firewall') but the action carries an upgradeId ('firewall-v2'), so
+   * the cost cannot be resolved at emit time. The handler neither validates the
+   * upgrade nor charges for it yet; emitting a fabricated cost would put false data
+   * into the event store.
+   */
+  cost?: number;
 }
 
 export interface ResourceAdjustedPayload {

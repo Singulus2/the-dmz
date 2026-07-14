@@ -7,6 +7,7 @@ import type {
   EmailTechnique,
   GameThreatTier,
 } from '@the-dmz/shared';
+import { EMAIL_STATUS } from '@the-dmz/shared';
 
 export interface EmailContentPool {
   emails: EmailInstance[];
@@ -108,7 +109,7 @@ export function generateDailyQueue(params: QueueGenerationParams): EmailQueueIte
       ...email,
       sessionId,
     },
-    status: 'new' as const,
+    status: EMAIL_STATUS.PENDING,
     receivedAt: now,
     age: 0,
     order: index,

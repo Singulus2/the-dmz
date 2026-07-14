@@ -113,7 +113,7 @@ export class RetentionWorker {
           try {
             const Sentry = await import('@sentry/node');
             const sentry = Sentry.default ?? Sentry;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+
             const context = sanitizeContext({
               jobId: job.id,
               jobName: job.name,
@@ -121,7 +121,7 @@ export class RetentionWorker {
               attemptsMade: job.attemptsMade,
               tenantId: job.data.tenantId,
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             sentry.captureException(error, { extra: context });
           } catch {
             // Sentry capture failed, continue without error tracking
@@ -226,6 +226,11 @@ export class RetentionWorker {
 
     const policy = await getEffectiveRetentionPolicy(tenantId, dataCategory);
     const expiryDate = calculateExpiryDate(policy.effectiveRetentionDays);
+
+    // A null expiry means indefinite retention (-1 days): nothing ever expires.
+    if (expiryDate === null) {
+      return { processed: 0, archived: 0, deleted: 0, anonymized: 0 };
+    }
 
     return this.handleRetentionCase(tenantId, dataCategory, expiryDate, policy, batchSize);
   }

@@ -47,7 +47,10 @@ export async function stripeWebhookRoutes(fastify: FastifyInstance): Promise<voi
   }
 
   const stripe = new Stripe(fastify.config.STRIPE_WEBHOOK_SECRET, {
-    apiVersion: '2024-06-20',
+    // The SDK types only admit the version it ships with, but the webhook handlers
+    // are written against the pinned 2024-06-20 event shapes. Changing the version
+    // is an API migration, not a type fix.
+    apiVersion: '2024-06-20' as Stripe.LatestApiVersion,
   });
 
   fastify.post(
@@ -104,10 +107,7 @@ async function recordAndProcessEvent(
 ): Promise<void> {
   const { id: eventId, type: eventType } = event;
 
-  await billingRepo.recordWebhookEvent(
-    { eventId, eventType, payload: event.data.object as unknown as Record<string, unknown> },
-    config,
-  );
+  await billingRepo.recordWebhookEvent({ eventId, eventType, payload: event.data.object }, config);
 
   try {
     await handleStripeEvent(eventType, data, config);

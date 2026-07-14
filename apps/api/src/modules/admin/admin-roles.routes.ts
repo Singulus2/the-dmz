@@ -274,7 +274,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       preHandler: [authGuard, tenantContext, requirePermission('roles', 'read')],
     },
     async (req: FastifyRequest, reply: FastifyReply) => {
-      const tenantContext = req.tenantContext;
+      const tenantContext = requireTenantContext(req);
 
       try {
         const roles = await roleAssignmentService.getTenantRoles(
