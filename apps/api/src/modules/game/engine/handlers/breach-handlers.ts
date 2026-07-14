@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import {
   SESSION_MACRO_STATES,
   DAY_PHASES,
@@ -37,7 +36,11 @@ export function handleResolveIncident(
   events.push(
     createGameEvent(
       GAME_ENGINE_EVENTS.INCIDENT_RESOLVED,
-      { incidentId: action.incidentId, responseActions: action.responseActions },
+      {
+        sessionId: state.sessionId,
+        incidentId: action.incidentId,
+        responseActions: action.responseActions,
+      },
       state.updatedAt,
     ),
   );
@@ -92,6 +95,8 @@ export function handleTriggerBreach(
     createGameEvent(
       GAME_ENGINE_EVENTS.BREACH_OCCURRED,
       {
+        sessionId: state.sessionId,
+        userId: state.userId,
         triggerType: action.triggerType,
         severity,
         isBreach,
@@ -145,6 +150,10 @@ export function handlePayRansom(
     ),
   );
 
+  if (breachState.recoveryDaysRemaining === null) {
+    throw new Error('Breach state has no recovery period');
+  }
+
   events.push(
     createGameEvent(
       GAME_ENGINE_EVENTS.BREACH_RECOVERY_STARTED,
@@ -188,6 +197,10 @@ export function handleRefuseRansom(
     );
   } else {
     state.currentPhase = DAY_PHASES.PHASE_RECOVERY;
+  }
+
+  if (breachState.currentSeverity === null) {
+    throw new Error('Breach state has no severity');
   }
 
   events.push(
