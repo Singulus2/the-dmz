@@ -7,7 +7,8 @@ import {
   setABACCachedPermissions,
   invalidateABACCache,
 } from '../cache/abac-cache.js';
-import { AuthError, authService } from '../../modules/auth/index.js';
+import { AuthError } from '../../modules/auth/auth.errors.js';
+import { verifyAccessToken } from '../../modules/auth/auth.service.js';
 
 import { AppError, ErrorCodes, insufficientPermissions } from './error-handler.js';
 import {
@@ -19,6 +20,8 @@ import {
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { AppConfig } from '../../config.js';
+import type { AuthenticatedUser } from '../../modules/auth/auth.types.js';
+import type { TenantContext } from './tenant-context.js';
 
 export interface PermissionContext {
   permissions: string[];
@@ -28,6 +31,7 @@ export interface PermissionContext {
 declare module 'fastify' {
   interface FastifyRequest {
     permissionContext?: PermissionContext;
+    user?: AuthenticatedUser;
   }
 }
 
@@ -312,7 +316,7 @@ export const authGuard = async (request: FastifyRequest, _reply: FastifyReply): 
   const bearerValue = authHeader.substring(7);
 
   try {
-    const user = await authService.verifyAccessToken(config, bearerValue);
+    const user = await verifyAccessToken(config, bearerValue);
     request.user = user;
   } catch (error) {
     if (error instanceof AuthError) {
@@ -326,27 +330,35 @@ export const authGuard = async (request: FastifyRequest, _reply: FastifyReply): 
   }
 };
 
+const requireAuthContext = (
+  request: FastifyRequest,
+): { user: AuthenticatedUser; tenantContext: TenantContext } => {
+  const user = request.user;
+  const tenantContext = request.tenantContext;
+
+  if (!user || !tenantContext) {
+    recordAuthorizationError();
+    request.log.warn(
+      {
+        requestId: request.id,
+        route: request.routeOptions?.url ?? request.url,
+      },
+      'Authorization check failed: missing user or tenant context',
+    );
+    throw new AppError({
+      code: ErrorCodes.AUTH_UNAUTHORIZED,
+      message: 'Authentication required',
+      statusCode: 401,
+    });
+  }
+
+  return { user, tenantContext };
+};
+
 export const requirePermission = (resource: string, action: string) => {
   return async (request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
     const startTime = performance.now();
-    const user = request.user;
-    const tenantContext = request.tenantContext;
-
-    if (!user || !tenantContext) {
-      recordAuthorizationError();
-      request.log.warn(
-        {
-          requestId: request.id,
-          route: request.routeOptions?.url ?? request.url,
-        },
-        'Authorization check failed: missing user or tenant context',
-      );
-      throw new AppError({
-        code: ErrorCodes.AUTH_UNAUTHORIZED,
-        message: 'Authentication required',
-        statusCode: 401,
-      });
-    }
+    const { user, tenantContext } = requireAuthContext(request);
 
     try {
       const config = request.server.config;
@@ -403,24 +415,7 @@ export const requirePermission = (resource: string, action: string) => {
 export const requireRole = (...requiredRoles: string[]) => {
   return async (request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
     const startTime = performance.now();
-    const user = request.user;
-    const tenantContext = request.tenantContext;
-
-    if (!user || !tenantContext) {
-      recordAuthorizationError();
-      request.log.warn(
-        {
-          requestId: request.id,
-          route: request.routeOptions?.url ?? request.url,
-        },
-        'Authorization check failed: missing user or tenant context',
-      );
-      throw new AppError({
-        code: ErrorCodes.AUTH_UNAUTHORIZED,
-        message: 'Authentication required',
-        statusCode: 401,
-      });
-    }
+    const { user, tenantContext } = requireAuthContext(request);
 
     try {
       const config = request.server.config;
