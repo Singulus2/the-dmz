@@ -1,6 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 
-import type { CoopWebSocketClient as CoopWebSocketClientType } from './coop-websocket';
+import type * as CoopWebSocketModule from './coop-websocket';
+
+type CoopWebSocketMessage = CoopWebSocketModule.CoopWebSocketMessage;
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -31,10 +33,12 @@ vi.stubGlobal(
 );
 
 describe('CoopWebSocketClient', () => {
-  let onEvent: ReturnType<typeof vi.fn>;
-  let onResync: ReturnType<typeof vi.fn>;
-  let onActionRejected: ReturnType<typeof vi.fn>;
-  let CoopWebSocketClient: CoopWebSocketClientType;
+  let onEvent: Mock<(event: { type: string; payload: Record<string, unknown> }) => void>;
+  let onResync: Mock<(currentSeq: number) => void>;
+  let onActionRejected: Mock<(reason: 'STALE_SEQ' | 'GAP_DETECTED', currentSeq: number) => void>;
+  // The class itself is assigned here, not an instance, so this is the constructor type.
+  // A type-only reference keeps the dynamic import in beforeEach mockable.
+  let CoopWebSocketClient: typeof CoopWebSocketModule.CoopWebSocketClient;
 
   beforeEach(async () => {
     vi.resetModules();
@@ -50,14 +54,23 @@ describe('CoopWebSocketClient', () => {
     onActionRejected = vi.fn();
   });
 
-  const createClient = () => {
-    return new CoopWebSocketClient({
+  // These tests drive the client through handleMessage, which is private. Expose it
+  // explicitly here rather than casting at each of the call sites below.
+  // Intersecting with the class type directly collapses to `never`, because a private
+  // member cannot appear in an intersection. Take its public surface and add the method.
+  type TestClient = Omit<CoopWebSocketModule.CoopWebSocketClient, 'handleMessage'> & {
+    handleMessage: (message: CoopWebSocketMessage) => void;
+  };
+
+  const createClient = (): TestClient => {
+    const client = new CoopWebSocketClient({
       sessionId: 'test-session',
       userId: 'test-user',
       onEvent,
       onResync,
       onActionRejected,
     });
+    return client as unknown as TestClient;
   };
 
   describe('handleMessage dispatch', () => {

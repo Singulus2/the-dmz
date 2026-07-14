@@ -43,9 +43,9 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].type).toBe('swipe');
-      expect(state.interactions[0].direction).toBe('left');
-      expect(state.interactions[0].synced).toBe(false);
+      expect(state.interactions[0]?.type).toBe('swipe');
+      expect(state.interactions[0]?.direction).toBe('left');
+      expect(state.interactions[0]?.synced).toBe(false);
     });
 
     it('should generate an id and timestamp for the interaction', () => {
@@ -54,8 +54,8 @@ describe('touch-state', () => {
       touchStateStore.recordTouchInteraction('tap', undefined, undefined, 'button');
 
       const state = touchStateStore.getState();
-      expect(state.interactions[0].id).toBe('generated-test-id');
-      expect(state.interactions[0].timestamp).toBe(new Date('2024-01-01T12:00:00Z').getTime());
+      expect(state.interactions[0]?.id).toBe('generated-test-id');
+      expect(state.interactions[0]?.timestamp).toBe(new Date('2024-01-01T12:00:00Z').getTime());
     });
 
     it('should limit interactions to MAX_STORED_INTERACTIONS (1000)', () => {
@@ -67,7 +67,7 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1000);
-      expect(state.interactions[0].targetElement).toBe('element-5');
+      expect(state.interactions[0]?.targetElement).toBe('element-5');
     });
 
     it('should not add interaction when not in browser', () => {
@@ -88,8 +88,8 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].type).toBe('swipe');
-      expect(state.interactions[0].direction).toBe('right');
+      expect(state.interactions[0]?.type).toBe('swipe');
+      expect(state.interactions[0]?.direction).toBe('right');
     });
   });
 
@@ -99,8 +99,8 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].type).toBe('pan');
-      expect(state.interactions[0].metadata).toEqual({ panDirection: 'next' });
+      expect(state.interactions[0]?.type).toBe('pan');
+      expect(state.interactions[0]?.metadata).toEqual({ panDirection: 'next' });
     });
   });
 
@@ -110,8 +110,8 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].type).toBe('pinch');
-      expect(state.interactions[0].metadata).toEqual({ scale: 1.5 });
+      expect(state.interactions[0]?.type).toBe('pinch');
+      expect(state.interactions[0]?.metadata).toEqual({ scale: 1.5 });
     });
   });
 
@@ -121,7 +121,7 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].type).toBe('longpress');
+      expect(state.interactions[0]?.type).toBe('longpress');
     });
   });
 
@@ -131,7 +131,7 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].type).toBe('tap');
+      expect(state.interactions[0]?.type).toBe('tap');
     });
   });
 
@@ -249,7 +249,7 @@ describe('touch-state', () => {
       expect(cleared).toBe(1);
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].targetElement).toBe('new');
+      expect(state.interactions[0]?.targetElement).toBe('new');
     });
 
     it('should preserve synced interactions even if older than cutoff', async () => {
@@ -265,7 +265,7 @@ describe('touch-state', () => {
       expect(cleared).toBe(0);
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].targetElement).toBe('old-synced');
+      expect(state.interactions[0]?.targetElement).toBe('old-synced');
     });
 
     it('should use default cutoff of 7 days', async () => {
@@ -391,8 +391,8 @@ describe('touch-state', () => {
 
       const state = touchStateStore.getState();
       expect(state.interactions).toHaveLength(1);
-      expect(state.interactions[0].id).toBe('existing-id');
-      expect(state.interactions[0].type).toBe('tap');
+      expect(state.interactions[0]?.id).toBe('existing-id');
+      expect(state.interactions[0]?.type).toBe('tap');
     });
 
     it('should start periodic sync after loading', async () => {
@@ -431,7 +431,7 @@ describe('touch-state', () => {
       unsubscribe();
 
       expect(states.length).toBeGreaterThan(1);
-      expect(states[states.length - 1].interactions).toHaveLength(1);
+      expect(states[states.length - 1]?.interactions).toHaveLength(1);
     });
   });
 });

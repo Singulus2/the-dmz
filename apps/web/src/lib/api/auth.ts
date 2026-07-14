@@ -99,8 +99,7 @@ export async function logout(): Promise<{ data?: LogoutResponse; error?: Categor
       }),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: logoutResponseSchema.parse(data) };
+        return logoutResponseSchema.parse(data);
       } catch {
         return { error: createInvalidResponseError('Invalid logout response from server') };
       }
@@ -116,8 +115,7 @@ export async function getCurrentUser(): Promise<{
     () => apiClient.get<MeResponse>('/auth/me'),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: meResponseSchema.parse(data) };
+        return meResponseSchema.parse(data);
       } catch {
         return { error: createInvalidResponseError('Invalid me response from server') };
       }

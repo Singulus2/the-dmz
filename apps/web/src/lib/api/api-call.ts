@@ -26,7 +26,7 @@ export async function apiCall<T, R = T>(
 
   if (dataExtractor) {
     const extracted = dataExtractor(result.data);
-    if ('error' in extracted) {
+    if (extracted !== null && typeof extracted === 'object' && 'error' in extracted) {
       return extracted;
     }
     return { data: extracted };

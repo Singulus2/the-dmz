@@ -50,7 +50,10 @@ const initialState: CoopStoreState = {
 function createCoopStore() {
   const { subscribe, set, update } = writable<CoopStoreState>(initialState);
 
-  return {
+  // `store` is referenced by sessionEventHandlers below: those are arrow functions
+  // inside a nested object literal, where `this` binds to the enclosing scope rather
+  // than to the store, so every session event threw a TypeError.
+  const store = {
     subscribe,
 
     get(): CoopStoreState {
@@ -491,14 +494,18 @@ function createCoopStore() {
     },
 
     sessionEventHandlers: {
-      'coop.session.role_assigned': (p) => this.handleRoleAssigned(p),
-      'coop.session.authority_transferred': (p) => this.handleAuthorityTransferred(p),
-      'coop.session.proposal_submitted': (p) => this.handleProposalSubmitted(p),
-      'coop.session.proposal_confirmed': (p) => this.handleProposalConfirmed(p),
-      'coop.session.proposal_overridden': (p) => this.handleProposalOverridden(p),
-      'coop.session.day_advanced': (p) => this.handleDayAdvanced(p),
-      'coop.session.ended': () => this.handleSessionEnded(),
-    },
+      'coop.session.role_assigned': (p: Record<string, unknown>) => store.handleRoleAssigned(p),
+      'coop.session.authority_transferred': (p: Record<string, unknown>) =>
+        store.handleAuthorityTransferred(p),
+      'coop.session.proposal_submitted': (p: Record<string, unknown>) =>
+        store.handleProposalSubmitted(p),
+      'coop.session.proposal_confirmed': (p: Record<string, unknown>) =>
+        store.handleProposalConfirmed(p),
+      'coop.session.proposal_overridden': (p: Record<string, unknown>) =>
+        store.handleProposalOverridden(p),
+      'coop.session.day_advanced': (p: Record<string, unknown>) => store.handleDayAdvanced(p),
+      'coop.session.ended': () => store.handleSessionEnded(),
+    } as Record<string, (payload: Record<string, unknown>) => void>,
 
     handleSessionEvent(event: { type: string; payload: Record<string, unknown> }): void {
       const handler = this.sessionEventHandlers[event.type];
@@ -511,6 +518,8 @@ function createCoopStore() {
       set(initialState);
     },
   };
+
+  return store;
 }
 
 export const coopStore = createCoopStore();

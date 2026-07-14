@@ -626,7 +626,7 @@ describe('pwa/index', () => {
         await getCacheStatus();
         const elapsed = Date.now() - startTime;
         expect(callTimes.length).toBe(3);
-        const maxGap = Math.max(...callTimes.map((t, i) => (i > 0 ? t - callTimes[i - 1] : 0)));
+        const maxGap = Math.max(...callTimes.map((t, i) => (i > 0 ? t - callTimes[i - 1]! : 0)));
         expect(maxGap).toBeLessThan(40);
         expect(elapsed).toBeLessThan(150);
       } finally {
@@ -677,7 +677,7 @@ describe('pwa/index', () => {
         const elapsed = Date.now() - startTime;
         expect(mockCache.match).toHaveBeenCalledTimes(3);
         const maxGap = Math.max(
-          ...matchCallTimes.map((t, i) => (i > 0 ? t - matchCallTimes[i - 1] : 0)),
+          ...matchCallTimes.map((t, i) => (i > 0 ? t - matchCallTimes[i - 1]! : 0)),
         );
         expect(maxGap).toBeLessThan(20);
         expect(elapsed).toBeLessThan(80);

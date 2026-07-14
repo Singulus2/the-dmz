@@ -1,4 +1,43 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, expectTypeOf } from 'vitest';
+
+import type {
+  ComplianceDashboardData,
+  ComplianceDetail,
+  ComplianceStatus,
+  ComplianceSummary,
+  FrameworkRequirement,
+} from '$lib/api/admin-compliance';
+import type {
+  ActiveUsersData,
+  DashboardData,
+  TenantFeatureFlags,
+  TenantInfo,
+  UserGrowthTrendItem,
+  UserMetrics,
+  UsersByRole,
+} from '$lib/api/admin-dashboard';
+import type {
+  CreateSAMLProviderRequest,
+  SAMLProviderConfig,
+  SAMLTestConnectionResponse,
+  UpdateSAMLProviderRequest,
+} from '$lib/api/admin-saml';
+import type {
+  SCIMGroupRoleMapping,
+  SCIMRole,
+  SCIMSyncStatus,
+  SCIMTestConnectionResponse,
+  SCIMTestProvisioningResponse,
+  SCIMTokenConfig,
+  SCIMTokenWithSecret,
+} from '$lib/api/admin-scim';
+import type {
+  CampaignCompletion,
+  CompetencyDistribution,
+  ErrorPattern,
+  LearnerSummary,
+  TrainerDashboardData,
+} from '$lib/api/admin-trainer';
 
 vi.mock('$lib/api/client', () => ({
   apiClient: {
@@ -16,39 +55,32 @@ describe('admin-dashboard module', () => {
     expect(typeof module.getDashboard).toBe('function');
   });
 
-  it('should export DashboardData type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.DashboardData).toBeDefined();
+  it('should export DashboardData type', () => {
+    expectTypeOf<DashboardData>().not.toBeAny();
   });
 
-  it('should export TenantInfo type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.TenantInfo).toBeDefined();
+  it('should export TenantInfo type', () => {
+    expectTypeOf<TenantInfo>().not.toBeAny();
   });
 
-  it('should export TenantFeatureFlags type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.TenantFeatureFlags).toBeDefined();
+  it('should export TenantFeatureFlags type', () => {
+    expectTypeOf<TenantFeatureFlags>().not.toBeAny();
   });
 
-  it('should export ActiveUsersData type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.ActiveUsersData).toBeDefined();
+  it('should export ActiveUsersData type', () => {
+    expectTypeOf<ActiveUsersData>().not.toBeAny();
   });
 
-  it('should export UserMetrics type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.UserMetrics).toBeDefined();
+  it('should export UserMetrics type', () => {
+    expectTypeOf<UserMetrics>().not.toBeAny();
   });
 
-  it('should export UserGrowthTrendItem type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.UserGrowthTrendItem).toBeDefined();
+  it('should export UserGrowthTrendItem type', () => {
+    expectTypeOf<UserGrowthTrendItem>().not.toBeAny();
   });
 
-  it('should export UsersByRole type', async () => {
-    const module = await import('$lib/api/admin-dashboard');
-    expect(module.UsersByRole).toBeDefined();
+  it('should export UsersByRole type', () => {
+    expectTypeOf<UsersByRole>().not.toBeAny();
   });
 });
 
@@ -78,29 +110,24 @@ describe('admin-trainer module', () => {
     expect(typeof module.getTrainerLearners).toBe('function');
   });
 
-  it('should export TrainerDashboardData type', async () => {
-    const module = await import('$lib/api/admin-trainer');
-    expect(module.TrainerDashboardData).toBeDefined();
+  it('should export TrainerDashboardData type', () => {
+    expectTypeOf<TrainerDashboardData>().not.toBeAny();
   });
 
-  it('should export CompetencyDistribution type', async () => {
-    const module = await import('$lib/api/admin-trainer');
-    expect(module.CompetencyDistribution).toBeDefined();
+  it('should export CompetencyDistribution type', () => {
+    expectTypeOf<CompetencyDistribution>().not.toBeAny();
   });
 
-  it('should export ErrorPattern type', async () => {
-    const module = await import('$lib/api/admin-trainer');
-    expect(module.ErrorPattern).toBeDefined();
+  it('should export ErrorPattern type', () => {
+    expectTypeOf<ErrorPattern>().not.toBeAny();
   });
 
-  it('should export CampaignCompletion type', async () => {
-    const module = await import('$lib/api/admin-trainer');
-    expect(module.CampaignCompletion).toBeDefined();
+  it('should export CampaignCompletion type', () => {
+    expectTypeOf<CampaignCompletion>().not.toBeAny();
   });
 
-  it('should export LearnerSummary type', async () => {
-    const module = await import('$lib/api/admin-trainer');
-    expect(module.LearnerSummary).toBeDefined();
+  it('should export LearnerSummary type', () => {
+    expectTypeOf<LearnerSummary>().not.toBeAny();
   });
 });
 
@@ -125,29 +152,24 @@ describe('admin-compliance module', () => {
     expect(typeof module.calculateCompliance).toBe('function');
   });
 
-  it('should export ComplianceStatus type', async () => {
-    const module = await import('$lib/api/admin-compliance');
-    expect(module.ComplianceStatus).toBeDefined();
+  it('should export ComplianceStatus type', () => {
+    expectTypeOf<ComplianceStatus>().not.toBeAny();
   });
 
-  it('should export ComplianceSummary type', async () => {
-    const module = await import('$lib/api/admin-compliance');
-    expect(module.ComplianceSummary).toBeDefined();
+  it('should export ComplianceSummary type', () => {
+    expectTypeOf<ComplianceSummary>().not.toBeAny();
   });
 
-  it('should export FrameworkRequirement type', async () => {
-    const module = await import('$lib/api/admin-compliance');
-    expect(module.FrameworkRequirement).toBeDefined();
+  it('should export FrameworkRequirement type', () => {
+    expectTypeOf<FrameworkRequirement>().not.toBeAny();
   });
 
-  it('should export ComplianceDetail type', async () => {
-    const module = await import('$lib/api/admin-compliance');
-    expect(module.ComplianceDetail).toBeDefined();
+  it('should export ComplianceDetail type', () => {
+    expectTypeOf<ComplianceDetail>().not.toBeAny();
   });
 
-  it('should export ComplianceDashboardData type', async () => {
-    const module = await import('$lib/api/admin-compliance');
-    expect(module.ComplianceDashboardData).toBeDefined();
+  it('should export ComplianceDashboardData type', () => {
+    expectTypeOf<ComplianceDashboardData>().not.toBeAny();
   });
 });
 
@@ -182,24 +204,20 @@ describe('admin-saml module', () => {
     expect(typeof module.testSAMLConnection).toBe('function');
   });
 
-  it('should export SAMLProviderConfig type', async () => {
-    const module = await import('$lib/api/admin-saml');
-    expect(module.SAMLProviderConfig).toBeDefined();
+  it('should export SAMLProviderConfig type', () => {
+    expectTypeOf<SAMLProviderConfig>().not.toBeAny();
   });
 
-  it('should export CreateSAMLProviderRequest type', async () => {
-    const module = await import('$lib/api/admin-saml');
-    expect(module.CreateSAMLProviderRequest).toBeDefined();
+  it('should export CreateSAMLProviderRequest type', () => {
+    expectTypeOf<CreateSAMLProviderRequest>().not.toBeAny();
   });
 
-  it('should export UpdateSAMLProviderRequest type', async () => {
-    const module = await import('$lib/api/admin-saml');
-    expect(module.UpdateSAMLProviderRequest).toBeDefined();
+  it('should export UpdateSAMLProviderRequest type', () => {
+    expectTypeOf<UpdateSAMLProviderRequest>().not.toBeAny();
   });
 
-  it('should export SAMLTestConnectionResponse type', async () => {
-    const module = await import('$lib/api/admin-saml');
-    expect(module.SAMLTestConnectionResponse).toBeDefined();
+  it('should export SAMLTestConnectionResponse type', () => {
+    expectTypeOf<SAMLTestConnectionResponse>().not.toBeAny();
   });
 });
 
@@ -249,38 +267,31 @@ describe('admin-scim module', () => {
     expect(typeof module.updateSCIMGroupRole).toBe('function');
   });
 
-  it('should export SCIMTokenConfig type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMTokenConfig).toBeDefined();
+  it('should export SCIMTokenConfig type', () => {
+    expectTypeOf<SCIMTokenConfig>().not.toBeAny();
   });
 
-  it('should export SCIMTokenWithSecret type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMTokenWithSecret).toBeDefined();
+  it('should export SCIMTokenWithSecret type', () => {
+    expectTypeOf<SCIMTokenWithSecret>().not.toBeAny();
   });
 
-  it('should export SCIMTestConnectionResponse type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMTestConnectionResponse).toBeDefined();
+  it('should export SCIMTestConnectionResponse type', () => {
+    expectTypeOf<SCIMTestConnectionResponse>().not.toBeAny();
   });
 
-  it('should export SCIMTestProvisioningResponse type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMTestProvisioningResponse).toBeDefined();
+  it('should export SCIMTestProvisioningResponse type', () => {
+    expectTypeOf<SCIMTestProvisioningResponse>().not.toBeAny();
   });
 
-  it('should export SCIMSyncStatus type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMSyncStatus).toBeDefined();
+  it('should export SCIMSyncStatus type', () => {
+    expectTypeOf<SCIMSyncStatus>().not.toBeAny();
   });
 
-  it('should export SCIMGroupRoleMapping type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMGroupRoleMapping).toBeDefined();
+  it('should export SCIMGroupRoleMapping type', () => {
+    expectTypeOf<SCIMGroupRoleMapping>().not.toBeAny();
   });
 
-  it('should export SCIMRole type', async () => {
-    const module = await import('$lib/api/admin-scim');
-    expect(module.SCIMRole).toBeDefined();
+  it('should export SCIMRole type', () => {
+    expectTypeOf<SCIMRole>().not.toBeAny();
   });
 });

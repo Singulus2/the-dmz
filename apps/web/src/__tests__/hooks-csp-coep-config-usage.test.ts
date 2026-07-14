@@ -40,6 +40,7 @@ describe('hooks.server.ts uses validated config for CSP/COEP', () => {
         CSP_CONNECT_SRC: '',
         CSP_IMG_SRC: '',
         COEP_POLICY: 'require-corp' as const,
+        VITE_VAPID_PUBLIC_KEY: '',
       };
 
       vi.mocked(loadFrontendConfig).mockReturnValue(mockConfig);
@@ -84,6 +85,7 @@ describe('hooks.server.ts uses validated config for CSP/COEP', () => {
         CSP_CONNECT_SRC: '',
         CSP_IMG_SRC: '',
         COEP_POLICY: 'credentialless' as const,
+        VITE_VAPID_PUBLIC_KEY: '',
       };
 
       vi.mocked(loadFrontendConfig).mockReturnValue(mockConfig);

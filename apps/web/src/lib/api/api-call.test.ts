@@ -55,7 +55,9 @@ describe('apiCall', () => {
   });
 
   it('should return INVALID_RESPONSE error when api call returns null data', async () => {
-    const apiCallFn = vi.fn().mockResolvedValue({ data: null } as ApiCallResult<{ id: string }>);
+    const apiCallFn = vi
+      .fn()
+      .mockResolvedValue({ data: null } as unknown as ApiCallResult<{ id: string }>);
 
     const result = await apiCall<{ id: string }>(apiCallFn);
 
@@ -67,7 +69,9 @@ describe('apiCall', () => {
 
   it('should use dataExtractor to transform data when provided', async () => {
     const envelope = { providers: [{ id: '1', name: 'Provider 1' }] };
-    const apiCallFn = vi.fn().mockResolvedValue({ data: envelope });
+    const apiCallFn = vi
+      .fn<() => Promise<ApiCallResult<typeof envelope>>>()
+      .mockResolvedValue({ data: envelope });
 
     const result = await apiCall(apiCallFn, (data) => data.providers);
 
@@ -77,7 +81,9 @@ describe('apiCall', () => {
   });
 
   it('should return INVALID_RESPONSE error when dataExtractor is provided but data is undefined', async () => {
-    const apiCallFn = vi.fn().mockResolvedValue({ data: undefined });
+    const apiCallFn = vi
+      .fn<() => Promise<ApiCallResult<{ providers: { id: string; name: string }[] }>>>()
+      .mockResolvedValue({});
 
     const result = await apiCall(apiCallFn, (data) => data.providers);
 
@@ -89,13 +95,15 @@ describe('apiCall', () => {
 
   it('should return error from api call even when dataExtractor is provided', async () => {
     const mockError: CategorizedApiError = {
-      category: 'auth',
+      category: 'authentication',
       code: 'UNAUTHORIZED',
       message: 'Not authenticated',
       status: 401,
       retryable: false,
     };
-    const apiCallFn = vi.fn().mockResolvedValue({ error: mockError });
+    const apiCallFn = vi
+      .fn<() => Promise<ApiCallResult<{ providers: { id: string; name: string }[] }>>>()
+      .mockResolvedValue({ error: mockError });
 
     const result = await apiCall(apiCallFn, (data) => data.providers);
 
@@ -111,7 +119,9 @@ describe('apiCall', () => {
         { id: 'token-2', name: 'SCIM Token 2' },
       ],
     };
-    const apiCallFn = vi.fn().mockResolvedValue({ data: envelope });
+    const apiCallFn = vi
+      .fn<() => Promise<ApiCallResult<typeof envelope>>>()
+      .mockResolvedValue({ data: envelope });
 
     const result = await apiCall(apiCallFn, (data) => data.tokens);
 
@@ -122,7 +132,9 @@ describe('apiCall', () => {
 
   it('should work with boolean data extraction (success field)', async () => {
     const envelope = { success: true };
-    const apiCallFn = vi.fn().mockResolvedValue({ data: envelope });
+    const apiCallFn = vi
+      .fn<() => Promise<ApiCallResult<typeof envelope>>>()
+      .mockResolvedValue({ data: envelope });
 
     const result = await apiCall(apiCallFn, (data) => data.success);
 

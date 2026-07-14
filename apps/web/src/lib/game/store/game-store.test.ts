@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { get } from 'svelte/store';
 
+import { GAME_EVENT_TYPES } from '$lib/game/state/events';
 import type { GameSessionBootstrap } from '@the-dmz/shared/schemas';
 import type { CategorizedApiError } from '$lib/api/types';
 import type { GameSessionRepositoryInterface } from '$lib/game/repositories/game-session.repository';
@@ -365,7 +366,7 @@ describe('gameStore', () => {
     it('should add events', () => {
       const event = {
         id: 'event-1',
-        type: 'decision_made' as const,
+        type: GAME_EVENT_TYPES.EMAIL_DECISION_SUBMITTED,
         occurredAt: new Date().toISOString(),
         payload: { emailId: 'email-1' },
       };

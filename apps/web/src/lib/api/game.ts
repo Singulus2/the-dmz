@@ -18,8 +18,7 @@ export async function bootstrapGameSession(): Promise<{
     () => apiClient.post<GameSessionBootstrapResponse>('/game/session', undefined),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: gameSessionBootstrapSchema.parse(data.data) };
+        return gameSessionBootstrapSchema.parse(data.data);
       } catch {
         return {
           error: createInvalidResponseError('Invalid game session bootstrap response from server'),
@@ -37,8 +36,7 @@ export async function getGameSession(): Promise<{
     () => apiClient.get<GameSessionBootstrapResponse>('/game/session'),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: gameSessionBootstrapSchema.parse(data.data) };
+        return gameSessionBootstrapSchema.parse(data.data);
       } catch {
         return { error: createInvalidResponseError('Invalid game session response from server') };
       }

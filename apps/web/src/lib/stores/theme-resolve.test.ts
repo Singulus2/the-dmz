@@ -1,6 +1,9 @@
+/* eslint-disable max-lines */
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+
+import type { EffectivePreferenceValue, EffectivePreferences } from '@the-dmz/shared/schemas';
+
 import { themeStore, resolveEffectiveTheme } from './theme';
-import type { EffectivePreferenceValue } from '@the-dmz/shared/schemas';
 
 const mockMatchMedia = vi.fn();
 
@@ -444,10 +447,7 @@ describe('resolveEffectiveTheme helper functions (extracted)', () => {
       });
       themeStore.init();
 
-      const result = resolveEffectiveTheme(
-        { themePreferences: {} } as EffectivePreferences,
-        [],
-      );
+      const result = resolveEffectiveTheme({ themePreferences: {} } as EffectivePreferences, []);
 
       expect(result.name).toBe('high-contrast');
       expect(result.source.theme).toBe('os');
@@ -457,10 +457,7 @@ describe('resolveEffectiveTheme helper functions (extracted)', () => {
       mockMatchMedia.mockReturnValue({ matches: false });
       themeStore.init();
 
-      const result = resolveEffectiveTheme(
-        { themePreferences: {} } as EffectivePreferences,
-        [],
-      );
+      const result = resolveEffectiveTheme({ themePreferences: {} } as EffectivePreferences, []);
 
       expect(result.name).toBe('green');
       expect(result.source.theme).toBe('default');

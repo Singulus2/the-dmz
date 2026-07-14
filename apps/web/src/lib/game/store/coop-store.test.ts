@@ -253,8 +253,8 @@ describe('coopStore', () => {
 
         const state = get(coopStore);
         expect(state.proposals).toHaveLength(1);
-        expect(state.proposals[0].status).toBe('confirmed');
-        expect(state.proposals[0].authorityAction).toBe('confirm');
+        expect(state.proposals[0]?.status).toBe('confirmed');
+        expect(state.proposals[0]?.authorityAction).toBe('confirm');
       });
     });
 
@@ -284,7 +284,7 @@ describe('coopStore', () => {
           status: 'overridden',
           authorityAction: 'override',
           conflictFlag: true,
-          conflictReason: 'conflict_detected',
+          conflictReason: 'policy_conflict',
           resolvedAt: '2026-01-01T00:01:00.000Z',
         };
 
@@ -295,10 +295,10 @@ describe('coopStore', () => {
 
         const state = get(coopStore);
         expect(state.proposals).toHaveLength(1);
-        expect(state.proposals[0].status).toBe('overridden');
-        expect(state.proposals[0].authorityAction).toBe('override');
-        expect(state.proposals[0].conflictFlag).toBe(true);
-        expect(state.proposals[0].conflictReason).toBe('conflict_detected');
+        expect(state.proposals[0]?.status).toBe('overridden');
+        expect(state.proposals[0]?.authorityAction).toBe('override');
+        expect(state.proposals[0]?.conflictFlag).toBe(true);
+        expect(state.proposals[0]?.conflictReason).toBe('policy_conflict');
       });
     });
 

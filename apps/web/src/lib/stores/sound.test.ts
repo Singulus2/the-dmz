@@ -33,7 +33,7 @@ describe('Sound Store', () => {
 
   it('should have other categories enabled by default', () => {
     const state = get(soundStore);
-    expect(state.categories.uiFeedback.enabled).toBe(true);
+    expect(state.categories.ui_feedback.enabled).toBe(true);
     expect(state.categories.alerts.enabled).toBe(true);
     expect(state.categories.stamps.enabled).toBe(true);
     expect(state.categories.narrative.enabled).toBe(true);

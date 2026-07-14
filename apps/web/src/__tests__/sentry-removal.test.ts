@@ -18,12 +18,12 @@ describe('Sentry Removal Verification', () => {
   describe('package.json dependencies', () => {
     it('should NOT have @sentry/sveltekit in dependencies', () => {
       expect(packageJson.dependencies).toBeDefined();
-      expect(packageJson.dependencies['@sentry/sveltekit']).toBeUndefined();
+      expect(packageJson.dependencies?.['@sentry/sveltekit']).toBeUndefined();
     });
 
     it('should NOT have @sentry/sveltekit in devDependencies', () => {
       expect(packageJson.devDependencies).toBeDefined();
-      expect(packageJson.devDependencies['@sentry/sveltekit']).toBeUndefined();
+      expect(packageJson.devDependencies?.['@sentry/sveltekit']).toBeUndefined();
     });
   });
 

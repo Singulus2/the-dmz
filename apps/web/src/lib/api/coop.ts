@@ -43,8 +43,7 @@ export async function getCoopSession(
     () => apiClient.get<CoopSessionResponse>(`/coop/sessions/${sessionId}`),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopSessionBootstrapSchema.parse(data.data) };
+        return coopSessionBootstrapSchema.parse(data.data);
       } catch {
         return { error: createInvalidResponseError('Invalid co-op session response from server') };
       }
@@ -60,8 +59,7 @@ export async function createCoopSession(): Promise<{
     () => apiClient.post<CoopSessionResponse>('/coop/sessions', undefined),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopSessionBootstrapSchema.parse(data.data) };
+        return coopSessionBootstrapSchema.parse(data.data);
       } catch {
         return {
           error: createInvalidResponseError('Invalid co-op session creation response from server'),
@@ -79,8 +77,7 @@ export async function assignCoopRoles(
     () => apiClient.post<CoopSessionResponse>(`/coop/sessions/${sessionId}/roles`, { roles }),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopSessionBootstrapSchema.parse(data.data) };
+        return coopSessionBootstrapSchema.parse(data.data);
       } catch {
         return {
           error: createInvalidResponseError('Invalid co-op role assignment response from server'),
@@ -98,8 +95,7 @@ export async function submitProposal(
     () => apiClient.post<CoopProposalResponse>(`/coop/sessions/${sessionId}/proposals`, request),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopDecisionProposalSchema.parse(data.data) };
+        return coopDecisionProposalSchema.parse(data.data);
       } catch {
         return { error: createInvalidResponseError('Invalid proposal response from server') };
       }
@@ -115,8 +111,7 @@ export async function confirmProposal(
     () => apiClient.post<CoopProposalResponse>(`/coop/sessions/${sessionId}/confirm`, request),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopDecisionProposalSchema.parse(data.data) };
+        return coopDecisionProposalSchema.parse(data.data);
       } catch {
         return { error: createInvalidResponseError('Invalid confirm response from server') };
       }
@@ -132,8 +127,7 @@ export async function overrideProposal(
     () => apiClient.post<CoopProposalResponse>(`/coop/sessions/${sessionId}/override`, request),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopDecisionProposalSchema.parse(data.data) };
+        return coopDecisionProposalSchema.parse(data.data);
       } catch {
         return { error: createInvalidResponseError('Invalid override response from server') };
       }
@@ -148,8 +142,7 @@ export async function advanceCoopDay(
     () => apiClient.post<CoopSessionResponse>(`/coop/sessions/${sessionId}/advance-day`, undefined),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopSessionBootstrapSchema.parse(data.data) };
+        return coopSessionBootstrapSchema.parse(data.data);
       } catch {
         return { error: createInvalidResponseError('Invalid advance day response from server') };
       }
@@ -190,8 +183,7 @@ export async function rotateAuthority(
       }),
     (data) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        return { data: coopSessionBootstrapSchema.parse(data.data) };
+        return coopSessionBootstrapSchema.parse(data.data);
       } catch {
         return {
           error: createInvalidResponseError('Invalid authority rotation response from server'),

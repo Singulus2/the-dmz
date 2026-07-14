@@ -1,4 +1,33 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, expectTypeOf } from 'vitest';
+
+import type {
+  ActiveUsersData,
+  CampaignCompletion,
+  CompetencyDistribution,
+  ComplianceDashboardData,
+  ComplianceDetail,
+  ComplianceStatus,
+  ComplianceSummary,
+  CreateSAMLProviderRequest,
+  DashboardData,
+  ErrorPattern,
+  FrameworkRequirement,
+  LearnerSummary,
+  SAMLProviderConfig,
+  SAMLTestConnectionResponse,
+  SCIMGroupRoleMapping,
+  SCIMRole,
+  SCIMSyncStatus,
+  SCIMTestConnectionResponse,
+  SCIMTestProvisioningResponse,
+  SCIMTokenConfig,
+  SCIMTokenWithSecret,
+  TenantFeatureFlags,
+  TenantInfo,
+  TrainerDashboardData,
+  UpdateSAMLProviderRequest,
+  UserMetrics,
+} from '$lib/api/admin';
 
 describe('admin barrel re-exports (backward compatibility)', () => {
   describe('dashboard exports', () => {
@@ -7,29 +36,24 @@ describe('admin barrel re-exports (backward compatibility)', () => {
       expect(typeof admin.getDashboard).toBe('function');
     });
 
-    it('should re-export DashboardData from admin-dashboard', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.DashboardData).toBeDefined();
+    it('should re-export DashboardData from admin-dashboard', () => {
+      expectTypeOf<DashboardData>().not.toBeAny();
     });
 
-    it('should re-export TenantInfo from admin-dashboard', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.TenantInfo).toBeDefined();
+    it('should re-export TenantInfo from admin-dashboard', () => {
+      expectTypeOf<TenantInfo>().not.toBeAny();
     });
 
-    it('should re-export TenantFeatureFlags from admin-dashboard', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.TenantFeatureFlags).toBeDefined();
+    it('should re-export TenantFeatureFlags from admin-dashboard', () => {
+      expectTypeOf<TenantFeatureFlags>().not.toBeAny();
     });
 
-    it('should re-export ActiveUsersData from admin-dashboard', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.ActiveUsersData).toBeDefined();
+    it('should re-export ActiveUsersData from admin-dashboard', () => {
+      expectTypeOf<ActiveUsersData>().not.toBeAny();
     });
 
-    it('should re-export UserMetrics from admin-dashboard', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.UserMetrics).toBeDefined();
+    it('should re-export UserMetrics from admin-dashboard', () => {
+      expectTypeOf<UserMetrics>().not.toBeAny();
     });
   });
 
@@ -59,29 +83,24 @@ describe('admin barrel re-exports (backward compatibility)', () => {
       expect(typeof admin.getTrainerLearners).toBe('function');
     });
 
-    it('should re-export TrainerDashboardData from admin-trainer', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.TrainerDashboardData).toBeDefined();
+    it('should re-export TrainerDashboardData from admin-trainer', () => {
+      expectTypeOf<TrainerDashboardData>().not.toBeAny();
     });
 
-    it('should re-export CompetencyDistribution from admin-trainer', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.CompetencyDistribution).toBeDefined();
+    it('should re-export CompetencyDistribution from admin-trainer', () => {
+      expectTypeOf<CompetencyDistribution>().not.toBeAny();
     });
 
-    it('should re-export ErrorPattern from admin-trainer', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.ErrorPattern).toBeDefined();
+    it('should re-export ErrorPattern from admin-trainer', () => {
+      expectTypeOf<ErrorPattern>().not.toBeAny();
     });
 
-    it('should re-export CampaignCompletion from admin-trainer', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.CampaignCompletion).toBeDefined();
+    it('should re-export CampaignCompletion from admin-trainer', () => {
+      expectTypeOf<CampaignCompletion>().not.toBeAny();
     });
 
-    it('should re-export LearnerSummary from admin-trainer', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.LearnerSummary).toBeDefined();
+    it('should re-export LearnerSummary from admin-trainer', () => {
+      expectTypeOf<LearnerSummary>().not.toBeAny();
     });
   });
 
@@ -106,29 +125,24 @@ describe('admin barrel re-exports (backward compatibility)', () => {
       expect(typeof admin.calculateCompliance).toBe('function');
     });
 
-    it('should re-export ComplianceStatus from admin-compliance', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.ComplianceStatus).toBeDefined();
+    it('should re-export ComplianceStatus from admin-compliance', () => {
+      expectTypeOf<ComplianceStatus>().not.toBeAny();
     });
 
-    it('should re-export ComplianceSummary from admin-compliance', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.ComplianceSummary).toBeDefined();
+    it('should re-export ComplianceSummary from admin-compliance', () => {
+      expectTypeOf<ComplianceSummary>().not.toBeAny();
     });
 
-    it('should re-export FrameworkRequirement from admin-compliance', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.FrameworkRequirement).toBeDefined();
+    it('should re-export FrameworkRequirement from admin-compliance', () => {
+      expectTypeOf<FrameworkRequirement>().not.toBeAny();
     });
 
-    it('should re-export ComplianceDetail from admin-compliance', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.ComplianceDetail).toBeDefined();
+    it('should re-export ComplianceDetail from admin-compliance', () => {
+      expectTypeOf<ComplianceDetail>().not.toBeAny();
     });
 
-    it('should re-export ComplianceDashboardData from admin-compliance', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.ComplianceDashboardData).toBeDefined();
+    it('should re-export ComplianceDashboardData from admin-compliance', () => {
+      expectTypeOf<ComplianceDashboardData>().not.toBeAny();
     });
   });
 
@@ -163,24 +177,20 @@ describe('admin barrel re-exports (backward compatibility)', () => {
       expect(typeof admin.testSAMLConnection).toBe('function');
     });
 
-    it('should re-export SAMLProviderConfig from admin-saml', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SAMLProviderConfig).toBeDefined();
+    it('should re-export SAMLProviderConfig from admin-saml', () => {
+      expectTypeOf<SAMLProviderConfig>().not.toBeAny();
     });
 
-    it('should re-export CreateSAMLProviderRequest from admin-saml', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.CreateSAMLProviderRequest).toBeDefined();
+    it('should re-export CreateSAMLProviderRequest from admin-saml', () => {
+      expectTypeOf<CreateSAMLProviderRequest>().not.toBeAny();
     });
 
-    it('should re-export UpdateSAMLProviderRequest from admin-saml', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.UpdateSAMLProviderRequest).toBeDefined();
+    it('should re-export UpdateSAMLProviderRequest from admin-saml', () => {
+      expectTypeOf<UpdateSAMLProviderRequest>().not.toBeAny();
     });
 
-    it('should re-export SAMLTestConnectionResponse from admin-saml', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SAMLTestConnectionResponse).toBeDefined();
+    it('should re-export SAMLTestConnectionResponse from admin-saml', () => {
+      expectTypeOf<SAMLTestConnectionResponse>().not.toBeAny();
     });
   });
 
@@ -230,39 +240,32 @@ describe('admin barrel re-exports (backward compatibility)', () => {
       expect(typeof admin.updateSCIMGroupRole).toBe('function');
     });
 
-    it('should re-export SCIMTokenConfig from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMTokenConfig).toBeDefined();
+    it('should re-export SCIMTokenConfig from admin-scim', () => {
+      expectTypeOf<SCIMTokenConfig>().not.toBeAny();
     });
 
-    it('should re-export SCIMTokenWithSecret from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMTokenWithSecret).toBeDefined();
+    it('should re-export SCIMTokenWithSecret from admin-scim', () => {
+      expectTypeOf<SCIMTokenWithSecret>().not.toBeAny();
     });
 
-    it('should re-export SCIMTestConnectionResponse from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMTestConnectionResponse).toBeDefined();
+    it('should re-export SCIMTestConnectionResponse from admin-scim', () => {
+      expectTypeOf<SCIMTestConnectionResponse>().not.toBeAny();
     });
 
-    it('should re-export SCIMTestProvisioningResponse from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMTestProvisioningResponse).toBeDefined();
+    it('should re-export SCIMTestProvisioningResponse from admin-scim', () => {
+      expectTypeOf<SCIMTestProvisioningResponse>().not.toBeAny();
     });
 
-    it('should re-export SCIMSyncStatus from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMSyncStatus).toBeDefined();
+    it('should re-export SCIMSyncStatus from admin-scim', () => {
+      expectTypeOf<SCIMSyncStatus>().not.toBeAny();
     });
 
-    it('should re-export SCIMGroupRoleMapping from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMGroupRoleMapping).toBeDefined();
+    it('should re-export SCIMGroupRoleMapping from admin-scim', () => {
+      expectTypeOf<SCIMGroupRoleMapping>().not.toBeAny();
     });
 
-    it('should re-export SCIMRole from admin-scim', async () => {
-      const admin = await import('$lib/api/admin');
-      expect(admin.SCIMRole).toBeDefined();
+    it('should re-export SCIMRole from admin-scim', () => {
+      expectTypeOf<SCIMRole>().not.toBeAny();
     });
   });
 });

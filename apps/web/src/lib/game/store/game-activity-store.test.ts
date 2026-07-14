@@ -14,7 +14,7 @@ vi.mock('$lib/game/services/sync', () => ({
 
 import type { GameAction } from '$lib/game/services/action-queue';
 import type { GameState } from '$lib/game/state/reducer';
-import type { GameEvent } from '$lib/game/state/events';
+import { GAME_EVENT_TYPES, type GameEvent } from '$lib/game/state/events';
 
 import {
   gameActivityStore,
@@ -272,7 +272,7 @@ describe('gameActivityStore', () => {
   describe('event management', () => {
     const mockEvent: GameEvent = {
       id: 'event-1',
-      type: 'session_started',
+      type: GAME_EVENT_TYPES.SESSION_STARTED,
       occurredAt: '2026-01-01T00:00:00.000Z',
       payload: {},
     };
@@ -337,7 +337,7 @@ describe('gameActivityStore', () => {
       });
       gameActivityStore.addEvent({
         id: 'event-1',
-        type: 'session_started',
+        type: GAME_EVENT_TYPES.SESSION_STARTED,
         occurredAt: '2026-01-01T00:00:00.000Z',
         payload: {},
       });
