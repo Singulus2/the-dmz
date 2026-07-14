@@ -32,6 +32,7 @@ import { hashPassword } from './auth.crypto.js';
 import { signJWT, verifyJWT, isString } from './jwt-keys.service.js';
 
 import type { AppConfig } from '../../config.js';
+import type { VerifiedJWTPayload } from './auth.types.js';
 
 const OAUTH_TOKEN_EXPIRY_SECONDS = 3600;
 
@@ -280,6 +281,43 @@ const signOAuthJWT = async (
   });
 };
 
+const validateClientCredentialClaims = (
+  payload: VerifiedJWTPayload,
+  claims: Record<string, unknown>,
+): { scopes: string[]; type: unknown } => {
+  const missingFields: string[] = [];
+  const invalidTypes: string[] = [];
+
+  if (!isString(payload.sub)) {
+    missingFields.push('sub');
+  }
+
+  if (!isString(payload.tenantId)) {
+    missingFields.push('tenantId');
+  }
+
+  const scopes = claims['scopes'];
+  const type = claims['type'];
+
+  if (!Array.isArray(scopes) || !scopes.every((s) => typeof s === 'string')) {
+    if (scopes === undefined) {
+      missingFields.push('scopes');
+    } else {
+      invalidTypes.push('scopes');
+    }
+  }
+
+  if (type !== undefined && typeof type !== 'string') {
+    invalidTypes.push('type');
+  }
+
+  if (missingFields.length > 0 || invalidTypes.length > 0) {
+    throw new Error('Invalid token payload');
+  }
+
+  return { scopes: scopes as string[], type };
+};
+
 export const verifyOAuthToken = async (
   config: AppConfig,
   token: string,
@@ -291,35 +329,9 @@ export const verifyOAuthToken = async (
   try {
     const { payload } = await verifyJWT(config, token);
 
-    const missingFields: string[] = [];
-    const invalidTypes: string[] = [];
-
-    if (!isString(payload.sub)) {
-      missingFields.push('sub');
-    }
-
-    if (!isString(payload.tenantId)) {
-      missingFields.push('tenantId');
-    }
-
-    const scopes = payload['scopes'];
-    const type = payload['type'];
-
-    if (!Array.isArray(scopes) || !scopes.every((s) => typeof s === 'string')) {
-      if (scopes === undefined) {
-        missingFields.push('scopes');
-      } else {
-        invalidTypes.push('scopes');
-      }
-    }
-
-    if (type !== undefined && typeof type !== 'string') {
-      invalidTypes.push('type');
-    }
-
-    if (missingFields.length > 0 || invalidTypes.length > 0) {
-      throw new Error('Invalid token payload');
-    }
+    // scopes/type are client-credential claims outside the declared session-token shape.
+    const claims = payload as unknown as Record<string, unknown>;
+    const { scopes, type } = validateClientCredentialClaims(payload, claims);
 
     if (type !== 'oauth_client_credentials') {
       throw new Error('Invalid token type');
@@ -328,7 +340,7 @@ export const verifyOAuthToken = async (
     return {
       clientId: payload.sub,
       tenantId: payload.tenantId,
-      scopes: scopes as string[],
+      scopes,
     };
   } catch (error) {
     if (error instanceof Error && error.message === 'Invalid token payload') {

@@ -21,7 +21,7 @@ import {
   verifyPassword,
   REFRESH_TOKEN_EXPIRY_DAYS,
 } from './auth.crypto.js';
-import { resolveTenantId } from './auth.utils.js';
+import { resolveTenantId, toSettingsRecord } from './auth.utils.js';
 import { InvalidCredentialsError, SessionConcurrentLimitError } from './auth.errors.js';
 
 import type { AppConfig } from '../../config.js';
@@ -40,7 +40,7 @@ async function validateUserAndTenant(
   tenantId: string,
   password: string,
 ): Promise<{
-  user: Awaited<ReturnType<typeof findUserByEmail>>;
+  user: NonNullable<Awaited<ReturnType<typeof findUserByEmail>>>;
   tenant: { tenantId: string; status: string; settings: Record<string, unknown> } | undefined;
 }> {
   const userWithHash = await findUserByEmail(db, email, tenantId);
@@ -75,7 +75,10 @@ async function validateUserAndTenant(
     });
   }
 
-  return { user: userWithHash, tenant: tenant ?? undefined };
+  return {
+    user: userWithHash,
+    tenant: tenant ? { ...tenant, settings: toSettingsRecord(tenant.settings) } : undefined,
+  };
 }
 
 async function handleConcurrentSessionLimit(
@@ -104,8 +107,8 @@ interface SessionDataParams {
   tenantId: string;
   tokenHash: string;
   expiresAt: Date;
-  ipAddress?: string;
-  userAgent?: string;
+  ipAddress?: string | undefined;
+  userAgent?: string | undefined;
 }
 
 function buildSessionData(params: SessionDataParams) {

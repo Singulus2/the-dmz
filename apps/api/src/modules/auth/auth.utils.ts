@@ -56,3 +56,10 @@ export const resolveTenantId = async (
 
   return defaultTenant.tenantId;
 };
+
+/**
+ * tenants.settings is a jsonb column, so Drizzle types it as unknown. Anything
+ * that is not a JSON object is treated as no settings at all.
+ */
+export const toSettingsRecord = (value: unknown): Record<string, unknown> =>
+  typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};

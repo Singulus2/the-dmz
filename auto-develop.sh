@@ -38,7 +38,8 @@ sleep_briefly() {
 }
 
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
+
+ command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
 }
 
 validate_positive_integer() {

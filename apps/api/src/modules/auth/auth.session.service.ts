@@ -30,6 +30,7 @@ import {
 } from './auth.repo.js';
 import { hashToken, generateTokens, REFRESH_TOKEN_EXPIRY_DAYS } from './auth.crypto.js';
 import { verifyJWT } from './jwt-keys.service.js';
+import { toSettingsRecord } from './auth.utils.js';
 import {
   InvalidCredentialsError,
   SessionExpiredError,
@@ -152,8 +153,8 @@ interface NewSessionDataParams {
   tenantId: string;
   tokenHash: string;
   expiresAt: Date;
-  ipAddress?: string;
-  userAgent?: string;
+  ipAddress?: string | undefined;
+  userAgent?: string | undefined;
 }
 
 function buildNewSessionData(params: NewSessionDataParams) {
@@ -168,6 +169,27 @@ function buildNewSessionData(params: NewSessionDataParams) {
   };
 }
 
+async function loadRefreshContext(
+  db: ReturnType<typeof getDatabaseClient>,
+  refreshTokenHash: string,
+) {
+  const sessionRow = await findSessionByTokenHash(db, refreshTokenHash);
+  const userRow = await findUserById(db, sessionRow?.userId ?? '', sessionRow?.tenantId ?? '');
+
+  const tenantRow = await db.query.tenants.findFirst({
+    where: (t, { eq }) => eq(t.tenantId, userRow?.tenantId ?? ''),
+    columns: { tenantId: true, status: true, settings: true },
+  });
+
+  return {
+    sessionRow,
+    userRow,
+    tenant: tenantRow
+      ? { ...tenantRow, settings: toSettingsRecord(tenantRow.settings) }
+      : undefined,
+  };
+}
+
 export const refresh = async (
   config: AppConfig,
   refreshToken: string,
@@ -176,17 +198,12 @@ export const refresh = async (
   const db = getDatabaseClient(config);
 
   const refreshTokenHash = await hashToken(refreshToken, config.TOKEN_HASH_SALT);
-  const session = await findSessionByTokenHash(db, refreshTokenHash);
-  const user = await findUserById(db, session?.userId ?? '', session?.tenantId ?? '');
-
-  const tenant = await db.query.tenants.findFirst({
-    where: (t, { eq }) => eq(t.tenantId, user?.tenantId ?? ''),
-    columns: { tenantId: true, status: true, settings: true },
-  });
+  const { sessionRow, userRow, tenant } = await loadRefreshContext(db, refreshTokenHash);
 
   const sessionPolicy = resolveTenantSessionPolicy(tenant?.settings);
 
-  await validateSessionAndUser(db, session, user, tenant ?? undefined);
+  // validateSessionAndUser throws unless both are present; take the narrowed pair.
+  const { session, user } = await validateSessionAndUser(db, sessionRow, userRow, tenant);
   await validateSessionTimeout(db, session, sessionPolicy);
   await checkSessionBinding(db, session, sessionPolicy, options);
   validateRefreshPermission(session, user.role);
@@ -245,6 +262,12 @@ export const verifyAccessToken = async (
 
     if (new Date() > session.expiresAt) {
       throw new SessionExpiredError();
+    }
+
+    // Every issuer of a session token sets a role claim; one without it is not
+    // a usable authenticated principal.
+    if (payload.role === undefined) {
+      throw new InvalidCredentialsError();
     }
 
     return {
