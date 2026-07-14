@@ -115,7 +115,7 @@ export interface SessionCompletedPayload {
 export interface SessionAbandonedPayload {
   sessionId: string;
   userId: string;
-  reason?: string;
+  reason?: string | undefined;
 }
 
 export interface SessionBreachRecoveryPayload {

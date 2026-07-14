@@ -32,8 +32,6 @@ import { isActionAllowedInPhase, createGameEvent } from './handler-utils.js';
 
 import type { DomainEvent } from './handler-utils.js';
 
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-redundant-type-constituents */
-
 export function handleAckDayStart(
   state: GameState,
   _action: AckDayStartPayload,
@@ -82,6 +80,7 @@ export function handleLoadInbox(
     createGameEvent(
       GAME_ENGINE_EVENTS.INBOX_LOADED,
       {
+        sessionId: state.sessionId,
         day: state.currentDay,
         emailCount: action.emails.length,
       },

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import {
   SESSION_MACRO_STATES,
   DAY_PHASES,
@@ -27,7 +26,13 @@ export function handlePauseSession(
     throw new Error('Cannot pause from current state');
   }
   state.currentMacroState = SESSION_MACRO_STATES.SESSION_PAUSED;
-  events.push(createGameEvent(GAME_ENGINE_EVENTS.SESSION_PAUSED, {}, state.updatedAt));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.SESSION_PAUSED,
+      { sessionId: state.sessionId, userId: state.userId },
+      state.updatedAt,
+    ),
+  );
 }
 
 export function handleResumeSession(
@@ -39,7 +44,13 @@ export function handleResumeSession(
     throw new Error('Cannot resume from current state');
   }
   state.currentMacroState = SESSION_MACRO_STATES.SESSION_ACTIVE;
-  events.push(createGameEvent(GAME_ENGINE_EVENTS.SESSION_RESUMED, {}, state.updatedAt));
+  events.push(
+    createGameEvent(
+      GAME_ENGINE_EVENTS.SESSION_RESUMED,
+      { sessionId: state.sessionId, userId: state.userId },
+      state.updatedAt,
+    ),
+  );
 }
 
 export function handleAbandonSession(
@@ -54,7 +65,7 @@ export function handleAbandonSession(
   events.push(
     createGameEvent(
       GAME_ENGINE_EVENTS.SESSION_ABANDONED,
-      { reason: action.reason },
+      { sessionId: state.sessionId, userId: state.userId, reason: action.reason },
       state.updatedAt,
     ),
   );
@@ -90,6 +101,7 @@ export function handleAdvanceDay(
     createGameEvent(
       GAME_ENGINE_EVENTS.DAY_ENDED,
       {
+        sessionId: state.sessionId,
         day: state.currentDay - 1,
         emailsProcessed: processedEmails.length,
         emailsDeferred: deferredEmails.length,
