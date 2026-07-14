@@ -16,7 +16,7 @@ export interface CoopThreatScaling {
 
 export interface CoopContext {
   partySize: number;
-  coopRole?: CoopRole;
+  coopRole?: CoopRole | undefined;
   difficultyTier: PartyDifficultyTier;
   threatScaling: CoopThreatScaling;
 }

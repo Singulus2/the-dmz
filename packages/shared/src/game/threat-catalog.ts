@@ -406,7 +406,7 @@ export interface GeneratedAttack {
   faction: string;
   timestamp: string;
   isCampaignPart: boolean;
-  campaignId?: string;
+  campaignId?: string | undefined;
 }
 
 export interface ThreatTierChangeEvent {

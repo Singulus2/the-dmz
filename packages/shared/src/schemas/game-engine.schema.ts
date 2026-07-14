@@ -16,21 +16,32 @@ import type { EmailInstance, VerificationPacket } from '../game/email-instance.j
 import type { GeneratedAttack } from '../game/threat-catalog.js';
 import type { BreachState } from '../game/breach.js';
 import type { CoopContext } from '../game/coop-scaling.js';
+import type {
+  DayPhase,
+  DecisionType,
+  GameActionType,
+  GameThreatTier,
+  SessionMacroState,
+} from '../types/game-engine.js';
 import type { FacilityState } from '../types/game-state.js';
 import type { CoopRole } from './coop-session.schema.js';
 
 export const sessionMacroStateSchema = z.enum(
-  Object.values(SESSION_MACRO_STATES) as [string, ...string[]],
+  Object.values(SESSION_MACRO_STATES) as [SessionMacroState, ...SessionMacroState[]],
 );
 
-export const dayPhaseSchema = z.enum(Object.values(DAY_PHASES) as [string, ...string[]]);
+export const dayPhaseSchema = z.enum(Object.values(DAY_PHASES) as [DayPhase, ...DayPhase[]]);
 
-export const gameActionTypeSchema = z.enum(Object.values(GAME_ACTIONS) as [string, ...string[]]);
+export const gameActionTypeSchema = z.enum(
+  Object.values(GAME_ACTIONS) as [GameActionType, ...GameActionType[]],
+);
 
-export const decisionTypeSchema = z.enum(Object.values(DECISION_TYPES) as [string, ...string[]]);
+export const decisionTypeSchema = z.enum(
+  Object.values(DECISION_TYPES) as [DecisionType, ...DecisionType[]],
+);
 
 export const gameThreatTierSchema = z.enum(
-  Object.values(GAME_THREAT_TIERS) as [string, ...string[]],
+  Object.values(GAME_THREAT_TIERS) as [GameThreatTier, ...GameThreatTier[]],
 );
 
 export const gameFacilityTierSchema = z.enum(

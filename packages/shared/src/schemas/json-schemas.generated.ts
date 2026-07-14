@@ -32,8 +32,8 @@ export const registerJsonSchema = {
     },
     displayName: {
       type: 'string',
-      minLength: 2,
-      maxLength: 64,
+      minLength: 1,
+      maxLength: 50,
     },
   },
   required: ['email', 'password', 'displayName'],

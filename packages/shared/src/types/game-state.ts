@@ -380,22 +380,22 @@ export type UpgradeType =
   | MaintenanceUpgradeType;
 
 export interface ResourceDelta {
-  rackCapacity?: number;
-  powerCapacity?: number;
-  coolingCapacity?: number;
-  bandwidthCapacity?: number;
-  rackUsage?: number;
-  powerUsage?: number;
-  coolingUsage?: number;
-  bandwidthUsage?: number;
-  efficiencyMultiplier?: number;
+  rackCapacity?: number | undefined;
+  powerCapacity?: number | undefined;
+  coolingCapacity?: number | undefined;
+  bandwidthCapacity?: number | undefined;
+  rackUsage?: number | undefined;
+  powerUsage?: number | undefined;
+  coolingUsage?: number | undefined;
+  bandwidthUsage?: number | undefined;
+  efficiencyMultiplier?: number | undefined;
 }
 
 export interface SecurityDelta {
-  breachProbabilityModifier?: number;
-  detectionProbabilityModifier?: number;
-  mitigationBonus?: number;
-  threatVectorModifiers?: Record<string, number>;
+  breachProbabilityModifier?: number | undefined;
+  detectionProbabilityModifier?: number | undefined;
+  mitigationBonus?: number | undefined;
+  threatVectorModifiers?: Record<string, number> | undefined;
 }
 
 export interface UpgradeDefinition {
@@ -453,15 +453,15 @@ export interface FacilityUpgrade {
   tierLevel: number;
   status: UpgradeStatus;
   purchasedDay: number;
-  completesDay?: number;
+  completesDay?: number | undefined;
   isCompleted: boolean;
-  completionDay?: number;
+  completionDay?: number | undefined;
   resourceDelta: ResourceDelta;
-  securityDelta?: SecurityDelta;
-  maintenanceDelta?: number;
+  securityDelta?: SecurityDelta | undefined;
+  maintenanceDelta?: number | undefined;
   opExPerDay: number;
   threatSurfaceDelta: number;
-  installationOverhead?: number;
+  installationOverhead?: number | undefined;
 }
 
 export interface FacilityState {
