@@ -2,7 +2,11 @@ import { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fa
 
 import { ErrorCodes } from '@the-dmz/shared/constants';
 
-import { authGuard, requirePermission } from '../../shared/middleware/authorization.js';
+import {
+  authGuard,
+  requirePermission,
+  requireTenantContext,
+} from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { errorResponseSchemas } from '../../shared/schemas/error-schemas.js';
 import * as ssoService from '../auth/index.js';
@@ -81,7 +85,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const providers = await ssoService.getActiveSSOProviders(tenantContext.tenantId);
@@ -140,7 +144,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Body: CreateOIDCProviderBody }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { name, metadataUrl, clientId, clientSecret } = request.body;
@@ -198,7 +202,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -277,7 +281,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: OIDCProviderIdParams; Body: UpdateOIDCProviderBody }>,
       _reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -349,7 +353,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -400,7 +404,7 @@ export const registerAdminOIDCRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: OIDCProviderIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;

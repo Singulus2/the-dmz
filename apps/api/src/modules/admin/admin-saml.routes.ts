@@ -2,7 +2,11 @@ import { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fa
 
 import { ErrorCodes } from '@the-dmz/shared/constants';
 
-import { authGuard, requirePermission } from '../../shared/middleware/authorization.js';
+import {
+  authGuard,
+  requirePermission,
+  requireTenantContext,
+} from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { errorResponseSchemas } from '../../shared/schemas/error-schemas.js';
 import * as ssoService from '../auth/index.js';
@@ -78,7 +82,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const providers = await ssoService.getActiveSSOProviders(tenantContext.tenantId);
@@ -137,7 +141,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Body: CreateSAMLProviderBody }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { name, metadataUrl, idpCertificate, spPrivateKey, spCertificate } = request.body;
@@ -204,7 +208,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -281,7 +285,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: SAMLProviderIdParams; Body: UpdateSAMLProviderBody }>,
       _reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -352,7 +356,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -403,7 +407,7 @@ export const registerAdminSAMLRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: SAMLProviderIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;

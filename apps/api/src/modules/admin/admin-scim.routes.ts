@@ -3,7 +3,11 @@ import { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fa
 
 import { ErrorCodes } from '@the-dmz/shared/constants';
 
-import { authGuard, requirePermission } from '../../shared/middleware/authorization.js';
+import {
+  authGuard,
+  requirePermission,
+  requireTenantContext,
+} from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { errorResponseSchemas } from '../../shared/schemas/error-schemas.js';
 import * as scimService from '../scim/index.js';
@@ -110,7 +114,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const tokens = await scimService.listScimTokens(
@@ -163,7 +167,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Body: CreateScimTokenBody }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { name, scopes, expiresInDays } = request.body;
@@ -227,7 +231,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: TokenIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -277,7 +281,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: TokenIdParams; Body: RotateScimTokenBody }>,
       _reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -342,7 +346,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: TokenIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -386,7 +390,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: TokenIdParams }>, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;
@@ -422,7 +426,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const result = await scimService.getScimSyncStatus(
@@ -487,7 +491,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const groups = await scimService.listScimGroupsWithRoles(
@@ -548,7 +552,7 @@ export const registerAdminSCIMRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: TokenIdParams; Body: GroupRoleBody }>,
       _reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const { id } = request.params;

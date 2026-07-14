@@ -1,6 +1,10 @@
 import { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 
-import { authGuard, requirePermission } from '../../shared/middleware/authorization.js';
+import {
+  authGuard,
+  requirePermission,
+  requireTenantContext,
+} from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 import { AppError } from '../../shared/middleware/error-handler.js';
 import { validateCsrf } from '../auth/index.js';
@@ -67,7 +71,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Querystring: ListUsersQuery }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const params: userService.UserListParams = {};
@@ -118,7 +122,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const user = await userService.getUserById(
@@ -166,7 +170,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Body: CreateUserBody }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -229,7 +233,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: UserIdParams; Body: UpdateUserBody }>,
       reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -291,7 +295,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -362,7 +366,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: UserIdParams; Body: AssignRoleBody }>,
       reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -415,7 +419,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: { id: string; roleId: string } }>,
       reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -463,7 +467,7 @@ export const registerAdminUserRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const activity = await userService.getUserActivity(

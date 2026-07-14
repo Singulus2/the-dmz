@@ -1,6 +1,10 @@
 import { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 
-import { authGuard, requirePermission } from '../../shared/middleware/authorization.js';
+import {
+  authGuard,
+  requirePermission,
+  requireTenantContext,
+} from '../../shared/middleware/authorization.js';
 import { tenantContext } from '../../shared/middleware/tenant-context.js';
 
 import * as roleAssignmentService from './role-assignment.service.js';
@@ -61,7 +65,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Body: AssignRoleBody }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -129,7 +133,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: RevokeRoleParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         await roleAssignmentService.revokeRole(
@@ -179,7 +183,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: RevokeRoleParams; Body: UpdateRoleBody }>,
       reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
       const user = request.user;
 
       if (!user) {
@@ -240,7 +244,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const effectivePermissions = await roleAssignmentService.getUserEffectivePermissions(
@@ -308,7 +312,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: RoleIdParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const permissions = await roleAssignmentService.getRolePermissions(
@@ -373,7 +377,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Body: CreateCustomRoleBody }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const isEntitled = await roleAssignmentService.checkPlanEntitlement(
@@ -441,7 +445,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       request: FastifyRequest<{ Params: RoleIdParams; Body: UpdateCustomRoleBody }>,
       reply: FastifyReply,
     ) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const isEntitled = await roleAssignmentService.checkPlanEntitlement(
@@ -498,7 +502,7 @@ export const registerAdminRoleRoutes = async (fastify: FastifyInstance): Promise
       },
     },
     async (request: FastifyRequest<{ Params: RoleIdParams }>, reply: FastifyReply) => {
-      const tenantContext = request.tenantContext;
+      const tenantContext = requireTenantContext(request);
 
       try {
         const isEntitled = await roleAssignmentService.checkPlanEntitlement(

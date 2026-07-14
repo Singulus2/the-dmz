@@ -330,6 +330,33 @@ export const authGuard = async (request: FastifyRequest, _reply: FastifyReply): 
   }
 };
 
+/**
+ * Routes behind the [authGuard, tenantContext] preHandler chain always have a
+ * tenant context, but the request type cannot express that. Narrow it here so a
+ * missing context surfaces as 401 rather than a TypeError.
+ */
+export const requireTenantContext = (request: FastifyRequest): TenantContext => {
+  const tenantContext = request.tenantContext;
+
+  if (!tenantContext) {
+    recordAuthorizationError();
+    request.log.warn(
+      {
+        requestId: request.id,
+        route: request.routeOptions?.url ?? request.url,
+      },
+      'Authorization check failed: missing tenant context',
+    );
+    throw new AppError({
+      code: ErrorCodes.AUTH_UNAUTHORIZED,
+      message: 'Authentication required',
+      statusCode: 401,
+    });
+  }
+
+  return tenantContext;
+};
+
 const requireAuthContext = (
   request: FastifyRequest,
 ): { user: AuthenticatedUser; tenantContext: TenantContext } => {
