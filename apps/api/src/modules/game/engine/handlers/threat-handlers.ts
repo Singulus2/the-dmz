@@ -50,10 +50,9 @@ export function handleProcessThreats(
     createGameEvent(
       GAME_ENGINE_EVENTS.THREATS_GENERATED,
       {
+        sessionId: state.sessionId,
         day: action.dayNumber,
         attacks: threatResult.attacks,
-        threatTier: threatResult.newThreatTier,
-        coopScalingApplied: threatResult.coopScalingApplied,
       },
       state.updatedAt,
     ),
@@ -66,10 +65,10 @@ export function handleProcessThreats(
         createGameEvent(
           GAME_ENGINE_EVENTS.THREAT_LEVEL_CHANGED,
           {
-            previousTier: tierChangeResult.event.previousTier,
-            newTier: tierChangeResult.event.newTier,
+            sessionId: state.sessionId,
+            previousLevel: tierChangeResult.event.previousTier,
+            newLevel: tierChangeResult.event.newTier,
             reason: tierChangeResult.event.reason,
-            narrativeMessage: tierChangeResult.event.narrativeMessage,
           },
           state.updatedAt,
         ),

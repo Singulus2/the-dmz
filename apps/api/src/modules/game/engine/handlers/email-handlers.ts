@@ -177,7 +177,7 @@ export function handleRequestVerification(
   events.push(
     createGameEvent(
       GAME_ENGINE_EVENTS.EMAIL_VERIFICATION_REQUESTED,
-      { emailId: action.emailId },
+      { sessionId: state.sessionId, emailId: action.emailId },
       state.updatedAt,
     ),
   );
@@ -185,6 +185,7 @@ export function handleRequestVerification(
     createGameEvent(
       GAME_ENGINE_EVENTS.VERIFICATION_PACKET_GENERATED,
       {
+        sessionId: state.sessionId,
         emailId: action.emailId,
         packetId: packet.packetId,
         artifactCount: packet.artifacts.length,
@@ -317,6 +318,7 @@ function pushEmailDecisionSubmittedEvent(ctx: EmailSubmittedContext): void {
     createGameEvent(
       GAME_ENGINE_EVENTS.EMAIL_DECISION_SUBMITTED,
       {
+        sessionId: ctx.state.sessionId,
         emailId: ctx.emailId,
         decision: ctx.decision,
         timeSpentMs: ctx.timeSpentMs,
@@ -354,6 +356,7 @@ function pushDecisionEvaluatedEvent(ctx: DecisionEvaluatedContext): void {
     createGameEvent(
       GAME_ENGINE_EVENTS.EMAIL_DECISION_EVALUATED,
       {
+        sessionId: ctx.state.sessionId,
         emailId: ctx.emailId,
         decision: ctx.decision,
         isCorrect: ctx.evaluation.isCorrect,
@@ -362,8 +365,8 @@ function pushDecisionEvaluatedEvent(ctx: DecisionEvaluatedContext): void {
         factionImpact: ctx.evaluation.factionImpact,
         threatImpact: ctx.evaluation.threatImpact,
         explanation: ctx.evaluation.explanation,
-        indicatorsFound: ctx.evaluation.indicatorsFound,
-        indicatorsMissed: ctx.evaluation.indicatorsMissed,
+        indicatorsFound: ctx.evaluation.indicatorTypesFound,
+        indicatorsMissed: ctx.evaluation.indicatorTypesMissed,
       },
       ctx.state.updatedAt,
     ),

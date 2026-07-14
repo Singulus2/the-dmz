@@ -203,6 +203,8 @@ export interface EmailDecisionSubmittedPayload {
   timeSpentMs: number;
   outcome?: string;
   competencyTags?: string[];
+  /** Set when the decision was recorded but its evaluation failed. */
+  evaluationError?: boolean;
 }
 
 export interface EmailDecisionResolvedPayload {

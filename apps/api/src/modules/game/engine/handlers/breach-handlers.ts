@@ -107,6 +107,10 @@ export function handleTriggerBreach(
   );
 
   if (isBreach) {
+    if (breachResult.ransomAmount === null) {
+      throw new Error('Breach occurred without a ransom amount');
+    }
+
     events.push(
       createGameEvent(
         GAME_ENGINE_EVENTS.BREACH_RANSOM_DISPLAYED,

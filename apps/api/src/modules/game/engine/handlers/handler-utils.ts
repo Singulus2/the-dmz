@@ -8,7 +8,11 @@ import {
 } from '@the-dmz/shared';
 
 import { isActionAllowedInPhase } from '../state-machine.js';
-import { GAME_ENGINE_EVENTS, type GameEngineEventType, type GameEngineEventPayloadMap } from '../events/index.js';
+import {
+  GAME_ENGINE_EVENTS,
+  type GameEngineEventType,
+  type GameEngineEventPayloadMap,
+} from '../events/index.js';
 
 import { UPGRADE_CATALOG } from './upgrade-catalog.js';
 
@@ -30,7 +34,7 @@ export function createGameEvent<T extends GameEngineEventType>(
     eventId: crypto.randomUUID(),
     eventType,
     timestamp,
-    payload: payload as Record<string, unknown>,
+    payload: payload as unknown as Record<string, unknown>,
   };
 }
 

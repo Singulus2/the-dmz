@@ -10,6 +10,8 @@ import type {
 } from '@the-dmz/shared';
 import { GAME_ACTIONS } from '@the-dmz/shared';
 
+import { GAME_ENGINE_EVENTS } from '../events/index.js';
+
 import { UPGRADE_CATALOG } from './upgrade-catalog.js';
 import {
   isActionAllowedInPhase,
@@ -21,7 +23,6 @@ import {
   installUpgrade,
   applyUpgradeEffects,
 } from './handler-utils.js';
-import { GAME_ENGINE_EVENTS } from '../events/index.js';
 
 import type { DomainEvent } from './handler-utils.js';
 
@@ -33,8 +34,16 @@ export function handlePurchaseUpgrade(
   if (!isActionAllowedInPhase(GAME_ACTIONS.PURCHASE_UPGRADE, state.currentPhase)) {
     throw new Error('PURCHASE_UPGRADE not allowed in current phase');
   }
+
   events.push(
-    createGameEvent(GAME_ENGINE_EVENTS.UPGRADE_PURCHASED, { upgradeId: action.upgradeId }, state.updatedAt),
+    createGameEvent(
+      GAME_ENGINE_EVENTS.UPGRADE_PURCHASED,
+      {
+        sessionId: state.sessionId,
+        upgradeId: action.upgradeId,
+      },
+      state.updatedAt,
+    ),
   );
 }
 
@@ -49,7 +58,7 @@ export function handleAdjustResource(
   events.push(
     createGameEvent(
       GAME_ENGINE_EVENTS.RESOURCE_ADJUSTED,
-      { resourceId: action.resourceId, delta: action.delta },
+      { sessionId: state.sessionId, resourceId: action.resourceId, delta: action.delta },
       state.updatedAt,
     ),
   );
@@ -186,7 +195,7 @@ export function handleEvictClient(
       GAME_ENGINE_EVENTS.FACILITY_CLIENT_EVICTED,
       {
         clientId: action.clientId,
-        reason: action.reason,
+        reason: action.reason ?? 'unspecified',
       },
       state.updatedAt,
     ),

@@ -16,6 +16,9 @@ export interface DecisionEvaluationResult {
   explanation: string;
   indicatorsFound: number;
   indicatorsMissed: number;
+  /** Indicator types the player marked / failed to mark, as the decision events record them. */
+  indicatorTypesFound: string[];
+  indicatorTypesMissed: string[];
 }
 
 export interface DecisionResolutionParams {
@@ -53,18 +56,40 @@ export const validateDecisionPhase = (phase: DayPhase): DecisionValidationResult
   return { valid: true };
 };
 
+function splitIndicators(
+  emailIndicators: Array<{ type: string }>,
+  markedIndicators: string[],
+): {
+  indicatorTypesFound: string[];
+  indicatorTypesMissed: string[];
+  indicatorsFound: number;
+  indicatorsMissed: number;
+} {
+  const markedIndicatorSet = new Set(markedIndicators);
+  const emailIndicatorTypes = [...new Set(emailIndicators.map((i) => i.type))];
+
+  const indicatorTypesFound = emailIndicatorTypes.filter((type) => markedIndicatorSet.has(type));
+  const indicatorTypesMissed = emailIndicatorTypes.filter((type) => !markedIndicatorSet.has(type));
+
+  const indicatorsFound = emailIndicators.filter((i) => markedIndicatorSet.has(i.type)).length;
+
+  return {
+    indicatorTypesFound,
+    indicatorTypesMissed,
+    indicatorsFound,
+    indicatorsMissed: emailIndicatorTypes.length - indicatorsFound,
+  };
+}
+
 export const evaluateDecision = (params: DecisionResolutionParams): DecisionEvaluationResult => {
   const { email, decision, markedIndicators, timeSpentMs } = params;
   const groundTruth = email.groundTruth;
 
   const isCorrect = decision === groundTruth.correctDecision;
 
-  const markedIndicatorSet = new Set(markedIndicators);
   const emailIndicatorTypes = new Set(email.indicators.map((i) => i.type));
-
-  const indicatorsFound = email.indicators.filter((i) => markedIndicatorSet.has(i.type)).length;
-
-  const indicatorsMissed = emailIndicatorTypes.size - indicatorsFound;
+  const { indicatorTypesFound, indicatorTypesMissed, indicatorsFound, indicatorsMissed } =
+    splitIndicators(email.indicators, markedIndicators);
 
   const riskScore = groundTruth.riskScore;
   let riskAlignment: 'risk_averse' | 'risk_balanced' | 'risk_permissive';
@@ -100,14 +125,13 @@ export const evaluateDecision = (params: DecisionResolutionParams): DecisionEval
   const finalTrustImpact = Math.round(consequences.trustImpact * (1 + speedBonus + indicatorBonus));
   const finalFundsImpact = Math.round(consequences.fundsImpact * (1 + speedBonus));
 
-  const explanation = generateExplanation(
-    decision,
+  const explanation = generateExplanation({
     isCorrect,
     indicatorsFound,
     indicatorsMissed,
-    email.indicators,
+    allIndicators: email.indicators,
     markedIndicators,
-  );
+  });
 
   return {
     isCorrect,
@@ -119,6 +143,8 @@ export const evaluateDecision = (params: DecisionResolutionParams): DecisionEval
     explanation,
     indicatorsFound,
     indicatorsMissed,
+    indicatorTypesFound,
+    indicatorTypesMissed,
   };
 };
 
@@ -157,14 +183,21 @@ function calculateIndicatorBonus(indicatorsFound: number, totalIndicators: numbe
   return 0;
 }
 
-function generateExplanation(
-  _decision: DecisionType,
-  isCorrect: boolean,
-  indicatorsFound: number,
-  indicatorsMissed: number,
-  allIndicators: Array<{ type: string; description: string }>,
-  markedIndicators: string[],
-): string {
+interface ExplanationParams {
+  isCorrect: boolean;
+  indicatorsFound: number;
+  indicatorsMissed: number;
+  allIndicators: Array<{ type: string; description: string }>;
+  markedIndicators: string[];
+}
+
+function generateExplanation({
+  isCorrect,
+  indicatorsFound,
+  indicatorsMissed,
+  allIndicators,
+  markedIndicators,
+}: ExplanationParams): string {
   const foundDescriptions = allIndicators
     .filter((i) => markedIndicators.includes(i.type))
     .map((i) => i.description)

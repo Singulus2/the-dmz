@@ -1,7 +1,8 @@
 import { GAME_ACTIONS, type GameState, type FlagDiscrepancyPayload } from '@the-dmz/shared';
 
-import { isActionAllowedInPhase, createGameEvent } from './handler-utils.js';
 import { GAME_ENGINE_EVENTS } from '../events/index.js';
+
+import { isActionAllowedInPhase, createGameEvent } from './handler-utils.js';
 
 import type { DomainEvent } from './handler-utils.js';
 

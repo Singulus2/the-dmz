@@ -406,7 +406,7 @@ export interface UpgradeDefinition {
   baseCost: number;
   installationDays: number;
   installationOverhead?: number;
-  minTier: string;
+  minTier: FacilityTierLevel;
   prerequisites: string[];
   resourceDelta: ResourceDelta;
   securityDelta?: SecurityDelta;
