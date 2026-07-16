@@ -19,6 +19,14 @@ aus den dd.mds wurde das milestones entwickelt
 
 die issues wurden aus den milestones.md entwickelt
 
+Create a new script for the following, that ALSO has an iterative loop. While true, create a new issue for github. The agent to do that should be defined by agent claude codex, the next thing to define: The Milestone: -milestone [number]. It refers to a milestone within the MILESTONES.md document. The plan is, that you will prompt the agent to read ALL the relevant documentation (like you just did) and create ONE new issue via Bash "gh". Do let the agent call that by itself, no need to write that in code. It should be the ONE next logical issue to posate Polyqun exit if the agent truely has no issue left to define. In that case, let it output "DONE" as the first AND last word. Do check word is "DONE", else continue. Now, ask 10 questions about this workflow
+
+10 questions about this workflow:
+. Should the script also set the GitHub issue milestone field, or only use-milestone as a planning scope from docs/MILESTONES.md? 2. Do you want a strict issue title format (for example, M{n}-X: ...)? 5. Should the agent always add labels automatically, and if yes, which label set is mandatory?
+Should duplicate detection consider only open issues, or both open and closed issues? 5. What minimum sections must each created issue body include (for example: context, acceptance criteria, test plan)? 5. Should the Loop continue immediately, or should it pause longer/back off between iterations? 2. Do you want a hard safety cap on iterations to avoid infinite loops if the agent misbehaves? 3. If gh issue create fails repeatedly, should the script keep looping forever or stop after N failures? 2. Should DONE be treated case-insensitively only as a standalone word, or also accept punctuation Like DONE.? 18. Should the script require a clean working tree before running, similar to your automation hygiene goals?
+
+1. yes, but not the script, tell the AGENT to do that. 2. yes, that is exactly the right format. Oh important: If I do set-milestone 1337, it is NOT a milestone, thats going to be found, but a bug fix. So the agent is supposed to find a bug by itself within the code. 3. yes, no mandatory labels, but it can use all the labels there are. 4. open only and closed issues from this very milestone (1337 is an exception, here only open) 5.check one example issue with a milestone given for that. There are several solved MB issues for reference. 6. no pause 7. no 8. the script does NOT do gh issue create. THIS IS ONLY FOR THE AGENT! 9. case insensitive and accept punctuation 10. по
+
 # Rekonstruierter Prompt — `auto-create-issues.sh`
 
 Rekonstruktion des mutmaßlichen Claude-Code-Prompts, der `auto-create-issues.sh`
